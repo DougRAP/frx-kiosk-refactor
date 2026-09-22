@@ -1,0 +1,3292 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Furniture-Rx Second Chance — You're still in control</title>
+<meta name="description" content="If you passed on the store plan, you still have options. Furniture-Rx is monthly, per-item protection. Cancel, restart, upgrade, or downgrade anytime. Powered by RAP.">
+<!-- favicon inline (09-jul): sin él, cada visita loguea un 404 de /favicon.ico -->
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%23d4541e'/%3E%3Ctext x='32' y='45' font-family='Georgia,serif' font-size='36' font-style='italic' font-weight='600' fill='%23fff' text-anchor='middle'%3ERx%3C/text%3E%3C/svg%3E">
+
+<script>
+/* Strip auth tokens from URL BEFORE any cross-origin GET fires.
+ * Supabase invite/recovery emails redirect with `#access_token=…` (or `#error=…`).
+ * Browsers normally drop the hash from Referer, but extensions and some legacy
+ * stacks have leaked it — and once the URL is in window.history, screenshots
+ * and analytics tools snapshot it too. We move the hash to a JS-only global and
+ * replace the URL synchronously so the very first subresource GET (Google Fonts,
+ * preconnects, etc.) is referer-clean. Must stay the first <script> in <head>. */
+(function(){
+  var h = location.hash || '';
+  if (h && (h.indexOf('access_token=') !== -1 || h.indexOf('error=') !== -1)) {
+    window.__authHash = h.charAt(0) === '#' ? h.slice(1) : h;
+    try { history.replaceState({}, '', location.pathname + location.search); } catch(_){}
+  }
+})();
+</script>
+
+<script>
+/* Kiosk mode (KIOSK-1) — in-store dealer variant. Set the flag on <html> BEFORE paint so the
+ * marketing hero never flashes. DESACOPLADO (24-jun): el kiosk se activa SOLO con ?kiosk=1 en la URL,
+ * sin persistencia, para no confundir en demos (antes entrar normal mostraba el kiosk "pegajoso"). La
+ * persistencia (sobrevivir el retorno de Stripe ?paid=1 sin ?kiosk=1) se reintroducirá con el configurador de kiosk. */
+(function(){
+  try {
+    sessionStorage.removeItem('furnfx_kiosk');   /* limpia flags pegajosos de pruebas previas */
+    if (/[?&]kiosk=1(&|$)/.test(location.search)) document.documentElement.classList.add('kiosk');
+  } catch(_){}
+})();
+</script>
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,500;0,9..144,600;1,9..144,500;1,9..144,600&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+<style>/*__CORE_CSS_INJECT__*/.cart-kits-note{font-size:.72rem;color:var(--ink-45);margin:8px 0 0;line-height:1.5}
+</style>
+</head>
+<body>
+
+<div class="utility">
+  <strong>Furniture protection from $9.99/mo</strong> <span class="dot">·</span> Cancel anytime <span class="dot">·</span> Offered with your furniture dealer
+</div>
+
+<header class="nav" id="nav">
+  <div class="container nav-inner">
+    <a href="/" class="logo" aria-label="Furniture-Rx home">
+      <span class="mark">Furniture<em>·</em>Rx</span>
+      <span class="tag">Powered by RAP</span>
+    </a>
+    <nav aria-label="Primary">
+      <ul class="nav-links">
+        <li><a href="#compare">Protection</a></li>
+        <li><a href="#membership">Repair Safety Net</a></li>
+        <li><a href="#kits">Care kits</a></li>
+        <li><a href="#faq">FAQ</a></li>
+        <!-- PREFILL-1: visible solo con sesión validada por account-me -->
+        <li id="nav-dash-li" hidden><a href="/account.html" id="nav-dash">Dashboard</a></li>
+      </ul>
+    </nav>
+    <div class="nav-cta">
+      <button type="button" class="nav-cart" id="nav-cart" aria-label="Open cart">
+        <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="9" cy="21" r="1"></circle><circle cx="20" cy="21" r="1"></circle><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"></path></svg>
+        <span class="nav-cart-count" id="nav-cart-count" hidden>0</span>
+      </button>
+    </div>
+    <button class="nav-toggle" id="nav-toggle" aria-label="Open menu" aria-expanded="false" aria-controls="nav-drawer">
+      <span></span><span></span><span></span>
+    </button>
+  </div>
+</header>
+
+<div class="nav-backdrop" id="nav-backdrop" hidden></div>
+<aside class="nav-drawer" id="nav-drawer" aria-label="Mobile navigation" hidden>
+  <button class="nav-drawer-close" id="nav-drawer-close" aria-label="Close menu">&times;</button>
+  <ul>
+    <li><a href="#compare">Protection</a></li>
+    <li><a href="#membership">Repair Safety Net</a></li>
+    <li><a href="#kits">Care kits</a></li>
+    <li><a href="#faq">FAQ</a></li>
+    <li id="drawer-dash-li" hidden><a href="/account.html">Dashboard</a></li>
+  </ul>
+  <a href="#configurator" class="btn btn-accent btn-block drawer-cta">Build my coverage <span class="arrow">&rarr;</span></a>
+</aside>
+
+<!-- GIFT-1: overlay de compra del gift coupon (el canje es un promotion code en el checkout de Stripe) -->
+<div class="gift-backdrop" id="gift-backdrop" hidden>
+  <div class="gift-card" role="dialog" aria-modal="true" aria-label="Gift FurnitureRx coverage">
+    <button type="button" class="gift-close" id="gift-close" aria-label="Close">&times;</button>
+    <h3>Gift FurnitureRx coverage</h3>
+    <p class="gift-sub">Give 3 months, on you. The code arrives by email, ready to forward or to include with a piece you sell.</p>
+    <div class="gift-field">
+      <label for="gift-tier">What to gift</label>
+      <select id="gift-tier">
+        <option value="stain">Stain Protection &middot; $9.99/mo</option>
+        <option value="stain-mech">Stain + Structure Protection &middot; $19.99/mo</option>
+        <option value="membership">Repair Safety Net membership &middot; $19.99/mo</option>
+      </select>
+    </div>
+    <p class="gift-total" id="gift-total">3 months &middot; total $29.97</p>
+    <div class="gift-field">
+      <label for="gift-email">Your email</label>
+      <input id="gift-email" type="email" autocomplete="email" placeholder="you@email.com">
+    </div>
+    <button type="button" class="btn btn-accent btn-block" id="gift-submit">Continue to payment</button>
+    <p class="gift-msg" id="gift-msg" aria-live="polite"></p>
+  </div>
+</div>
+
+<main id="main">
+
+<!-- HERO + CONFIGURATOR -->
+<section class="hero" aria-label="Introduction">
+  <div class="container hero-grid">
+    <div class="hero-copy">
+      <span class="eyebrow eyebrow-orange">Furniture-Rx &middot; Monthly protection</span>
+      <h1 class="h-display hero-headline">A Flexible Way to Protect Your New Furniture</h1>
+      <p class="hero-lead">Select a protection plan that fits your budget and life.</p>
+      <p class="hero-price"><span class="hero-price-lead">as low as</span> <em class="accent">$9.99/month.</em></p>
+      <div class="hero-proof">
+        <span class="proof-line"><strong>4.5 Google Star Rating</strong>, Trusted by <strong>2M+</strong> households</span>
+        <span class="proof-line">Administered by <strong>RAP</strong>, Offered in Partnership with Your Dealer</span>
+      </div>
+      <p class="hiw-title">How it works</p>
+      <ol class="hiw-steps">
+        <li>Choose your level &mdash; <strong>Stain protection</strong> (household &amp; pet stains) or <strong>Stain + Structure</strong> (adds rips, burns, mechanical &amp; electrical).</li>
+        <!-- PORT-29a (email Doug 13-ago): sin tope de renovación — "let them renew until cancelled". -->
+        <li>Pick your term. For max flexibility and premium service, choose <strong>Monthly</strong> &mdash; each payment adds another month.</li>
+        <li>Check your coverage amount &mdash; the dollar limit is optimized and shown for each plan.</li>
+        <li>Tell us what you&rsquo;re protecting by choosing a type; buy multiple plans to cover different kinds of items.</li>
+      </ol>
+      <p class="hiw-foot">Click <strong>Continue to checkout</strong> to buy now &mdash; your free Repair Club membership is included.</p>
+    </div>
+
+    <aside class="signed-card" id="configurator" aria-label="Build your coverage">
+      <div class="configurator">
+        <div class="cfg-title">
+          <h2>Build your coverage</h2>
+        </div>
+
+        <div class="cfg-group">
+          <label class="cfg-label">1. Select coverage level</label>
+          <div class="cfg-toggle" role="radiogroup" aria-label="Coverage level">
+            <button class="active" data-cov="stain" role="radio" aria-checked="true">
+              Stain protection
+              <span class="cfg-cov-desc">Stains, Including Pet &amp; Common Household</span>
+            </button>
+            <button data-cov="stain-mech" role="radio" aria-checked="false">
+              Stain + Structure
+              <span class="cfg-cov-desc">Including rips, burns, mechanical &amp; electric</span>
+            </button>
+          </div>
+        </div>
+
+        <div class="cfg-group">
+          <label class="cfg-label">2. Choose your term</label>
+          <div class="cfg-term" id="cfg-term" role="radiogroup" aria-label="Plan term">
+            <button class="active" data-term="monthly" role="radio" aria-checked="true"><span class="t-name">Monthly</span><span class="t-tag"><span class="t-price">Best Value</span><span class="t-svc">Premium Service</span></span></button>
+            <button data-term="year1" role="radio" aria-checked="false"><span class="t-name">1 Year</span><span class="t-tag"><span class="t-price">Value Priced</span><span class="t-svc">Gold Service</span></span></button>
+            <button data-term="year3" role="radio" aria-checked="false"><span class="t-name">3 Year</span><span class="t-tag"><span class="t-price">Market Price</span><span class="t-svc">Silver Service</span></span></button>
+          </div>
+        </div>
+
+        <div class="cfg-group" id="cfg-step3">
+          <label class="cfg-label">3. Your coverage</label>
+          <div class="cfg-limits" id="cfg-limits" role="group" aria-label="Coverage limit, set by your term">
+            <span class="cfg-limit active" data-limit="5000">Up to $5,000</span>
+            <span class="cfg-limit" data-limit="7500">Up to $7,500</span>
+            <span class="cfg-limit" data-limit="10000">Up to $10,000</span>
+          </div>
+        </div>
+
+        <div class="cfg-group" id="cfg-type">
+          <label class="cfg-label" id="cfg-type-label">4. What are you protecting?</label>
+          <button type="button" class="cfg-type-btn" id="cfg-type-btn" aria-haspopup="listbox" aria-expanded="false" aria-labelledby="cfg-type-label">
+            <span class="cfg-type-sel"><span class="cfg-type-name">Furniture</span><span class="cfg-type-desc">Sofas, dining sets, tables &amp; more</span></span>
+            <span class="cfg-type-caret" aria-hidden="true">&#9662;</span>
+          </button>
+          <ul class="cfg-type-menu" id="cfg-type-menu" role="listbox" aria-labelledby="cfg-type-label" hidden></ul>
+        </div>
+
+        <div class="cfg-price">
+          <div class="cfg-eq" role="group" aria-label="Price">
+            <span class="cfg-eq-box">
+              <span class="cfg-eq-k">Per plan</span>
+              <span class="cfg-eq-v"><span id="cfg-unit-price">$9.99</span><small id="cfg-unit">/month</small></span>
+            </span>
+            <span class="cfg-eq-op" aria-hidden="true">&times;</span>
+            <span class="cfg-eq-box">
+              <span class="cfg-eq-k">Plans</span>
+              <span class="cfg-count-ctl">
+                <button type="button" id="cfg-count-dec" aria-label="One fewer plan">&minus;</button>
+                <span id="cfg-count" aria-live="polite">1</span>
+                <button type="button" id="cfg-count-inc" aria-label="One more plan">+</button>
+              </span>
+            </span>
+            <span class="cfg-eq-op" aria-hidden="true">=</span>
+            <span class="cfg-eq-box cfg-eq-total">
+              <span class="cfg-eq-k">Total</span>
+              <span class="cfg-eq-v"><span id="cfg-total">$9.99</span><small id="cfg-total-unit">/month</small></span>
+            </span>
+          </div>
+          <p class="cfg-covers" id="cfg-covers">Covers up to $5,000 &middot; assign items at checkout</p>
+        </div>
+
+        <div class="cfg-actions">
+          <p class="cfg-yearly-note" id="cfg-yearly-note" hidden>1- &amp; 3-year are typical multi-year prices &mdash; get the <strong>same coverage monthly</strong>, cancel anytime. <button type="button" class="cfg-link" id="cfg-to-monthly">Switch to Monthly &rarr;</button></p>
+          <div class="cfg-cta-row">
+            <button type="button" id="cfg-keep" class="btn btn-accent">Keep shopping <span class="arrow">&rarr;</span></button>
+            <button type="button" id="cfg-checkout" class="btn btn-ghost">Checkout</button>
+          </div>
+          <p class="cfg-saved" id="cfg-saved" hidden>&#10003; Saved &mdash; keep shopping below.</p>
+          <p class="cfg-note">No charge yet &mdash; review and check out on the next step. <button type="button" class="cfg-link" id="cfg-reset">Start over</button> &middot; <button type="button" class="cfg-link" id="cfg-needmore">Need more or custom coverage? Request a quote &rarr;</button></p>
+        </div>
+      </div>
+    </aside>
+  </div>
+</section>
+
+<!-- TRUST -->
+<section class="trust" aria-label="RAP trust">
+  <div class="container">
+    <div class="trust-grid">
+      <div class="trust-lead">
+        <span class="eyebrow">4.5 stars on Google &middot; Trusted by 2M+ households</span>
+        <h2 class="h-section">2M households trust <em class="gold">our service.</em></h2>
+        <p>US-based service that handles every step &mdash; file a claim in moments through our app, 24/7. No hold music.</p>
+      </div>
+      <div class="trust-stats">
+        <div class="trust-stat"><div class="num">4.5<span class="star">&#9733;</span></div><div class="lbl">Average RAP service rating across the network</div></div>
+        <div class="trust-stat"><div class="num">24/7</div><div class="lbl">Claim filing via app &mdash; takes minutes, no hold music</div></div>
+        <div class="trust-stat"><div class="num">Same day</div><div class="lbl">Most claims processed in hours, not weeks</div></div>
+        <div class="trust-stat"><div class="num">2M+</div><div class="lbl">Households in the RAP service network</div></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+
+
+<!-- COMPARISON -->
+<section class="compare" id="compare" aria-label="Comparison">
+  <div class="container">
+    <div class="compare-header reveal">
+      <!-- DASH-5 (Doug 24-jun): recaptura del cliente existente; /dashboard → /account.html (netlify.toml) -->
+      <p class="dash-login"><a href="/dashboard">Already covered? Log in to your dashboard &rarr;</a></p>
+      <span class="eyebrow eyebrow-orange">Pay monthly &middot; Cancel anytime &middot; Only pay for what you need</span>
+      <h2 class="h-section">Multi-year plan more than you wanted to spend? Get the same coverage, <em class="accent">monthly.</em></h2>
+      <p class="lead" style="max-width:640px;margin-top:18px">Pay monthly for only the coverage you need &mdash; cancel, pause, upgrade, or restart anytime.</p>
+    </div>
+
+    <div class="compare-grid reveal">
+      <article class="compare-col plan-offer" data-cov="stain">
+        <div class="compare-tag">Monthly plan</div>
+        <h3>Stain protection</h3>
+        <div class="upfront">$9.99<small>/month</small></div>
+        <p class="upfront-sub">Stains, including pet &amp; common household &middot; up to $5,000 coverage.</p>
+        <p class="cmp-for">For the pieces you don&rsquo;t want ruined.</p>
+
+        <button type="button" class="cov-assist-trigger" data-cov="stain">
+          <span class="cov-assist-title">Maya · your sales assistant</span>
+          <span class="cov-assist-sub">Tell me about your purchase &rarr;</span>
+        </button>
+
+        <ul class="cmp-features">
+          <li>Covers accidental stains &mdash; food, drink, ink, pet</li>
+          <li><strong>$5,000</strong> total coverage</li>
+          <li>We repair or clean first &middot; partial cash benefit if not repairable</li>
+          <li>24/7 claim filing &middot; same-day processing</li>
+          <li><strong>Repair Safety Net included</strong> &mdash; discounted service for anything the plan doesn&rsquo;t cover</li>
+        </ul>
+
+        <div class="cfg-price">
+          <div class="cfg-eq" role="group" aria-label="Stain plans in your cart">
+            <span class="cfg-eq-box">
+              <span class="cfg-eq-k">Per plan</span>
+              <span class="cfg-eq-v">$9.99<small>/month</small></span>
+            </span>
+            <span class="cfg-eq-op" aria-hidden="true">&times;</span>
+            <span class="cfg-eq-box">
+              <span class="cfg-eq-k">Plans</span>
+              <span class="cfg-count-ctl">
+                <button type="button" id="cmp-stain-dec" aria-label="One fewer Stain plan">&minus;</button>
+                <span class="cmp-count" id="cmp-stain-count" aria-live="polite">0</span>
+                <button type="button" id="cmp-stain-inc" aria-label="One more Stain plan">+</button>
+              </span>
+            </span>
+            <span class="cfg-eq-op" aria-hidden="true">=</span>
+            <span class="cfg-eq-box cfg-eq-total">
+              <span class="cfg-eq-k">Total</span>
+              <span class="cfg-eq-v"><span id="cmp-stain-total">$0.00</span><small>/month</small></span>
+            </span>
+          </div>
+        </div>
+        <div class="cfg-cta-row cmp-cta-row">
+          <button type="button" id="cmp-stain-save" class="btn btn-accent">Save to cart <span class="arrow">&rarr;</span></button>
+          <button type="button" id="cmp-stain-checkout" class="btn btn-ghost">Checkout</button>
+        </div>
+        <div class="cmp-addons">
+          <span class="cmp-addons-label">Add to your cart</span>
+          <div class="cmp-addons-row">
+            <button type="button" class="btn-addon" data-addon="membership">+ Add membership <small>$19.99/mo</small></button>
+            <a href="#kits" class="btn-addon">Browse kits <small>from $49.99</small></a>
+          </div>
+        </div>
+      </article>
+
+      <article class="compare-col plan-offer" data-cov="stain-mech">
+        <div class="compare-tag">Monthly plan</div>
+        <h3>Stain + Structure</h3>
+        <div class="upfront">$19.99<small>/month</small></div>
+        <p class="upfront-sub">Rips, burns, mechanical &amp; electrical failure &middot; up to $5,000 coverage.</p>
+        <p class="cmp-for">For sofas, recliners, beds &mdash; anything with moving parts.</p>
+
+        <button type="button" class="cov-assist-trigger" data-cov="stain-mech">
+          <span class="cov-assist-title">Maya · your sales assistant</span>
+          <span class="cov-assist-sub">Tell me about your purchase &rarr;</span>
+        </button>
+
+        <ul class="cmp-features">
+          <li>Everything in Stain Protection</li>
+          <li>Electrical &amp; mechanical failure on eligible pieces</li>
+          <li><strong>$5,000</strong> total coverage</li>
+          <li>Repair first, then partial cash benefit if needed</li>
+          <li>Concierge claim handling end-to-end</li>
+          <li><strong>Repair Safety Net included</strong> &mdash; discounted service for anything the plan doesn&rsquo;t cover</li>
+        </ul>
+
+        <div class="cfg-price">
+          <div class="cfg-eq" role="group" aria-label="Stain + Structure plans in your cart">
+            <span class="cfg-eq-box">
+              <span class="cfg-eq-k">Per plan</span>
+              <span class="cfg-eq-v">$19.99<small>/month</small></span>
+            </span>
+            <span class="cfg-eq-op" aria-hidden="true">&times;</span>
+            <span class="cfg-eq-box">
+              <span class="cfg-eq-k">Plans</span>
+              <span class="cfg-count-ctl">
+                <button type="button" id="cmp-mech-dec" aria-label="One fewer Stain + Structure plan">&minus;</button>
+                <span class="cmp-count" id="cmp-mech-count" aria-live="polite">0</span>
+                <button type="button" id="cmp-mech-inc" aria-label="One more Stain + Structure plan">+</button>
+              </span>
+            </span>
+            <span class="cfg-eq-op" aria-hidden="true">=</span>
+            <span class="cfg-eq-box cfg-eq-total">
+              <span class="cfg-eq-k">Total</span>
+              <span class="cfg-eq-v"><span id="cmp-mech-total">$0.00</span><small>/month</small></span>
+            </span>
+          </div>
+        </div>
+        <div class="cfg-cta-row cmp-cta-row">
+          <button type="button" id="cmp-mech-save" class="btn btn-accent">Save to cart <span class="arrow">&rarr;</span></button>
+          <button type="button" id="cmp-mech-checkout" class="btn btn-ghost">Checkout</button>
+        </div>
+        <div class="cmp-addons">
+          <span class="cmp-addons-label">Add to your cart</span>
+          <div class="cmp-addons-row">
+            <button type="button" class="btn-addon" data-addon="membership">+ Add membership <small>$19.99/mo</small></button>
+            <a href="#kits" class="btn-addon">Browse kits <small>from $49.99</small></a>
+          </div>
+        </div>
+      </article>
+    </div>
+    <p class="plans-fine reveal">Available for new furniture purchased from an authorized dealer in the last 60 days. To activate coverage include your sales order# and zip code at checkout &mdash; a valid sales receipt is required to activate coverage. Coverage is month to month paid in advance, start 30 days after you pay the monthly fee, please read the <a href="/terms/" target="_blank" rel="noopener" class="js-plan-terms">terms and conditions</a> before purchasing, not available in all states.</p>
+  </div>
+</section>
+
+<!-- DASHBOARD LEAD-IN (slim dark cap that funnels into the dashboard; scoped via .trust-dash-lead) -->
+<section class="trust trust-dash-lead" aria-label="Dashboard, included">
+  <div class="container">
+    <div class="dash-lead-inner reveal">
+      <span class="eyebrow">Included with every plan</span>
+      <h2 class="h-section">You also get your own <em class="gold">dashboard.</em></h2>
+      <p>Manage coverage, file claims, and track repairs from your phone &mdash; 24/7.</p>
+      <span class="dash-lead-arrow" aria-hidden="true">&darr;</span>
+    </div>
+  </div>
+</section>
+
+<!-- DASHBOARD -->
+<section class="dash" aria-label="Dashboard preview">
+  <div class="container">
+    <div class="dash-grid">
+      <div class="dash-copy reveal">
+        <span class="eyebrow eyebrow-orange">Your dashboard</span>
+        <h2 class="h-section">Your plan, your claims, your offers &mdash; <em class="accent">all in one place.</em></h2>
+        <p class="lead">Your dashboard puts you in control. Manage your coverage, track claim status in real time, get service alerts, and see exclusive member offers &mdash; all from your phone.</p>
+        <ul>
+          <li>Manage and update your plan anytime</li>
+          <li>Track claims and service status in real time</li>
+          <li>Get service alerts and repair updates</li>
+          <li>Access your Repair Safety Net member benefits</li>
+        </ul>
+        <div class="dash-promises">
+          <p class="dash-promise"><strong>No phone calls. No paperwork.</strong></p>
+          <p class="dash-promise"><strong>Cancel today. Restart tomorrow. No questions asked.</strong></p>
+        </div>
+      </div>
+
+      <div class="dash-mock reveal">
+        <div class="dash-mock-bar">
+          <div class="title">furniturerx.net/dashboard</div>
+          <div class="dots"><span></span><span></span><span></span></div>
+        </div>
+        <div class="dash-body">
+          <div class="dash-greet">Good afternoon</div>
+          <h3 class="dash-greet-h">Your coverage, Jamie.</h3>
+
+          <div class="dash-section-label">Your items <span class="count">(3)</span></div>
+          <div class="dash-items" aria-label="Items on your plan">
+            <div class="dash-items-row selected">
+              <span class="name"><span class="check">&#10003;</span>Mid-century sofa</span>
+              <span class="pill">Active</span>
+            </div>
+            <div class="dash-items-row">
+              <span class="name">Leather recliner</span>
+              <span class="pill">Active</span>
+            </div>
+            <div class="dash-items-row">
+              <span class="name">Queen bed frame</span>
+              <span class="pill paused">Paused</span>
+            </div>
+          </div>
+
+          <div class="dash-item" id="dash-item" style="margin-top:18px">
+            <div class="dash-item-top">
+              <div>
+                <div class="dash-item-name">Mid-century sofa</div>
+                <div class="dash-item-cov" id="dash-cov">Stain protection &middot; active since this month</div>
+              </div>
+              <div class="dash-item-status" id="dash-status">Active</div>
+            </div>
+            <div class="dash-item-price"><span id="dash-price">$9.99</span><small>/month</small></div>
+            <div class="dash-actions">
+              <button id="dash-pause">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="6" y="5" width="4" height="14"/><rect x="14" y="5" width="4" height="14"/></svg>
+                <span id="dash-pause-label">Pause</span>
+              </button>
+              <button id="dash-upgrade">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 19V5M5 12l7-7 7 7"/></svg>
+                <span id="dash-upgrade-label">Upgrade</span>
+              </button>
+              <button class="primary" id="dash-claim">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 11.5a8.4 8.4 0 1 1-3.7-7"/><polyline points="21 4 21 11 14 11"/></svg>
+                File a claim
+              </button>
+            </div>
+            <div class="dash-toast" id="dash-toast">Try a button above.</div>
+          </div>
+
+          <div class="dash-section-label">Recent activity</div>
+          <div class="dash-activity">
+            <div class="dash-activity-row"><span class="dot"></span><span>Claim #2451 &middot; Technician scheduled <strong>Tue 10:00 AM</strong> <span class="meta">2 days ago</span></span></div>
+            <div class="dash-activity-row"><span class="dot" style="background:var(--ink-45)"></span><span>Plan updated &middot; Stain &rarr; Stain + Mechanical <span class="meta">Apr 12</span></span></div>
+          </div>
+
+          <div class="dash-foot">
+            <a href="/terms/" target="_blank" rel="noopener" class="js-plan-terms">Terms &amp; conditions</a>
+            <a href="#">Help</a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- MEMBERSHIP -->
+<section class="membership" id="membership">
+  <div class="container">
+    <div class="mem-intro reveal">
+      <span class="eyebrow eyebrow-orange">Already included with every plan</span>
+      <h2 class="h-section">Your plan comes with a <em class="accent">Repair Safety Net.</em></h2>
+      <p class="lead">$19.99 value &mdash; included with any protection plan.</p>
+    </div>
+
+    <article class="mem-card reveal">
+      <header class="mem-card-head">
+        <span class="kicker">FurnitureRx Repair Safety Net</span>
+        <h3>Free with any plan. <em class="accent">Or take it on its own.</em></h3>
+        <div class="price">
+          <span class="amt">$19.99</span>
+          <span class="per">/ month</span>
+        </div>
+        <div class="price-sub">Covers every piece of furniture in your home &mdash; new, old, online, local, inherited, or custom. Free when bundled with any Furniture-Rx protection plan.</div>
+      </header>
+
+      <div class="mem-card-body">
+        <div class="copy" style="display: flex; flex-direction: column; align-items: flex-start;">
+          <h4>What you actually get</h4>
+          <p>Covers every piece you own &mdash; not just the ones on your plan.</p>
+          <p><strong>How it works</strong> &mdash; We schedule the visit, source the parts, and send a vetted technician. You pay member rates, not retail labor.</p>
+          <p><strong>When your plan doesn&rsquo;t cover it</strong> &mdash; Repair Safety Net does. You always have a path forward.</p>
+          <p><strong>Or take it on its own</strong> &mdash; $19.99/month. No protection plan required.</p>
+          <button type="button" class="btn btn-accent" id="mem-add-btn" style="margin-top: 24px; align-self: flex-start;">Add membership &middot; $19.99/mo <span class="arrow">&rarr;</span></button>
+          <a href="#" class="link-inline" id="mem-details-link" style="margin-top: 14px; align-self: flex-start;">See membership details</a>
+          <a href="#kits" class="link-inline" style="margin-top: 8px; align-self: flex-start;">Shop our quality cleaning kits <span class="arrow">&rarr;</span></a>
+          <!-- GIFT-1: espejo del link del kiosk; abre el overlay de compra del gift -->
+          <a href="#" class="link-inline js-gift-coupon" style="margin-top: 8px; align-self: flex-start;"><strong>Gift coupon codes</strong> &middot; give 3 months to a friend or furniture buyer <span class="arrow">&rarr;</span></a>
+        </div>
+
+        <ul class="mem-benefits">
+          <li><strong>Touch-ups &amp; repairs</strong> &mdash; nicks, scratches, loose joints, wobbly legs, worn upholstery</li>
+          <li><strong>Setup &amp; assembly</strong> &mdash; discounted in-home setup for beds, dining, sectionals, storage, and built-to-order</li>
+          <li><strong>Moving &amp; rearranging</strong> &mdash; member pricing for move-in / move-out, room resets, and heavy piece repositioning</li>
+          <li><strong>Facebook Marketplace support</strong> &mdash; touch-ups and repair for the piece you just scored from a local seller</li>
+          <li><strong>Online purchase support</strong> &mdash; setup, assembly, and touch-up for OEM dropships and direct-to-door buys</li>
+          <li><strong>Priority service</strong> &mdash; faster scheduling, preferred windows, member-first support</li>
+          <li><strong>Predictable pricing</strong> &mdash; clear member rates, no surprise third-party labor charges at the door</li>
+        </ul>
+      </div>
+    </article>
+  </div>
+</section>
+
+<!-- FAQ -->
+<section class="faq" id="faq" style="background: var(--paper-cool); border-top: 1px solid var(--rule); border-bottom: 1px solid var(--rule);">
+  <div class="container faq-wrap reveal">
+    <div class="faq-header">
+      <span class="eyebrow eyebrow-orange">Real questions</span>
+      <h2 class="h-section">Direct answers.</h2>
+    </div>
+
+    <p class="eyebrow eyebrow-ink" style="margin: 0 0 0; padding-bottom: 12px; border-bottom: 1px solid var(--rule);">About the plan</p>
+
+    <details class="faq-item">
+      <summary>Can I really cancel anytime?</summary>
+      <div class="faq-answer">
+        <p>Yes. One tap from your dashboard cancels your coverage at the end of the current month. No cancellation fee, no retention call, no fine print. If you want to come back two months later, your account is still there &mdash; one tap restarts it.</p>
+      </div>
+    </details>
+
+    <details class="faq-item">
+      <summary>How much coverage does my plan offer?</summary>
+      <div class="faq-answer">
+        <p>If you purchased a subscription or one-year plan, total coverage is <strong>$5,000</strong> based on what you paid for the items. If you purchased a 3-year plan, your total coverage is <strong>$10,000</strong>.</p>
+      </div>
+    </details>
+
+    <details class="faq-item">
+      <summary>What&rsquo;s <em>not</em> covered?</summary>
+      <div class="faq-answer">
+        <p>For information about coverage, click the terms and conditions link in the Review Terms &amp; Conditions section.</p>
+        <p>Generally, the plans do not cover used or previously owned items, and you must have a sales receipt showing purchase of the items to be covered, that you received the items, and that you purchased the items and received delivery in the last 60 days before purchasing a plan.</p>
+        <p>If you purchased used furniture, you can purchase a repair membership program instead of a protection plan to help keep your furniture looking new and functioning.</p>
+      </div>
+    </details>
+
+    <p class="eyebrow eyebrow-ink" style="margin: 32px 0 0; padding-bottom: 12px; border-bottom: 1px solid var(--rule);">About the membership</p>
+
+    <details class="faq-item">
+      <summary>What&rsquo;s the difference between Protection and Membership?</summary>
+      <div class="faq-answer">
+        <p>Protection covers new pieces for damage and stains and is available at a low per-month rate of $9.99 or $19.99 &mdash; or by the year, or even up to 3 years.</p>
+        <p>You can add a Membership for a low monthly fee that helps you repair and keep used items looking new and functioning. Memberships provide you with access to discounted service: touch-ups, repairs, setup, moving help, and priority scheduling. Membership programs are great for items purchased through online marketplaces, like Facebook Marketplace.</p>
+      </div>
+    </details>
+
+    <details class="faq-item">
+      <summary>What if I don&rsquo;t want protection at all?</summary>
+      <div class="faq-answer">
+        <p>Then start with the membership instead, or pick up a care kit on this page and call us when you need a technician. No subscription is required to use the service network &mdash; we just charge at member rates instead of retail rates for anyone who has the membership.</p>
+      </div>
+    </details>
+
+    <details class="faq-item">
+      <summary>What happens if a claim isn&rsquo;t covered by the plan?</summary>
+      <div class="faq-answer">
+        <p>Every Furniture-Rx protection plan includes the <strong>Repair Safety Net</strong> at no extra cost. So if you have damage the plan doesn&rsquo;t cover &mdash; a rip, a burn, an older inherited piece, anything &mdash; you still get access to our managed service network at discounted member rates. You pay only for the service itself, not full retail labor charges. The traditional store plan doesn&rsquo;t include this; if your claim is denied there, you&rsquo;re on your own.</p>
+      </div>
+    </details>
+
+    <details class="faq-item">
+      <summary>Who is RAP?</summary>
+      <div class="faq-answer">
+        <p>Risk Assurance Partners &mdash; the service network behind Furniture-Rx. RAP has handled tens of thousands of claims for furniture retailers and households, with an average 4.5-star service rating. We administer every claim end-to-end so you never have to chase a retailer for help.</p>
+      </div>
+    </details>
+
+    <details class="faq-item">
+      <summary>How do claims actually work?</summary>
+      <div class="faq-answer">
+        <p>File 24/7 from the dashboard, the app, or a phone call. Most claims are processed the same day. A repair-first concierge coordinates a technician visit, parts, or cleaning service. If the piece can&rsquo;t be repaired, you receive a partial cash benefit toward replacement.</p>
+      </div>
+    </details>
+  </div>
+</section>
+
+<!-- CARE KITS -->
+<section class="kits" id="kits">
+  <div class="container">
+    <div class="kits-intro reveal">
+      <span class="eyebrow eyebrow-orange">While you&rsquo;re here</span>
+      <h2 class="h-section">Care kits, <em class="accent">in a box.</em></h2>
+      <p class="lead" style="max-width:620px">Member-grade cleaning and conditioning, but no subscription required. The same products our technicians carry on service calls.</p>
+    </div>
+
+    <div class="kits-grid reveal">
+      <article class="kit-card">
+        <div class="kit-image">
+          <img src="kit_assets/wood.jpg" alt="Wood care kit — cleaner, polish, and microfiber cloth" loading="lazy" width="600" height="480">
+          <!-- DEPRECATED placeholder (replaced by kit_assets/wood.jpg): <svg viewBox="0 0 64 64" fill="none" stroke="currentColor"><circle cx="32" cy="32" r="22"/><circle cx="32" cy="32" r="16"/><circle cx="32" cy="32" r="10"/><circle cx="32" cy="32" r="4"/></svg> -->
+          <!-- DEPRECATED fake-packaging overlay (superseded by real kit_assets photo):
+          <div class="kit-pkg">
+            <div>
+              <div class="pkg-logo"><span class="star">&#9733;</span>5 STAR SERVICE</div>
+              <div class="pkg-title">Wood<small>Clean &middot; Polish</small></div>
+            </div>
+            <div class="pkg-band"></div>
+          </div>
+          -->
+        </div>
+        <div class="kit-body">
+          <span class="kit-tag">Wood care kit</span>
+          <h3>Clean &amp; polish for every wood piece.</h3>
+          <p class="kit-desc">Cleaner, polish, and microfiber cloth. Removes dirt, grease, and grime. Restores lustre and conditions wood. Works on modern, vintage, and antique pieces.</p>
+          <div class="kit-foot">
+            <span class="kit-price">$49.99</span>
+            <span class="cfg-count-ctl" role="group" aria-label="Wood Care Kit quantity">
+              <button type="button" class="kit-dec" aria-label="One fewer Wood Care Kit">&minus;</button>
+              <span class="cmp-count kit-count" aria-live="polite">0</span>
+              <button type="button" class="kit-inc" aria-label="One more Wood Care Kit">+</button>
+            </span>
+          </div>
+          <div class="cfg-cta-row cmp-cta-row">
+            <button type="button" class="btn btn-accent kit-add-btn" data-kit="Wood Care Kit">Add to cart <span class="arrow">&rarr;</span></button>
+            <button type="button" class="btn btn-ghost kit-checkout-btn" data-kit="Wood Care Kit">Checkout</button>
+          </div>
+        </div>
+      </article>
+
+      <article class="kit-card">
+        <div class="kit-image fabric">
+          <img src="kit_assets/fabric.jpg" alt="Fabric & upholstery care kit — stain remover, protectant spray, and brush applicator" loading="lazy" width="600" height="480">
+          <!-- DEPRECATED placeholder (replaced by kit_assets/fabric.jpg): <svg viewBox="0 0 64 64" fill="none" stroke="currentColor"><path d="M8 16h48v32H8z"/><path d="M8 24h48M8 32h48M8 40h48"/><path d="M16 16v32M28 16v32M40 16v32M52 16v32"/></svg> -->
+          <!-- DEPRECATED fake-packaging overlay (superseded by real kit_assets photo):
+          <div class="kit-pkg">
+            <div>
+              <div class="pkg-logo"><span class="star">&#9733;</span>5 STAR SERVICE</div>
+              <div class="pkg-title">Fabric<small>Clean &middot; Protect</small></div>
+            </div>
+            <div class="pkg-band"></div>
+          </div>
+          -->
+        </div>
+        <div class="kit-body">
+          <span class="kit-tag">Fabric &amp; upholstery</span>
+          <h3>Lift stains. Protect against the next one.</h3>
+          <p class="kit-desc">Stain remover, protectant spray, and brush applicator. Safe for most upholstery, cushions, and decorative fabrics. Built for the spill that always happens at dinner.</p>
+          <div class="kit-foot">
+            <span class="kit-price">$49.99</span>
+            <span class="cfg-count-ctl" role="group" aria-label="Fabric Care Kit quantity">
+              <button type="button" class="kit-dec" aria-label="One fewer Fabric Care Kit">&minus;</button>
+              <span class="cmp-count kit-count" aria-live="polite">0</span>
+              <button type="button" class="kit-inc" aria-label="One more Fabric Care Kit">+</button>
+            </span>
+          </div>
+          <div class="cfg-cta-row cmp-cta-row">
+            <button type="button" class="btn btn-accent kit-add-btn" data-kit="Fabric Care Kit">Add to cart <span class="arrow">&rarr;</span></button>
+            <button type="button" class="btn btn-ghost kit-checkout-btn" data-kit="Fabric Care Kit">Checkout</button>
+          </div>
+        </div>
+      </article>
+
+      <article class="kit-card">
+        <div class="kit-image leather">
+          <img src="kit_assets/leather.jpg" alt="Leather care kit — cleaner, conditioner, and applicator pads" loading="lazy" width="600" height="480">
+          <!-- DEPRECATED placeholder (replaced by kit_assets/leather.jpg): <svg viewBox="0 0 64 64" fill="none" stroke="currentColor"><path d="M12 20c0-6 8-10 20-10s20 4 20 10v24c0 6-8 10-20 10s-20-4-20-10z"/><path d="M12 32c0-6 8-10 20-10s20 4 20 10"/></svg> -->
+          <!-- DEPRECATED fake-packaging overlay (superseded by real kit_assets photo):
+          <div class="kit-pkg">
+            <div>
+              <div class="pkg-logo"><span class="star">&#9733;</span>5 STAR SERVICE</div>
+              <div class="pkg-title">Leather<small>Clean &middot; Condition</small></div>
+            </div>
+            <div class="pkg-band"></div>
+          </div>
+          -->
+        </div>
+        <div class="kit-body">
+          <span class="kit-tag">Leather care kit</span>
+          <h3>Keep leather supple. Avoid the cracks.</h3>
+          <p class="kit-desc">Leather cleaner, conditioner, and applicator pads. Restores moisture, prevents cracking, and refreshes color. Works on aniline, pigmented, and bonded leathers.</p>
+          <div class="kit-foot">
+            <span class="kit-price">$49.99</span>
+            <span class="cfg-count-ctl" role="group" aria-label="Leather Care Kit quantity">
+              <button type="button" class="kit-dec" aria-label="One fewer Leather Care Kit">&minus;</button>
+              <span class="cmp-count kit-count" aria-live="polite">0</span>
+              <button type="button" class="kit-inc" aria-label="One more Leather Care Kit">+</button>
+            </span>
+          </div>
+          <div class="cfg-cta-row cmp-cta-row">
+            <button type="button" class="btn btn-accent kit-add-btn" data-kit="Leather Care Kit">Add to cart <span class="arrow">&rarr;</span></button>
+            <button type="button" class="btn btn-ghost kit-checkout-btn" data-kit="Leather Care Kit">Checkout</button>
+          </div>
+        </div>
+      </article>
+    </div>
+  </div>
+</section>
+
+<!-- FINAL CTA -->
+<section class="final" id="final">
+  <div class="container final-wrap reveal">
+    <span class="eyebrow">Begin, or come back to it</span>
+    <h2 class="h-section">Save your build. Or just <em class="gold">add it.</em></h2>
+    <p class="final-sub">Three paths: add the coverage you built and start protecting your piece today, start the membership and cover the whole house, or save your build to your inbox and decide later. No account required, no marketing list &mdash; just your build, your way.</p>
+
+    <div class="final-ctas">
+      <a href="#configurator" class="btn btn-accent">Build my coverage <span class="arrow">&rarr;</span></a>
+      <button type="button" class="btn btn-on-dark" id="final-membership">Start membership <span class="arrow">&rarr;</span></button>
+      <button type="button" class="btn btn-on-dark-outline" id="final-howto">How it works <span class="arrow">&rarr;</span></button>
+    </div>
+
+    <p class="final-tertiary">Offered through your furniture retailer&rsquo;s partnership with Furniture-Rx. <a href="#faq">How does that work?</a></p>
+  </div>
+</section>
+
+<!-- REFERRAL PERK -->
+<section class="refer" id="refer" aria-label="Referral perk">
+  <div class="container">
+    <div class="refer-inner reveal">
+      <div class="refer-copy">
+        <span class="eyebrow">Member perk</span>
+        <h2>Refer a plan, get <em>one month on us.</em></h2>
+        <p>Send a friend or family member to Furniture-Rx. When they start any plan, your next month is free &mdash; no cap on how many you can earn.</p>
+      </div>
+      <div class="refer-cta">
+        <a href="#" class="btn btn-ghost">Get your referral link <span class="arrow">&rarr;</span></a>
+        <p class="refer-fine">Active members only. <a href="#">See terms</a>.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+</main>
+
+<footer class="footer">
+  <div class="container">
+    <div class="footer-grid">
+      <div class="footer-brand">
+        <a href="/" class="logo"><span class="mark">Furniture<em>&middot;</em>Rx</span></a>
+        <p class="footer-tagline">A subscription protection and repair-help program administered by Risk Assurance Partners.</p>
+      </div>
+      <div class="footer-col">
+        <h4>Program</h4>
+        <ul>
+          <li><a href="#compare">Protection plans</a></li>
+          <li><a href="#membership">Membership</a></li>
+          <li><a href="#kits">Care kits</a></li>
+          <li><a href="#faq">FAQ</a></li>
+        </ul>
+      </div>
+      <div class="footer-col">
+        <h4>Account</h4>
+        <ul>
+          <li><a href="/account.html">Log in</a></li>
+          <li><a href="#">File a claim</a></li>
+          <li><a href="#">Manage coverage</a></li>
+          <li><a href="#">Contact concierge</a></li>
+        </ul>
+      </div>
+      <div class="footer-col">
+        <h4>Legal</h4>
+        <ul>
+          <li><a href="#">Terms of service</a></li>
+          <li><a href="#">Privacy policy</a></li>
+          <li><a href="/terms/" target="_blank" rel="noopener" class="js-plan-terms">Coverage terms</a></li>
+          <li><a href="#">Accessibility</a></li>
+        </ul>
+      </div>
+    </div>
+    <div class="footer-base">
+      <span>&copy; 2026 Risk Assurance Partners. All rights reserved.</span>
+      <span>Furniture-Rx is administered by Risk Assurance Partners.</span>
+    </div>
+  </div>
+</footer>
+
+<div class="sticky-mobile" id="sticky-mobile">
+  <a href="#configurator" class="btn btn-accent">Build coverage <span class="arrow">&rarr;</span></a>
+  <a href="#membership" class="btn btn-quiet">Membership</a>
+</div>
+
+<!-- CART / CHECKOUT slide-out (CHK-1) -->
+<div class="cart-backdrop" id="cart-backdrop" hidden></div>
+<aside class="cart-panel" id="cart-panel" role="dialog" aria-modal="true" aria-label="Checkout" hidden>
+  <div class="cart-head">
+    <h3 id="cart-title">Your coverage</h3>
+    <button class="cart-close" id="cart-close" aria-label="Close checkout">&times;</button>
+  </div>
+  <div class="cart-body">
+    <div id="cart-view-form">
+      <div class="cart-summary" id="cart-plan-summary" hidden>
+        <div class="cov" id="cart-cov">Stain protection</div>
+        <div class="meta" id="cart-meta">0 selected items &middot; up to 3</div>
+        <div class="price"><span id="cart-price">$9.99</span><small>/month &middot; cancel anytime</small></div>
+      </div>
+      <div id="cart-plans" hidden>
+        <div class="cart-kits-title">Plans</div>
+        <ul id="cart-plans-list"></ul>
+      </div>
+      <div id="cart-kits" hidden>
+        <div class="cart-kits-title">Care kits</div>
+        <ul id="cart-kits-list"></ul>
+        <!-- BE-5 (14-ago): el cliente paga S&H + tax de los kits; el total de abajo ya los incluye. -->
+        <p class="cart-kits-note">Shipped to your door &mdash; $11.00 shipping &amp; handling per kit and 6% sales tax are included in the one-time total.</p>
+      </div>
+      <div id="cart-membership" hidden>
+        <div class="cart-kits-title">Membership</div>
+        <ul id="cart-membership-list"></ul>
+      </div>
+      <div id="cart-total" class="cart-total" hidden>
+        <span class="cart-total-label">Total</span>
+        <span id="cart-total-val" class="cart-total-val"></span>
+      </div>
+      <button type="button" id="cart-clear" class="cart-clear" hidden>Empty cart</button>
+      <div id="cart-membership-extras" hidden>
+        <label class="cart-kit-add" for="cart-kit-toggle">
+          <input type="checkbox" id="cart-kit-toggle">
+          <span>Add a care kit <small>$49.99 one-time</small></span>
+        </label>
+        <div class="cart-field" id="cart-kit-type-field" hidden>
+          <label for="cart-kit-type">Which kit?</label>
+          <select id="cart-kit-type">
+            <option value="Wood Care Kit">Wood care kit</option>
+            <option value="Fabric Care Kit">Fabric care kit</option>
+            <option value="Leather Care Kit">Leather care kit</option>
+          </select>
+        </div>
+      </div>
+      <form id="cart-form" novalidate>
+        <p class="cart-hint">Tell us about yourself &mdash; this is how we&rsquo;ll reach you for plan updates and claims.</p>
+        <div class="cart-field">
+          <label for="cart-name">Full name</label>
+          <input id="cart-name" name="name" type="text" autocomplete="name" placeholder="First and Last Name" required>
+        </div>
+        <div class="cart-field">
+          <label for="cart-email">Email</label>
+          <input id="cart-email" name="email" type="email" autocomplete="email" placeholder="you@email.com" required>
+          <!-- PREFILL-1: sesión detectada → email BLOQUEADO (la compra suma a esta cuenta) -->
+          <p class="prefill-note" id="prefill-note" hidden>Buying as <b id="prefill-email"></b> &middot; <button type="button" class="prefill-signout" id="prefill-signout">Not you? Sign out</button></p>
+        </div>
+        <div class="cart-field">
+          <label for="cart-phone">Phone</label>
+          <input id="cart-phone" name="phone" type="tel" autocomplete="tel" placeholder="(555) 123-4567" required>
+        </div>
+        <div class="cart-field">
+          <label for="cart-address">Address</label>
+          <input id="cart-address" name="address" type="text" autocomplete="street-address" placeholder="Street, City, State ZIP" required>
+        </div>
+        <div id="cart-receipt-fields">
+          <p class="cart-hint">From your sales receipt &mdash; we use this to match your dealer automatically.</p>
+          <div class="cart-field kiosk-only">
+            <label for="cart-associate">Sales associate #</label>
+            <input id="cart-associate" name="associate" type="text" autocomplete="off" placeholder="e.g. 4471">
+          </div>
+          <div class="cart-field">
+            <label for="cart-order">Sale order number</label>
+            <input id="cart-order" name="order" type="text" autocomplete="off" inputmode="numeric" placeholder="e.g. 100482" required>
+          </div>
+          <div class="cart-field">
+            <label for="cart-zip">ZIP code</label>
+            <input id="cart-zip" name="zip" type="text" autocomplete="postal-code" inputmode="numeric" maxlength="10" pattern="\d{5}(-\d{4})?" placeholder="e.g. 84321" required>
+          </div>
+          <div class="cart-field">
+            <label for="cart-date"><span class="lbl-default">Purchase date</span><span class="lbl-kiosk">Delivery date (coverage start)</span></label>
+            <input id="cart-date" name="date" type="date" required>
+          </div>
+          <div class="cart-field">
+            <label for="cart-receipt-photo">Photo of your sales receipt</label>
+            <div id="cart-dropzone" class="cart-dropzone">
+              <input id="cart-receipt-photo" name="receipt_photo" type="file" accept="image/*" capture="environment" class="cart-dropzone-input" required>
+              <div class="cart-dropzone-prompt">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 8.5A1.5 1.5 0 0 1 4.5 7h2L8 5h8l1.5 2h2A1.5 1.5 0 0 1 21 8.5v9A1.5 1.5 0 0 1 19.5 19h-15A1.5 1.5 0 0 1 3 17.5v-9Z"/><circle cx="12" cy="13" r="3.2"/></svg>
+                <span class="cart-dropzone-main">Tap to take a photo or browse</span>
+                <span class="cart-dropzone-sub">or drag an image here</span>
+              </div>
+              <div id="cart-receipt-preview" class="cart-receipt-preview" hidden>
+                <img id="cart-receipt-thumb" alt="Receipt preview">
+                <div class="cart-receipt-meta">
+                  <span id="cart-receipt-status" class="cart-receipt-status"></span>
+                  <button type="button" id="cart-receipt-remove" class="cart-receipt-remove">Remove</button>
+                </div>
+              </div>
+            </div>
+          </div>
+          <p class="cart-fine">Eligibility: new furniture from an authorized dealer within the last 60 days; a valid sales receipt is required to activate. Billed monthly in advance &middot; coverage starts 30 days after payment &middot; not available in all states. Read the <a href="/terms/" target="_blank" rel="noopener" class="js-plan-terms">terms and conditions</a> of this plan before you purchase.</p>
+        </div>
+        <!-- PORT-9 (método B, Doug 15-jul): referral code del dealer — atribuye la venta y su
+             comisión; opcional; "same method for kiosk, tech site, and DtC site". La verdad la
+             re-resuelve el server (resolveAttribution); esto es solo captura + feedback. -->
+        <div class="cart-field">
+          <label for="cart-referral">Dealer referral code (optional)</label>
+          <input id="cart-referral" name="referral_code" type="text" autocomplete="off" maxlength="24" placeholder="e.g. GAL-7K2M">
+          <p class="cart-note" id="cart-referral-msg" aria-live="polite" hidden></p>
+        </div>
+        <p class="cart-fine" id="cart-membership-fine" hidden>Covers every piece of furniture in your home &mdash; new, old, online, inherited, or custom. Billed monthly in advance &middot; cancel anytime. <a href="#" id="memterms-drawer-link">Terms &amp; conditions</a>.</p>
+        <fieldset class="cart-deliver" id="cart-deliver">
+          <legend>How will the customer pay?</legend>
+          <label><input type="radio" name="deliver" value="redirect" checked> Pay on this device</label>
+          <label><input type="radio" name="deliver" value="qr"> Show a QR code to scan</label>
+          <label><input type="radio" name="deliver" value="email"> Email the link to the customer</label>
+        </fieldset>
+        <button type="submit" class="btn btn-accent btn-block" id="cart-pay">Pay <span id="cart-pay-amt">$9.99</span>/mo <span class="arrow">&rarr;</span></button>
+        <!-- C.6: destapado — el envío es REAL (POST /api/email-cart → Resend) y verificado en sandbox el 06-jul -->
+        <button type="button" class="btn btn-ghost btn-block" id="cart-email-self" style="margin-top:10px">Email my cart to myself</button>
+        <p class="cart-note" id="cart-email-status" aria-live="polite"></p>
+        <p class="cart-note" id="cart-stripe-note">Secure checkout by Stripe (test mode). Cancel in one tap.</p>
+      </form>
+    </div>
+    <div id="cart-view-success" class="cart-success" hidden>
+      <div class="tick" aria-hidden="true">&#10003;</div>
+      <h3 id="cart-success-title">Payment received</h3>
+      <!-- KIOSK-21 (Doug 08-jul): habla del PLAN HOLDER, GRANDE, con spam y el 833 (misma vista
+           que el kiosk; aquí "New sale" no se pinta: es kiosk-only) -->
+      <p class="success-big">We sent the plan holder the sign-in information to the email address provided.</p>
+      <p class="success-big">Go to that email and log in to your dashboard.</p>
+      <p class="success-note">Don&rsquo;t see it? Check your spam folder.</p>
+      <p class="success-call">Questions? Call us at <a href="tel:18333957824">1-833-395-7824</a></p>
+      <!-- SELF-1: copy neutro de actor — lo puede tocar el associate O el propio cliente -->
+      <button type="button" class="btn btn-accent btn-block kiosk-only" id="cart-newsale-success" style="margin-top:18px">Start a new purchase</button>
+    </div>
+    <div id="cart-view-handoff" class="cart-handoff" hidden>
+      <h3 id="cart-handoff-title">Waiting for the customer’s payment</h3>
+      <p id="cart-handoff-sub">Have the customer scan the code to pay securely.</p>
+      <div class="qr-box" id="cart-qr" hidden></div>
+      <p class="handoff-link" id="cart-handoff-link"></p>
+      <p class="handoff-valid">This payment link is valid for 24 hours.</p>
+      <button type="button" class="btn btn-accent btn-block" id="cart-newsale">Start a new purchase</button>
+    </div>
+  </div>
+</aside>
+
+<div class="kit-toast" id="kit-toast" role="status" aria-live="polite">
+  <span class="check">&#10003;</span><span id="kit-toast-text">Added.</span>
+</div>
+
+<!-- HOW IT WORKS POPUP (Path 3 instructions) -->
+<div class="howto-backdrop" id="howto-backdrop" hidden></div>
+<div class="howto-modal" id="howto-modal" role="dialog" aria-modal="true" aria-labelledby="howto-title" hidden>
+  <button class="howto-close" id="howto-close" type="button" aria-label="Close">&times;</button>
+  <span class="eyebrow eyebrow-orange">How it works</span>
+  <h3 id="howto-title">Build it now, or save it for later.</h3>
+  <ol class="howto-steps">
+    <li><strong>Build your plan.</strong> Pick your coverage and term in the builder at the top of the page.</li>
+    <li><strong>Add it to your cart.</strong> Save the plan you built &mdash; it stays on this device until you&rsquo;re ready.</li>
+    <li><strong>Email your cart to yourself.</strong> From checkout, send yourself a copy and decide later &mdash; or pay now.</li>
+  </ol>
+  <a href="#configurator" class="btn btn-accent" id="howto-build">Build plan <span class="arrow">&rarr;</span></a>
+</div>
+
+<!-- MEMBERSHIP TERMS & CONDITIONS POPUP -->
+<div class="terms-backdrop" id="memterms-backdrop" hidden></div>
+<div class="terms-modal" id="memterms-modal" role="dialog" aria-modal="true" aria-labelledby="memterms-title" hidden>
+  <div class="terms-head">
+    <h3 id="memterms-title">Repair Membership Terms &amp; Conditions</h3>
+    <button class="terms-close" id="memterms-close" type="button" aria-label="Close">&times;</button>
+  </div>
+  <div class="terms-body">
+    <p class="terms-meta"><strong>Effective Date:</strong> [Insert Date]<br>
+      <strong>Program Name:</strong> Furniture-Rx Repair Membership / Repair Safety Net<br>
+      <strong>Administrator:</strong> Risk Assurance Partners, doing business as Furniture-Rx, referred to as &ldquo;Furniture-Rx,&rdquo; &ldquo;RAP,&rdquo; &ldquo;we,&rdquo; &ldquo;us,&rdquo; or &ldquo;our.&rdquo;</p>
+    <p>These Membership Terms explain what the Furniture-Rx Repair Membership includes, how member repair rates work, how service is scheduled and paid for, and what is not included.</p>
+    <p>Please read these terms before joining. By purchasing, activating, using, or continuing a Furniture-Rx Repair Membership, you agree to these Membership Terms.</p>
+
+    <h4>1. What the Furniture-Rx Repair Membership Is</h4>
+    <p>The Furniture-Rx Repair Membership is a monthly service-access membership for furniture care, repair coordination, and discounted service rates.</p>
+    <p>The membership gives you access to Furniture-Rx&rsquo;s repair coordination team, technician network, member pricing, repair scheduling support, parts assistance, furniture care guidance, and related service benefits.</p>
+    <p>The membership is designed to help you repair, maintain, assemble, move, touch up, and care for furniture in your home.</p>
+
+    <h4>2. What the Membership Is Not</h4>
+    <p>The Furniture-Rx Repair Membership is not an insurance policy, not a warranty, not a service contract, and not a protection plan.</p>
+    <p>The membership does not promise to repair or replace furniture for free. It does not reimburse you for furniture damage. It does not create coverage for stains, rips, burns, mechanical failure, electrical failure, accidents, misuse, wear and tear, or any other loss.</p>
+    <p>If you purchase a separate Furniture-Rx protection plan, that protection plan will have its own separate terms, limits, exclusions, eligibility rules, and claim process. The membership and any protection plan are separate products.</p>
+
+    <h4>3. Monthly Membership Fee</h4>
+    <p>The standalone membership price is <strong>$19.99 per month</strong>, unless a different price is shown to you at checkout or in your account.</p>
+    <p>Membership fees are billed monthly in advance to your card on file. Your membership renews automatically each month until canceled.</p>
+    <p>If the membership is included with a Furniture-Rx protection plan or offered as a promotional benefit, the promotional terms shown at checkout or in your plan materials will control the length and scope of the included membership period.</p>
+
+    <h4>4. What Members Receive</h4>
+    <p>As an active member, you receive access to membership benefits that may include:</p>
+    <ul>
+      <li>access to Furniture-Rx&rsquo;s repair coordination team;</li>
+      <li>access to Furniture-Rx&rsquo;s vetted technician network where available;</li>
+      <li>discounted member repair rates;</li>
+      <li>repair scheduling and coordination;</li>
+      <li>assistance sourcing or identifying furniture parts;</li>
+      <li>furniture care guidance;</li>
+      <li>cleaning, touch-up, repair, assembly, moving, and service coordination;</li>
+      <li>dashboard access for service history and membership information;</li>
+      <li>priority service handling where available;</li>
+      <li>access to member-only offers or care products; and</li>
+      <li>help coordinating customer-paid service when a protection plan does not cover the issue or when you do not have a protection plan.</li>
+    </ul>
+    <p>Membership benefits are subject to technician availability, service area, parts availability, provider participation, and the type and condition of the furniture.</p>
+
+    <h4>5. Discounted Member Rates</h4>
+    <p>Your membership gives you access to discounted member rates for eligible repair and service work.</p>
+    <p>Member rates may apply to labor, trip charges, diagnostic charges, repair coordination, and other eligible services as shown at booking or in your service estimate.</p>
+    <p>Discounts may vary by location, service type, technician, partner provider, furniture type, and availability. Unless we specifically say otherwise, discounts do not apply to taxes, government fees, shipping, special-order parts, manufacturer charges, third-party fees, hazardous conditions, or non-standard work.</p>
+    <p>Furniture-Rx does not promise that member rates will be the lowest rate available in the market. The benefit is access to our managed network, service coordination, and discounted Furniture-Rx member pricing.</p>
+
+    <h4>6. Customer-Paid Service</h4>
+    <p>The membership does not include free repair service unless a specific free or included benefit is expressly shown in writing.</p>
+    <p>Most service is customer-paid. This means you are responsible for paying for technician labor, trip charges, diagnostic fees, parts, materials, shipping, taxes, and any other approved charges related to the service.</p>
+    <p>Before service is performed, we will generally provide a price, estimate, rate schedule, or explanation of expected charges. Some charges may depend on what the technician finds during diagnosis or inspection.</p>
+
+    <h4>7. Card on File and Auto-Charge Authorization</h4>
+    <p>A valid payment card must remain on file to use the membership and to book service.</p>
+    <p>By scheduling service, approving a service estimate, authorizing a technician visit, ordering parts, or using a membership service benefit, you authorize Furniture-Rx, RAP, our payment processor, and our service partners, as applicable, to automatically charge your card on file for all approved charges.</p>
+    <p>Approved charges may include:</p>
+    <ul>
+      <li>monthly membership fees;</li>
+      <li>trip or diagnostic fees;</li>
+      <li>labor charges;</li>
+      <li>parts and materials;</li>
+      <li>shipping or handling;</li>
+      <li>special-order items;</li>
+      <li>care kits or related products;</li>
+      <li>taxes and applicable fees;</li>
+      <li>cancellation, missed appointment, or no-access fees if disclosed; and</li>
+      <li>any other service charges you approve.</li>
+    </ul>
+    <p>Service cannot be scheduled or continued unless you agree to keep a valid card on file and authorize automatic charges for approved service amounts.</p>
+
+    <h4>8. All Sales Are Final</h4>
+    <p>All membership fees, service charges, diagnostic fees, trip charges, parts, materials, care kits, special-order items, and other authorized purchases are final and non-refundable, except where a refund is required by law or expressly approved by Furniture-Rx in writing.</p>
+    <p>Canceling your membership stops future monthly membership charges. It does not refund prior membership fees, the current billing period, completed services, scheduled services already performed, approved parts, ordered materials, care kits, or any other authorized charges.</p>
+
+    <h4>9. Cancellations</h4>
+    <p>You may cancel your membership at any time through your dashboard, by contacting Furniture-Rx support, or through any cancellation method we make available.</p>
+    <p>Cancellation takes effect at the end of your then-current paid monthly billing period. You will continue to have access to membership benefits until the end of that period.</p>
+    <p>We do not provide prorated refunds for partial months unless required by law.</p>
+    <p>If you cancel and later rejoin, your new membership will be subject to the pricing, benefits, and terms then in effect.</p>
+
+    <h4>10. Failed Payments</h4>
+    <p>If your payment fails, we may pause or cancel your membership, suspend access to member rates, delay service, cancel scheduled appointments, or require payment before service continues.</p>
+    <p>You remain responsible for any unpaid membership fees, service charges, parts, materials, or other approved amounts.</p>
+
+    <h4>11. Service Area and Availability</h4>
+    <p>Membership benefits are available only where Furniture-Rx or its service partners can reasonably provide service.</p>
+    <p>Some locations may not have in-home technician service. In those areas, we may offer remote support, referral assistance, parts guidance, mail-in options, or other alternatives where available.</p>
+    <p>We do not guarantee same-day service, specific appointment windows, specific technicians, or availability of parts. Service timing depends on your location, technician capacity, furniture type, parts availability, weather, safety conditions, and other factors.</p>
+
+    <h4>12. Eligible Furniture</h4>
+    <p>The membership may be used for many types of household furniture, including new, old, online, local, inherited, custom, marketplace, and previously owned items.</p>
+    <p>Eligible service categories may include sofas, chairs, sectionals, recliners, beds, dining furniture, tables, case goods, upholstery, leather, wood furniture, rugs, mattresses, lighting, and related household furniture items.</p>
+    <p>We may decline service for items that are unsafe, unsanitary, infested, structurally unstable, counterfeit, illegally modified, contaminated, inaccessible, outside our service scope, or not reasonably repairable.</p>
+
+    <h4>13. Examples of Services We May Help Coordinate</h4>
+    <p>Depending on availability and service area, Furniture-Rx may help coordinate:</p>
+    <ul>
+      <li>furniture touch-ups;</li>
+      <li>minor repairs;</li>
+      <li>scratch, nick, and scuff repair;</li>
+      <li>upholstery repair;</li>
+      <li>leather touch-up;</li>
+      <li>wood repair and polishing;</li>
+      <li>loose joint or wobbly leg repair;</li>
+      <li>furniture assembly;</li>
+      <li>bed frame assembly;</li>
+      <li>room-to-room furniture moving;</li>
+      <li>light furniture rearranging;</li>
+      <li>repair of online purchases;</li>
+      <li>repair of marketplace purchases;</li>
+      <li>parts identification or sourcing;</li>
+      <li>cleaning or spot-treatment guidance;</li>
+      <li>manufacturer warranty documentation help;</li>
+      <li>service contract claim documentation help; and</li>
+      <li>furniture care recommendations.</li>
+    </ul>
+    <p>The exact services available may change over time.</p>
+
+    <h4>14. Parts and Materials</h4>
+    <p>Parts and materials are not included in the membership fee unless we specifically say otherwise in writing.</p>
+    <p>You are responsible for the cost of parts, materials, shipping, special orders, and related charges. Some parts may be unavailable, discontinued, delayed, custom-made, or subject to manufacturer restrictions.</p>
+    <p>Special-order parts, custom materials, color-matched items, and ordered goods are final sale once ordered.</p>
+
+    <h4>15. Manufacturer Warranties and Other Plans</h4>
+    <p>Furniture-Rx may help you gather information, photos, receipts, and documentation for a manufacturer warranty or third-party service contract claim.</p>
+    <p>That help does not guarantee that the manufacturer, retailer, insurer, warranty company, or service contract provider will approve your claim.</p>
+    <p>Membership does not create coverage under any manufacturer warranty, retailer warranty, insurance policy, protection plan, or service contract.</p>
+
+    <h4>16. Relationship to Furniture-Rx Protection Plans</h4>
+    <p>Some Furniture-Rx protection plans may include Repair Safety Net membership benefits for a stated period.</p>
+    <p>If your protection claim is not covered, denied, excluded, outside the claim limit, or related to an item that is not covered, your membership may still give you access to member rates for customer-paid service.</p>
+    <p>You remain responsible for paying for any customer-paid service that is not covered under a separate protection plan.</p>
+
+    <h4>17. Your Responsibilities</h4>
+    <p>To use the membership, you agree to:</p>
+    <ul>
+      <li>provide accurate contact, address, furniture, and payment information;</li>
+      <li>keep a valid card on file;</li>
+      <li>provide safe access to the furniture and service area;</li>
+      <li>secure pets and children during service visits;</li>
+      <li>disclose known hazards, infestations, contamination, structural instability, or prior attempted repairs;</li>
+      <li>review and approve service charges before work begins when approval is requested;</li>
+      <li>pay all approved charges;</li>
+      <li>be present or provide authorized access during service windows;</li>
+      <li>follow reasonable care instructions; and</li>
+      <li>treat Furniture-Rx staff, technicians, and partners respectfully.</li>
+    </ul>
+    <p>We may refuse or stop service if conditions are unsafe, access is not available, payment is not authorized, or service is outside the membership scope.</p>
+
+    <h4>18. Independent Technicians and Service Partners</h4>
+    <p>Furniture-Rx may provide service through employees, independent technicians, subcontractors, local partners, vendors, or third-party service providers.</p>
+    <p>We coordinate the service experience, but some work may be performed by independent providers. Availability, pricing, methods, and timing may vary by provider and location.</p>
+
+    <h4>19. No Guarantee of Repair Outcome</h4>
+    <p>Furniture repair can be affected by age, material, construction, prior damage, prior repair attempts, wear, discontinued parts, color variation, dye lots, leather or fabric type, wood finish, environmental conditions, and manufacturer design.</p>
+    <p>We will make reasonable efforts to coordinate appropriate service, but we do not guarantee that every item can be repaired, restored, matched, cleaned, stabilized, or returned to like-new condition.</p>
+
+    <h4>20. Missed Appointments and No-Access Visits</h4>
+    <p>If a technician arrives and cannot access the home, furniture, building, room, or service area, or if you miss a confirmed appointment, we may charge a missed appointment, trip, or diagnostic fee if disclosed before booking.</p>
+
+    <h4>21. Changes to Membership Benefits</h4>
+    <p>We may update membership benefits, rates, service areas, participating providers, discounts, and available services over time.</p>
+    <p>Changes will apply going forward and will not reduce any specific service already approved and paid for.</p>
+    <p>If we materially change the monthly membership price, we will provide notice before the new price applies, unless the change is caused by taxes, law, or third-party fees.</p>
+
+    <h4>22. Promotions and Included Membership Periods</h4>
+    <p>If you receive the membership free or at a discount through a Furniture-Rx protection plan, dealer offer, referral offer, or promotion, the offer has no cash value and cannot be exchanged for cash.</p>
+    <p>Promotional memberships end when the stated promotional period ends, when the related protection plan ends, or as otherwise disclosed in the offer.</p>
+    <p>If automatic renewal after a promotional period applies, it will only apply if disclosed and accepted at checkout or in your account.</p>
+
+    <h4>23. Account, Dashboard, and Communications</h4>
+    <p>You may receive service updates, membership notices, appointment reminders, payment notices, and account communications by email, text message, phone, dashboard notification, or other contact method you provide.</p>
+    <p>Message and data rates may apply.</p>
+    <p>You are responsible for keeping your account information current.</p>
+
+    <h4>24. Privacy</h4>
+    <p>Our collection and use of personal information are governed by our Privacy Policy. By using the membership, you agree that we may use your information to administer your membership, process payments, coordinate service, communicate with you, manage claims or service requests, improve the program, and comply with legal obligations.</p>
+
+    <h4>25. Limitation of Liability</h4>
+    <p>To the maximum extent allowed by law, Furniture-Rx is not responsible for indirect, incidental, special, consequential, punitive, or lost-value damages.</p>
+    <p>Our responsibility for any membership-related issue will not exceed the membership fees you paid to us during the three months before the issue occurred, except where a different limit is required by law.</p>
+    <p>This limitation does not limit any rights you may have under applicable consumer protection law.</p>
+
+    <h4>26. Termination by Furniture-Rx</h4>
+    <p>We may suspend or terminate your membership if you fail to pay, misuse the program, provide false information, abuse staff or technicians, create unsafe service conditions, violate these terms, or use the membership for commercial or resale purposes without our written approval.</p>
+
+    <h4>27. Governing Terms</h4>
+    <p>These Membership Terms apply only to the Furniture-Rx Repair Membership. Separate terms may apply to protection plans, care kits, website use, privacy, payment processing, promotions, referrals, and other products or services.</p>
+    <p>If there is a conflict between these Membership Terms and a separate written protection plan, the protection plan terms control for protection claims and covered losses. These Membership Terms control for membership access, discounted service, repair coordination, and customer-paid service.</p>
+
+    <h4>28. Questions</h4>
+    <p>Questions about the Furniture-Rx Repair Membership can be directed to:</p>
+    <p><strong>Furniture-Rx / Risk Assurance Partners</strong><br>
+      [Insert support email]<br>
+      [Insert phone number]<br>
+      [Insert mailing address or support URL]</p>
+  </div>
+</div>
+
+<!-- CHAT WIDGET -->
+<div class="chat-panel" id="chat-panel" role="dialog" aria-label="Chat with us">
+  <div class="chat-head">
+    <div class="chat-avatar">M</div>
+    <div class="who">
+      <div class="name">Maya · your sales assistant</div>
+<!-- MAYA-3 (Doug 02-jul 29:12): fuera la línea de status del header — prometía respuesta "en minutos" y Maya responde al instante -->
+    </div>
+  </div>
+  <div class="chat-body" id="chat-body" aria-live="polite">
+    <div class="chat-msg them">Hi there 👋 I&rsquo;m Maya on the Furniture-Rx team. Anything I can help you sort out about the plans or membership?</div>
+  </div>
+  <form class="chat-foot" id="chat-form">
+    <input type="text" id="chat-input" placeholder="Type a message…" autocomplete="off" aria-label="Your message">
+    <button type="submit" aria-label="Send">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M22 2L11 13"/><path d="M22 2l-7 20-4-9-9-4 20-7z"/></svg>
+    </button>
+  </form>
+</div>
+
+<button class="chat-btn" id="chat-btn" aria-label="Open chat" aria-expanded="false">
+  <span class="dot" aria-hidden="true"></span>
+  <svg class="icon-chat" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+  <svg class="icon-close" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M18 6L6 18M6 6l12 12"/></svg>
+</button>
+
+<script>
+(function(){
+  'use strict';
+
+  /* KIOSK-1: in-store dealer mode. The flag is set on <html> in <head> (FOUC-safe), activado SOLO por
+     ?kiosk=1 (desacoplado 24-jun, sin persistencia). Read it once here to drive the checkout payload + conditional required fields. */
+  var KIOSK = document.documentElement.classList.contains('kiosk');
+
+  /* Backend writes go through Netlify Functions with the service_role key (see
+     /.netlify/functions/create-lead). The browser holds NO Supabase credentials. */
+
+  // NAV
+  var nav = document.getElementById('nav');
+  var navToggle = document.getElementById('nav-toggle');
+  var navDrawer = document.getElementById('nav-drawer');
+  var navDrawerClose = document.getElementById('nav-drawer-close');
+  var navBackdrop = document.getElementById('nav-backdrop');
+
+  function openDrawer(){
+    navDrawer.hidden = false; navBackdrop.hidden = false;
+    requestAnimationFrame(function(){ navDrawer.classList.add('open'); navBackdrop.classList.add('open'); });
+    navToggle.setAttribute('aria-expanded','true');
+    document.body.style.overflow = 'hidden';
+  }
+  function closeDrawer(){
+    navDrawer.classList.remove('open'); navBackdrop.classList.remove('open');
+    navToggle.setAttribute('aria-expanded','false');
+    document.body.style.overflow = '';
+    setTimeout(function(){ navDrawer.hidden = true; navBackdrop.hidden = true; }, 280);
+  }
+  navToggle.addEventListener('click', openDrawer);
+  navDrawerClose.addEventListener('click', closeDrawer);
+  navBackdrop.addEventListener('click', closeDrawer);
+  navDrawer.querySelectorAll('a').forEach(function(a){ a.addEventListener('click', closeDrawer); });
+
+  var navScrolled = false;
+  function onScroll(){
+    var s = window.scrollY > 60;
+    if(s !== navScrolled){ navScrolled = s; nav.classList.toggle('scrolled', s); }
+    var sticky = document.getElementById('sticky-mobile');
+    if(sticky){ sticky.classList.toggle('show', window.scrollY > 600); }
+  }
+  window.addEventListener('scroll', onScroll, { passive:true });
+  onScroll();
+
+  // REVEAL
+  if('IntersectionObserver' in window){
+    var io = new IntersectionObserver(function(entries){
+      entries.forEach(function(e){
+        if(e.isIntersecting){ e.target.classList.add('in-view'); io.unobserve(e.target); }
+      });
+    }, { threshold: 0.12, rootMargin: '0px 0px -40px 0px' });
+    document.querySelectorAll('.reveal').forEach(function(el){ io.observe(el); });
+  } else {
+    document.querySelectorAll('.reveal').forEach(function(el){ el.classList.add('in-view'); });
+  }
+
+  // CONFIGURATOR + COMPARISON
+  /* PLANS — single source of truth for term pricing. Coverage is tied to the TERM: each term
+     grants one flat price + one coverage limit. monthly bills /month; year1/year3 are one-time,
+     due upfront (the bigger upfront sticker steers buyers to monthly). Buyers can take 1–2
+     SEPARATE plans of one type (state.count); price scales × count. */
+  var PLANS = {
+    monthly: { label:'Monthly', unit:'/month',     base:{ stain:9.99,   'stain-mech':19.99  }, limit:5000  },
+    year1:   { label:'1 Year',  unit:'', base:{ stain:129.99, 'stain-mech':259.99 }, limit:7500  },
+    year3:   { label:'3 Year',  unit:'', base:{ stain:249.99, 'stain-mech':449.99 }, limit:10000 }
+  };
+  var MAX_COUNT = 99;   /* Doug 18-jun: no artificial cap — "buy any number" (CART-1.2; was 2). The ">cap → request a quote" path is now dormant; the full multi-line rework will revisit it. */
+
+  /* TYPES — what the plan covers (LABEL ONLY; does not change price/limit). The example text
+     mirrors the checkout item-picker categories. */
+  var TYPES = [
+    { key:'furniture', name:'Furniture',              desc:'Sofas, dining sets, tables & more' },
+    { key:'outdoor',   name:'Outdoor',               desc:'Patio & outdoor furniture' },
+    { key:'adjbed',    name:'Adjustable bed',         desc:'Bases & frames' },
+    { key:'mattress',  name:'Mattress',              desc:'Mattresses & foundations' },
+    { key:'rugs',      name:'Rugs',                  desc:'Area rugs & runners' },
+    { key:'lighting',  name:'Lighting & accessories', desc:'Lamps, lighting & décor' }
+  ];
+
+  /* cov: coverage LEVEL (stain | stain-mech). term: plan term (drives price + limit).
+     type: covered category (label only). count: number of separate plans (1..MAX_COUNT). */
+  var state = { cov:'stain', term:'monthly', type:'furniture', count:1 };
+
+  var covBtns = document.querySelectorAll('.cfg-toggle button');
+  var limitBtns = document.querySelectorAll('#cfg-limits .cfg-limit');
+  var unitPriceEl = document.getElementById('cfg-unit-price');
+  var unitEl = document.getElementById('cfg-unit');
+  var totalEl = document.getElementById('cfg-total');
+  var totalUnitEl = document.getElementById('cfg-total-unit');
+  var countEl = document.getElementById('cfg-count');
+  var countDec = document.getElementById('cfg-count-dec');
+  var countInc = document.getElementById('cfg-count-inc');
+  var coversEl = document.getElementById('cfg-covers');
+  var typeBtn = document.getElementById('cfg-type-btn');
+  var typeMenu = document.getElementById('cfg-type-menu');
+  var cfgKeep = document.getElementById('cfg-keep');
+  var cfgCheckout = document.getElementById('cfg-checkout');
+  var cfgYearlyNote = document.getElementById('cfg-yearly-note');   /* nota "yearly = preview" */
+  var cfgToMonthly = document.getElementById('cfg-to-monthly');     /* botón "Switch to Monthly" */
+  var cfgSaved = document.getElementById('cfg-saved');
+  var navCart = document.getElementById('nav-cart');
+  var navCartCount = document.getElementById('nav-cart-count');
+  /* These `var`s must be assigned BEFORE the loadCart() call below: var hoists the declaration but not
+     the assignment, so loadCart()/persistCart() would otherwise see CART_KEY === undefined and read/write
+     the wrong key. (The persistCart/loadCart function declarations themselves hoist whole, so their
+     textual position further down is fine.) */
+  var CART_KEY = 'furnfx_cart';
+  var KNOWN_COV = { 'stain':1, 'stain-mech':1 };
+  var savedItems = loadCart();   /* hydrate the device-local cart (localStorage) so it survives reloads */
+  /* Care kits cart (KIT-3) — a SEPARATE one-time-product line from the plan cart. Same hoisting rule
+     as CART_KEY: KIT_KEY/KIT_NAMES must be assigned before loadKits() runs (the function decl hoists). */
+  var KIT_KEY = 'furnfx_kits';
+  var KIT_NAMES = { 'Wood Care Kit':1, 'Fabric Care Kit':1, 'Leather Care Kit':1 };
+  /* nombre del kit → sku canónico EXISTENTE en care_kits (la tabla ya estaba sembrada). */
+  var KIT_SKU = { 'Wood Care Kit':'CARE-WOOD-001', 'Fabric Care Kit':'CARE-FABRIC-001', 'Leather Care Kit':'CARE-LEATHER-001' };
+  var savedKits = loadKits();
+  var kitCardRenderers = [];   /* render de cada kit card (poblado por el IIFE kitCards); declarado aquí por el mismo hoisting que CART_KEY */
+  var compareCardRenderers = [];   /* render de cada compare card; DEBE declararse aquí (no más abajo): el handler de ?paid=1 corre clearCart()→renderCompareCards() antes; var hoistea la decl pero no el valor → estaría undefined */
+  /* MEMBERSHIP — Repair Membership ($19.99/mo) es una suscripción recurrente como un plan, pero un
+     PRODUCTO APARTE (los T&C la llaman "separate product"). Regla de precio: GRATIS con cualquier
+     plan, $19.99/mo en solitario. Es 1 por hogar (sin cantidad). Mismo hoisting que CART_KEY:
+     MEMBERSHIP_KEY debe estar asignado antes de que corra loadMembership(). */
+  var MEMBERSHIP_KEY = 'furnfx_membership';
+  var savedMembership = loadMembership();
+  var membershipBtnRenderers = [];   /* botones "Add membership" → "✓ In cart" (igual que kitCardRenderers) */
+  var termBtns = document.querySelectorAll('#cfg-term button');
+
+  function plan(){ return PLANS[state.term]; }
+  function perUnit(){ return plan().base[state.cov]; }       /* one plan's price for the term + level */
+  function finalPrice(){ return perUnit() * state.count; }   /* per unit × number of plans */
+  function planLimit(){ return plan().limit; }               /* coverage limit per plan (term-driven) */
+  function fmt(n){ return '$' + n.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 }); }   /* always show cents */
+  function fmtBig(n){ return '$' + Math.round(n).toLocaleString(); }
+
+  /* (legacy store/Rx comparison tables removed — the comparison is now two cart-driven plan cards; see the compare-cards module below.) */
+
+  function update(){
+    /* Cart is the single source of truth: the hero stepper mirrors the cart line for the
+       currently-selected coverage + term (0 when that line isn't in the cart yet), and adopts
+       that line's "what are you protecting?" label so the hero and the section-2 cards agree. */
+    var heroLine = findLine(state.cov, state.term);
+    state.count = heroLine ? heroLine.count : 0;
+    if(heroLine){ state.type = heroLine.type; syncTypeBtn(); }
+    var p = plan();
+    var lim = planLimit();
+    /* Solo MONTHLY está wired para checkout. year1/year3 son PREVIEW de comparación (no comprables):
+       muestran el precio por plan, pero NO escriben carrito ni permiten checkout. */
+    var buyable = state.term === 'monthly';
+    var shownCount = buyable ? state.count : 1;   /* yearly: previsualiza 1 plan (no toca el carrito) */
+
+    /* Price equation row: per plan × count = total. monthly shows /month; year1/year3 show no suffix (payment timing is set at checkout). */
+    if(unitPriceEl) unitPriceEl.textContent = fmt(perUnit());
+    if(unitEl)      unitEl.textContent = p.unit;
+    if(totalEl)     totalEl.textContent = fmt(perUnit() * shownCount);
+    if(totalUnitEl) totalUnitEl.textContent = p.unit;
+    if(countEl)     countEl.textContent = String(shownCount);
+
+    /* Coverage line under the price (separate plans, not pooled). */
+    if(coversEl){
+      coversEl.textContent = !buyable
+        ? 'Covers up to ' + fmtBig(lim) + ' per plan'
+        : (state.count > 1
+            ? state.count + ' plans · ' + fmtBig(lim) + ' each · assign items at checkout'
+            : 'Covers up to ' + fmtBig(lim) + ' · assign items at checkout');
+    }
+
+    /* Yearly = preview de comparación: muestra la nota + oculta "Checkout" (no comprable). */
+    if(cfgYearlyNote) cfgYearlyNote.hidden = buyable;
+    if(cfgCheckout)   cfgCheckout.hidden = !buyable;
+
+    syncLimits();
+    syncCount();
+  }
+
+  /* Coverage limit read-out (Step 3) — display-only; the highlighted limit follows the term. */
+  function syncLimits(){
+    limitBtns.forEach(function(b){
+      b.classList.toggle('active', parseInt(b.dataset.limit, 10) === planLimit());
+    });
+  }
+
+  /* Plan-count stepper (1..MAX_COUNT). */
+  function syncCount(){
+    var buyable = state.term === 'monthly';              /* yearly = preview → stepper deshabilitado */
+    if(countDec) countDec.disabled = !buyable || state.count <= 0;
+    if(countInc) countInc.disabled = !buyable || state.count >= MAX_COUNT;
+  }
+  function setCount(n){
+    if(state.term !== 'monthly') return;   /* INVARIANTE: yearly es display-only → NUNCA escribe una línea no comprable (cierra el único chokepoint: stepper + auto-add del checkout) */
+    n = Math.max(0, Math.min(MAX_COUNT, n));
+    cartSet(state.cov, state.term, state.type, n);   /* the stepper IS the cart line for this plan */
+    update();                                        /* re-derives state.count + re-prices */
+    updateCartBadge();
+    renderCompareCards();                            /* reflect the change into the section-2 cards */
+    if(cartPanel && !cartPanel.hidden) cartFillSummary();
+  }
+  if(countDec) countDec.addEventListener('click', function(){ setCount(state.count - 1); });
+  if(countInc) countInc.addEventListener('click', function(){ setCount(state.count + 1); });
+
+  /* Type dropdown — custom listbox (a native <select> can't show two-line, wrapping options).
+     Single-select, label only. Keyboard: button toggles (click/Enter/Space), ArrowDown/Up opens;
+     in the open list Up/Down/Home/End move the active option (aria-activedescendant), Enter/Space
+     selects, Esc/Tab closes. Click-outside, scroll AND resize all dismiss it so it never floats
+     detached over the content below (Doug 18-jun: "covering everything up").
+     ── DRY: ONE factory drives the hero AND both compare-card selectors (was 3 near-identical copies).
+     The factory owns the DOM/keyboard/a11y; the caller owns the selection state via getSelected/onSelect. */
+  function createTypeSelect(o){
+    var btn = o.btn, menu = o.menu, active = 0;
+    function typeObjOf(key){ for(var i = 0; i < TYPES.length; i++){ if(TYPES[i].key === key) return TYPES[i]; } return TYPES[0]; }
+    function idxOf(key){ for(var i = 0; i < TYPES.length; i++){ if(TYPES[i].key === key) return i; } return 0; }
+    function renderMenu(){
+      var sel = o.getSelected();
+      while(menu.firstChild) menu.removeChild(menu.firstChild);
+      TYPES.forEach(function(t, i){
+        var li = document.createElement('li');
+        li.id = menu.id + '-opt-' + t.key;
+        li.className = 'cfg-type-opt' + (t.key === sel ? ' active' : '') + (i === active ? ' focus' : '');
+        li.setAttribute('role', 'option');
+        li.setAttribute('aria-selected', t.key === sel ? 'true' : 'false');
+        li.dataset.type = t.key;
+        var nm = document.createElement('span'); nm.className = 'cfg-type-name'; nm.textContent = t.name;
+        var ds = document.createElement('span'); ds.className = 'cfg-type-desc'; ds.textContent = t.desc;
+        li.appendChild(nm); li.appendChild(ds); menu.appendChild(li);
+      });
+    }
+    function syncBtn(){
+      var t = typeObjOf(o.getSelected());
+      btn.querySelector('.cfg-type-name').textContent = t.name;
+      btn.querySelector('.cfg-type-desc').textContent = t.desc;
+    }
+    function setActive(i){
+      active = Math.max(0, Math.min(TYPES.length - 1, i));
+      var opts = menu.querySelectorAll('.cfg-type-opt');
+      opts.forEach(function(op, idx){ op.classList.toggle('focus', idx === active); });
+      if(opts[active]){ menu.setAttribute('aria-activedescendant', opts[active].id); opts[active].scrollIntoView({ block:'nearest' }); }
+    }
+    /* Dismiss on page scroll/resize so the open menu never hangs detached over the content below.
+       The internal option-list scroll (overflow:auto) is ignored via the menu.contains guard. */
+    function onScrollOrResize(e){ if(e && e.type === 'scroll' && menu.contains(e.target)) return; closeMenu(false); }
+    /* Open upward when there isn't room below the button (and there's more room above). The menu is
+       dismissed on scroll/resize, so a one-shot decision at open time is enough — no live repositioning. */
+    function positionMenu(){
+      var r = btn.getBoundingClientRect();
+      var need = menu.offsetHeight + 8;            /* menu height (capped at max-height) + the 6px gap */
+      var below = window.innerHeight - r.bottom;
+      menu.classList.toggle('cfg-type-menu--up', below < need && r.top > below);
+    }
+    function openMenu(){
+      if(!menu.hidden) return;
+      active = idxOf(o.getSelected());
+      renderMenu(); menu.hidden = false; positionMenu(); btn.setAttribute('aria-expanded', 'true'); setActive(active); menu.focus();
+      /* Attach on the NEXT tick so the open's own focus() scroll doesn't immediately self-close it. */
+      setTimeout(function(){
+        if(menu.hidden) return;
+        window.addEventListener('scroll', onScrollOrResize, true);
+        window.addEventListener('resize', onScrollOrResize);
+      }, 0);
+    }
+    function closeMenu(focus){
+      if(menu.hidden) return;
+      menu.hidden = true; btn.setAttribute('aria-expanded', 'false'); menu.removeAttribute('aria-activedescendant');
+      window.removeEventListener('scroll', onScrollOrResize, true);
+      window.removeEventListener('resize', onScrollOrResize);
+      if(focus) btn.focus();
+    }
+    function select(key){ o.onSelect(key); syncBtn(); closeMenu(true); }
+    menu.setAttribute('tabindex', '-1');
+    btn.setAttribute('aria-controls', menu.id);
+    btn.addEventListener('click', function(e){ e.stopPropagation(); if(menu.hidden) openMenu(); else closeMenu(true); });
+    btn.addEventListener('keydown', function(e){ if(e.key === 'ArrowDown' || e.key === 'ArrowUp'){ e.preventDefault(); openMenu(); } });
+    menu.addEventListener('click', function(e){ var op = e.target.closest('.cfg-type-opt'); if(op) select(op.dataset.type); });
+    menu.addEventListener('keydown', function(e){
+      if(menu.hidden) return;
+      switch(e.key){
+        case 'ArrowDown': e.preventDefault(); setActive(active + 1); break;
+        case 'ArrowUp':   e.preventDefault(); setActive(active - 1); break;
+        case 'Home':      e.preventDefault(); setActive(0); break;
+        case 'End':       e.preventDefault(); setActive(TYPES.length - 1); break;
+        case 'Enter': case ' ': e.preventDefault(); select(TYPES[active].key); break;
+        case 'Escape':    e.preventDefault(); closeMenu(true); break;
+        case 'Tab':       closeMenu(false); break;
+      }
+    });
+    document.addEventListener('click', function(e){ if(!menu.hidden && !btn.contains(e.target) && !menu.contains(e.target)) closeMenu(false); });
+    syncBtn();
+    return { syncBtn: syncBtn, render: renderMenu, close: function(){ closeMenu(false); } };
+  }
+
+  /* Hero type selector — selection lives in state.type; relabels the shared cart line so the cards follow. */
+  function setTypeCore(key){
+    state.type = key;
+    var line = findLine(state.cov, state.term);
+    if(line){ line.type = key; persistCart(); renderCompareCards(); }
+    if(cartPanel && !cartPanel.hidden) cartFillSummary();
+  }
+  var heroType = (typeBtn && typeMenu)
+    ? createTypeSelect({ btn: typeBtn, menu: typeMenu, getSelected: function(){ return state.type; }, onSelect: setTypeCore })
+    : null;
+  function syncTypeBtn(){ if(heroType) heroType.syncBtn(); }   /* kept as a thin shim so update() stays unchanged */
+  syncTypeBtn();
+
+  /* "Need more?" (beyond MAX_COUNT plans) → chat; "Start over" → reset the card. */
+  var needMore = document.getElementById('cfg-needmore');
+  if(needMore) needMore.addEventListener('click', function(e){ e.preventDefault(); var cb = document.getElementById('chat-btn'); if(cb) cb.click(); });
+  function resetCfg(){
+    state.term = 'monthly'; state.type = 'furniture'; state.count = 1;
+    termBtns.forEach(function(b){ var on = b.dataset.term === 'monthly'; b.classList.toggle('active', on); b.setAttribute('aria-checked', on ? 'true' : 'false'); });
+    syncTypeBtn();
+    setCov('stain');   /* sets state.cov + syncs the toggle + calls update() */
+  }
+  var resetBtn = document.getElementById('cfg-reset');
+  if(resetBtn) resetBtn.addEventListener('click', resetCfg);
+
+  /* Single source for coverage changes — the toggle and the plan cards both go through here. */
+  function setCov(cov){
+    state.cov = cov;
+    covBtns.forEach(function(b){
+      var on = b.dataset.cov === cov;
+      b.classList.toggle('active', on);
+      b.setAttribute('aria-checked', on ? 'true' : 'false');
+    });
+    update();
+    if(cartPanel && !cartPanel.hidden) cartFillSummary();  /* keep an already-open cart in sync */
+  }
+  covBtns.forEach(function(btn){
+    btn.addEventListener('click', function(){ setCov(btn.dataset.cov); });
+  });
+
+  /* The section-2 cards edit the cart directly. After such an edit, mirror it back into the hero so
+     the single shared count stays in sync and the coverage toggle auto-switches to the edited card
+     (the cards are monthly-only, so the hero term snaps to monthly). setCov() runs update(), which
+     re-derives the count + label from the cart line. */
+  function reflectToHero(cov){
+    state.term = 'monthly';
+    termBtns.forEach(function(b){
+      var on = b.dataset.term === 'monthly';
+      b.classList.toggle('active', on);
+      b.setAttribute('aria-checked', on ? 'true' : 'false');
+    });
+    setCov(cov);
+  }
+
+  // CART / CHECKOUT slide-out (CHK-1) — mock pay now, Stripe-test hook below
+  var cartPanel = document.getElementById('cart-panel');
+  var cartBackdrop = document.getElementById('cart-backdrop');
+  var cartClose = document.getElementById('cart-close');
+  var cartForm = document.getElementById('cart-form');
+  var cartViewForm = document.getElementById('cart-view-form');
+  var cartViewSuccess = document.getElementById('cart-view-success');
+  var cartCov = document.getElementById('cart-cov');
+  var cartMeta = document.getElementById('cart-meta');
+  var cartPrice = document.getElementById('cart-price');
+  var cartPayAmt = document.getElementById('cart-pay-amt');
+
+  /* MEMBERSHIP MODE (Path 2): the same drawer doubles as Repair-Membership signup. Front-end
+     stub only — no real charge; "add a care kit" is a $49.99 one-time add-on. Real membership/
+     kit purchase + email-cart send are flagged for the backend punch-list. */
+  var cartMode = 'plan';                      /* 'plan' | 'membership' */
+  var MEMBERSHIP_PRICE = 19.99;
+  /* Precio POR kit (espeja care_kits.price_cents; el server recobra desde la BD, esto es display). */
+  var KIT_PRICE = { 'Wood Care Kit': 49.99, 'Fabric Care Kit': 49.99, 'Leather Care Kit': 49.99 };
+  function kitPrice(name){ return KIT_PRICE[name] || 0; }
+  /* BE-5 (14-ago): los kits cobran al cliente S&H ($11 POR KIT, promedio de Dahlia 10.97
+     redondeado) y sales tax flat 6% con base SOLO el kit. Espeja _lib/checkout.mjs
+     kitCharges(); el server es canonico y estos consts son display (patron ELIG_DAYS).
+     Suscripciones y membership NO llevan tax (RAP lo absorbe, "we eat the 6%"). */
+  var KIT_SH = 11.00;
+  var KIT_TAX_RATE = 0.06;
+  function kitsRetailTotal(){ var t = 0; for(var n in savedKits){ t += kitPrice(n) * savedKits[n]; } return t; }
+  function kitsShTotal(){ return KIT_SH * kitCount(); }
+  function kitsTaxTotal(){ return Math.round(kitsRetailTotal() * KIT_TAX_RATE * 100) / 100; }
+  function kitsOneTimeTotal(){ return kitsRetailTotal() + kitsShTotal() + kitsTaxTotal(); }
+  var cartTitleEl = document.getElementById('cart-title');
+  var memExtras = document.getElementById('cart-membership-extras');
+  var receiptFields = document.getElementById('cart-receipt-fields');
+  var memFine = document.getElementById('cart-membership-fine');
+  var kitToggle = document.getElementById('cart-kit-toggle');
+  var kitTypeField = document.getElementById('cart-kit-type-field');
+  var emailSelfBtnEl = document.getElementById('cart-email-self');
+  var payBtnInit = document.getElementById('cart-pay');
+  var PAY_HTML = payBtnInit ? payBtnInit.innerHTML : '';   /* original plan-mode pay label */
+
+  function membershipPayLabel(){
+    var label = 'Start membership · ' + fmt(MEMBERSHIP_PRICE) + '/mo';
+    if(kitToggle && kitToggle.checked) label += ' + ' + fmt(kitPrice('Wood Care Kit')) + ' kit';
+    return label + ' <span class="arrow">&rarr;</span>';
+  }
+  function applyCartMode(){
+    var mem = cartMode === 'membership';
+    if(cartTitleEl) cartTitleEl.textContent = mem ? 'Your membership' : 'Your coverage';
+    if(memExtras) memExtras.hidden = !mem;
+    if(mem){ ['cart-kits','cart-total','cart-plans'].forEach(function(id){ var el = document.getElementById(id); if(el) el.hidden = true; }); }   /* plan-cart artifacts hidden in membership mode */
+    if(receiptFields) receiptFields.hidden = mem;
+    if(memFine) memFine.hidden = !mem;
+    /* KIOSK-5b: el botón email-cart queda SIEMPRE oculto (hidden en el markup) hasta Resend — esta
+       línea lo re-mostraba en modo plan en cada apertura del drawer. */
+    var payBtnEl = document.getElementById('cart-pay');
+    if(payBtnEl){
+      payBtnEl.innerHTML = mem ? membershipPayLabel() : PAY_HTML;
+      cartPayAmt = document.getElementById('cart-pay-amt');   /* innerHTML rebuilt the node; re-grab */
+    }
+  }
+  function fillMembershipSummary(){
+    var ps = document.getElementById('cart-plan-summary'); if(ps) ps.hidden = false;   /* membership reuses the single summary block */
+    var pls = document.getElementById('cart-plans'); if(pls) pls.hidden = true;        /* la lista de planes no aplica en membership */
+    if(cartCov) cartCov.textContent = 'Repair Membership';
+    if(cartMeta) cartMeta.textContent = 'Every piece in your home — new, old, online, or inherited';
+    if(cartPrice) cartPrice.textContent = fmt(MEMBERSHIP_PRICE);
+  }
+
+  /* Cart summary shows the configured plan + coverage (the per-item breakdown is a downstream
+     item — items are now chosen at checkout). Price scales with the plan count via finalPrice(). */
+  /* Drawer en modo plan: lista TODAS las líneas del carrito (planes + kits) + total combinado.
+     El bloque single #cart-plan-summary queda solo para el modo membership. */
+  function cartFillSummary(){
+    var planSummary = document.getElementById('cart-plan-summary');
+    if(planSummary) planSummary.hidden = true;
+    /* El recibo (order#/zip/fecha) solo aplica a planes de muebles → en solo-kit se oculta
+       y deja de ser required (si no, el `required` del HTML bloquearía el checkout solo-kit). */
+    var hasPlans = savedItems.length > 0;
+    var receipt = document.getElementById('cart-receipt-fields');
+    if(receipt){
+      receipt.hidden = !hasPlans;
+      ['cart-order','cart-zip','cart-date','cart-receipt-photo'].forEach(function(id){ var el = document.getElementById(id); if(el) el.required = hasPlans; });   /* BE-1: foto requerida con plan */
+      var assocEl = document.getElementById('cart-associate'); if(assocEl) assocEl.required = hasPlans && KIOSK;   /* KIOSK-1: associate # required solo en kiosk */
+    }
+    renderPlanLines();
+    renderMembershipLine();
+    updateCartTotal();
+  }
+  /* Una fila por línea de plan (cov+term+type-label) con su subtotal y botón borrar,
+     espejando renderCartKits. Borrar una línea la quita del carrito y re-sincroniza todo. */
+  function renderPlanLines(){
+    var wrap = document.getElementById('cart-plans');
+    var list = document.getElementById('cart-plans-list');
+    if(!wrap || !list) return;
+    while(list.firstChild) list.removeChild(list.firstChild);
+    wrap.hidden = savedItems.length === 0;
+    savedItems.forEach(function(line){
+      var covName = line.cov === 'stain-mech' ? 'Stain + Structure' : 'Stain protection';
+      var tObj = TYPES.filter(function(x){ return x.key === line.type; })[0] || TYPES[0];
+      var pl = PLANS[line.term] || PLANS.monthly;
+      var li = document.createElement('li'); li.className = 'cart-line plan';
+
+      var rm = document.createElement('button');
+      rm.type = 'button'; rm.className = 'cart-line-remove'; rm.setAttribute('aria-label', 'Remove plan'); rm.textContent = '×';
+      rm.addEventListener('click', function(){
+        cartSet(line.cov, line.term, line.type, 0);   /* 0 elimina la línea */
+        renderPlanLines(); renderMembershipLine(); renderCompareCards(); update(); updateCartBadge(); updateCartTotal();
+      });
+
+      var cov = document.createElement('div'); cov.className = 'cov'; cov.textContent = covName;
+      var meta = document.createElement('div'); meta.className = 'meta';
+      var metaTxt = pl.label + ' · ' + tObj.name + ' · up to ' + fmtBig(pl.limit) + ' coverage';
+      if(line.count > 1) metaTxt += ' · ' + line.count + ' plans';
+      meta.textContent = metaTxt;
+      var price = document.createElement('div'); price.className = 'price';
+      price.textContent = fmt(line.price);
+      var small = document.createElement('small'); small.textContent = '/month · cancel anytime';
+      price.appendChild(small);
+
+      li.appendChild(rm); li.appendChild(cov); li.appendChild(meta); li.appendChild(price);
+      list.appendChild(li);
+    });
+  }
+  /* Total combinado: Σ planes (mensual) + Σ kits (one-time), mostrados SEPARADOS (un solo cobro,
+     distinta cadencia). Pay: /mo si hay planes (los kits van en la 1ª factura), "Pay $X once" si es
+     solo-kit, deshabilitado si está vacío. Solo gestiona el botón en modo plan. */
+  function updateCartTotal(){
+    /* Recurrente /mo = Σ planes + membership de pago ($19.99/mo SIEMPRE, MEM-7).
+       One-time = Σ kits. Se muestran SEPARADOS porque son cadencias distintas. */
+    var monthly = 0;
+    for(var i = 0; i < savedItems.length; i++) monthly += savedItems[i].price;
+    if(savedMembership) monthly += membershipPrice();
+    var kitN = kitCount();
+    var totalEl = document.getElementById('cart-total');
+    var totalVal = document.getElementById('cart-total-val');
+    if(totalEl && totalVal){
+      var parts = [];
+      if(monthly > 0) parts.push(fmt(monthly) + '/mo');
+      if(kitN > 0) parts.push(fmt(kitsOneTimeTotal()) + ' one-time');
+      totalVal.textContent = parts.join('  +  ');
+      totalEl.hidden = parts.length === 0;
+    }
+    var clearBtn = document.getElementById('cart-clear');
+    if(clearBtn) clearBtn.hidden = !(savedItems.length > 0 || kitN > 0 || savedMembership);
+    if(cartMode === 'plan'){
+      var payBtn = document.getElementById('cart-pay');
+      if(payBtn){
+        if(monthly > 0){
+          payBtn.disabled = false;
+          if(kitN > 0){
+            /* Recurrente + kits: el cobro de HOY = 1ª mensualidad + kits one-time. Mostramos el total
+               de hoy y, entre paréntesis, qué parte recurre mensual y qué parte es pago único. */
+            var oneTime = kitsOneTimeTotal();
+            payBtn.innerHTML = 'Pay <span id="cart-pay-amt">' + fmt(monthly + oneTime) + '</span> today <span class="pay-sub">(' + fmt(monthly) + '/mo + ' + fmt(oneTime) + ' one-time)</span> <span class="arrow">&rarr;</span>';
+          } else if(savedMembership && savedItems.length === 0){
+            /* Membership en solitario (sin plan): es el único recurrente → etiqueta propia. */
+            payBtn.innerHTML = 'Start membership · <span id="cart-pay-amt">' + fmt(monthly) + '</span>/mo <span class="arrow">&rarr;</span>';
+          } else {
+            payBtn.innerHTML = PAY_HTML;
+            if((cartPayAmt = document.getElementById('cart-pay-amt'))) cartPayAmt.textContent = fmt(monthly);
+          }
+          cartPayAmt = document.getElementById('cart-pay-amt');   /* innerHTML rebuilt the node; re-grab */
+        } else if(kitN > 0){
+          payBtn.disabled = false;
+          payBtn.innerHTML = 'Pay ' + fmt(kitsOneTimeTotal()) + ' once <span class="arrow">&rarr;</span>';
+        } else {
+          payBtn.disabled = true;
+          payBtn.textContent = 'Your cart is empty';
+        }
+      }
+    }
+  }
+  /* "Add membership" ya NO abre un modo aparte: agrega la membership como una línea recurrente más
+     del carrito multi-línea ($19.99/mo, MEM-7: la incluida es beneficio, no línea) y abre el mismo drawer. */
+  function openMembership(){
+    membershipAdd();
+    renderMembershipBtns();
+    updateCartBadge();
+    openCart();
+  }
+  if(kitToggle){
+    kitToggle.addEventListener('change', function(){
+      if(kitTypeField) kitTypeField.hidden = !kitToggle.checked;
+      if(cartMode === 'membership'){
+        var pb = document.getElementById('cart-pay');
+        if(pb) pb.innerHTML = membershipPayLabel();
+      }
+    });
+  }
+  /* MEMBERSHIP BUTTONS — "Add membership" en la sección (#mem-add-btn), en el final-CTA
+     (#final-membership) y como add-on en las plan cards ([data-addon=membership]). Todas agregan la
+     membership como línea del carrito y pasan a "✓ In cart" (mismo patrón que las kit cards). */
+  (function membershipButtons(){
+    var btns = [];
+    var mab = document.getElementById('mem-add-btn'); if(mab) btns.push(mab);
+    var fmb = document.getElementById('final-membership'); if(fmb) btns.push(fmb);
+    document.querySelectorAll('[data-addon="membership"]').forEach(function(b){ btns.push(b); });
+    btns.forEach(function(btn){
+      var orig = btn.innerHTML;   /* etiqueta original, para restaurar al quitar la membership */
+      btn.addEventListener('click', function(){ if(!savedMembership) openMembership(); else openCart(); });
+      membershipBtnRenderers.push(function(){
+        btn.disabled = savedMembership;
+        btn.classList.toggle('btn-incart', savedMembership);
+        btn.innerHTML = savedMembership ? '&#10003; In cart' : orig;
+      });
+    });
+    renderMembershipBtns();   /* estado inicial (carrito hidratado desde localStorage) */
+  })();
+
+  function openCart(){
+    cartMode = 'plan';
+    applyCartMode();        /* restore plan-mode UI + pay label (re-grabs cartPayAmt) before filling */
+    cartFillSummary();
+    renderCartKits();       /* list any care kits added from the #kits cards (KIT-3) */
+    /* BUGFIX 04-jul: vistas excluyentes — sin este hide, reabrir el drawer tras un handoff apilaba
+       el form + la vista de espera zombi (mismo fix que el kiosk). */
+    if(cartViewHandoff) cartViewHandoff.hidden = true;
+    cartViewSuccess.hidden = true; cartViewForm.hidden = false;   /* reset to form view */
+    cartPanel.hidden = false; cartBackdrop.hidden = false;
+    requestAnimationFrame(function(){ cartPanel.classList.add('open'); cartBackdrop.classList.add('open'); });
+    document.body.style.overflow = 'hidden';
+    /* Focus the first input now that the form leads with "Tell us about yourself".
+       Delay matches the panel transition so the focus ring isn't visible during the slide. */
+    var first = document.getElementById('cart-name');
+    if(first) setTimeout(function(){ first.focus(); }, 300);
+  }
+  function closeCart(){
+    stopPoll(); clearAutoReset();   /* KIOSK-1: no dejar el poll/auto-reset vivos al cerrar (X/backdrop/Esc) */
+    cartPanel.classList.remove('open'); cartBackdrop.classList.remove('open');
+    document.body.style.overflow = '';
+    setTimeout(function(){ cartPanel.hidden = true; cartBackdrop.hidden = true; }, 280);
+  }
+
+  /* Start checkout via the create-checkout-session Function: it persists the lead
+     (service_role, price recomputed server-side) and creates a Stripe Checkout Session,
+     returning its hosted URL. Resolves to { url } on success, { rateLimited, retryAfter }
+     on a 429 (BE-2), or {} on any other failure/timeout.
+     NOTE: future leads (chat / save-build) go through a Function too — the anon key is
+     gone on purpose; never re-add direct browser writes. */
+  function startCheckout(p){
+    var controller = new AbortController();
+    var timer = setTimeout(function(){ controller.abort(); }, 8000);
+    return fetch('/api/create-checkout-session', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        email: p.email, plans: p.plans, kits: p.kits, membership: !!p.membership,
+        full_name: p.full_name, phone: p.phone, address: p.address,
+        order: p.order, zip: p.zip, date: p.date,
+        associate: p.associate, kiosk: !!p.kiosk,           /* KIOSK-1 */
+        referral_code: p.referral_code || undefined,        /* PORT-9: método B (undefined → sale del JSON) */
+        return_to: location.pathname,                       /* página de retorno: success/cancel vuelven AQUÍ en cualquier dominio (kiosk.html / raíz propia) */
+        receipt_path: p.receipt_path || null                /* BE-1: path del recibo en Storage */
+      }),
+      signal: controller.signal
+    }).then(function(res){
+      clearTimeout(timer);
+      if(res.status === 429){
+        var ra = parseInt(res.headers.get('Retry-After'), 10);
+        return { rateLimited: true, retryAfter: isNaN(ra) ? 30 : ra };
+      }
+      if(!res.ok){
+        console.error('[checkout] create-checkout-session failed:', res.status);
+        return res.json().then(function(d){ return { error: (d && d.error) || ('http_' + res.status) }; }, function(){ return { error: 'http_' + res.status }; });
+      }
+      return res.json().then(function(d){ return d && d.url ? { url: d.url, emailed: !!d.emailed, id: d.id } : {}; });
+    }, function(err){
+      clearTimeout(timer);
+      console.error('[checkout] create-checkout-session error:', err);
+      return {};
+    });
+  }
+
+  /* PORT-9: feedback en vivo del referral code (fail-soft; la verdad la decide el server). */
+  (function referralFeedback(){
+    var inp = document.getElementById('cart-referral'), msg = document.getElementById('cart-referral-msg');
+    if(!inp || !msg) return;
+    function check(){
+      var v = inp.value.trim();
+      if(!v){ msg.hidden = true; return; }
+      fetch('/api/referral-validate?code=' + encodeURIComponent(v)).then(function(r){ return r.json(); }).then(function(d){
+        msg.hidden = false;
+        msg.textContent = d && d.valid
+          ? ('Code applied — supporting ' + (d.org_name || 'your dealer') + '.')
+          : 'Code not recognized — you can still check out.';
+      }).catch(function(){ msg.hidden = true; });
+    }
+    inp.addEventListener('blur', check);
+    /* PORT-9: link permanente por dealer — ?ref=CODIGO pre-llena el código (misma vía B, misma
+       verificación server-side). Visible a propósito: el cliente ve a quién apoya y, si el código
+       está apagado/mal, degrada solo a 'not recognized' sin bloquear la venta. */
+    var ref = new URLSearchParams(location.search).get('ref');
+    if(ref && !inp.value){ inp.value = ref.trim(); check(); }
+  })();
+
+  var EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  var ZIP_OK_RE = /^\d{5}(-\d{4})?$/;   /* QA-7 (BUG-02): espejo del server (invalid_zip) */
+  var ELIG_DAYS = 60;      /* QA-6 (BUG-03; decisión Doug 27-jul "Use 60 days") — espejo de ELIGIBILITY_WINDOW_DAYS */
+  var HORIZON_DAYS = 90;   /* entregas programadas a futuro — espejo de DELIVERY_HORIZON_DAYS */
+  (function qa6DateWindow(){   /* min/max del date picker = la misma ventana que enforza el server */
+    var el = document.getElementById('cart-date'); if(!el) return;
+    var iso = function(d){ return d.toISOString().slice(0, 10); };
+    var min = new Date(); min.setDate(min.getDate() - ELIG_DAYS);
+    var max = new Date(); max.setDate(max.getDate() + HORIZON_DAYS);
+    el.min = iso(min); el.max = iso(max);
+  })();
+  /* Phone client-side gate: ≥7 dígitos (espeja cleanPhone en validate.mjs). */
+  function phoneDigitsOk(v){ return (v || '').replace(/\D/g, '').length >= 7; }
+  /* KIOSK-18: máscara (000) 000-0000 mientras se teclea — solo dígitos (tope 10); el server sigue
+     extrayendo dígitos (cleanPhone), el contrato no cambia. Con ≤3 dígitos no hay puntuación, así
+     borrar colapsa la máscara sin atascarse. */
+  function formatPhone(v){
+    var d = (v || '').replace(/\D/g, '').slice(0, 10);
+    if(d.length >= 7) return '(' + d.slice(0,3) + ') ' + d.slice(3,6) + '-' + d.slice(6);
+    if(d.length >= 4) return '(' + d.slice(0,3) + ') ' + d.slice(3);
+    return d;
+  }
+  (function phoneMask(){
+    var el = document.getElementById('cart-phone');
+    if(!el) return;
+    el.addEventListener('input', function(){
+      var f = formatPhone(el.value);
+      if(el.value !== f) el.value = f;
+    });
+  })();
+  /* ── KIOSK-18: errores ESPECÍFICOS por campo (espejo del kiosk). setFieldError inyecta un
+     <p class="field-msg"> (textContent, nunca innerHTML) y marca .field-error; teclear o cambiar
+     el campo limpia SU error (delegación a nivel documento). ─────────────────────────────── */
+  var FIELD_LABEL = {
+    'cart-name':'name', 'cart-email':'email', 'cart-phone':'phone', 'cart-address':'address',
+    'cart-associate':'associate #', 'cart-order':'sale order number', 'cart-zip':'ZIP code',
+    'cart-date':'purchase date', 'cart-receipt-photo':'receipt photo'
+  };
+  function fieldBox(id){
+    var el = document.getElementById(id);
+    return el && el.closest ? el.closest('.cart-field') : null;
+  }
+  function setFieldError(id, msg){
+    var box = fieldBox(id);
+    if(!box) return;
+    box.classList.add('field-error');
+    var m = box.querySelector('.field-msg');
+    if(!m){ m = document.createElement('p'); m.className = 'field-msg'; box.appendChild(m); }
+    m.textContent = msg;
+  }
+  /* QA-7 (BUG-06/07): hint NO bloqueante — informa sin detener la venta (falso rechazo = venta perdida) */
+  function softHint(id, msg){
+    var box = fieldBox(id);
+    if(!box) return;
+    var h = box.querySelector('.field-hint');
+    if(!msg){ if(h) box.removeChild(h); return; }
+    if(!h){ h = document.createElement('p'); h.className = 'field-hint'; box.appendChild(h); }
+    h.textContent = msg;
+  }
+  (function qa7SoftHints(){
+    var n = document.getElementById('cart-name');
+    if(n) n.addEventListener('blur', function(){
+      var v = n.value.trim();
+      softHint('cart-name', (v && !/\d/.test(v) && v.split(/\s+/).length < 2) ? 'Looks like only one name — if the customer has a last name, add it.' : '');
+    });
+    var a = document.getElementById('cart-address');
+    if(a) a.addEventListener('blur', function(){
+      var v = a.value.trim();
+      softHint('cart-address', (v && (v.split(/\s+/).length < 2 || !/\d/.test(v))) ? 'Double-check the address — a street number, city, state and ZIP help us ship the care kit.' : '');
+    });
+  })();
+  function clearFieldError(id){
+    var box = fieldBox(id);
+    if(!box) return;
+    box.classList.remove('field-error');
+    var m = box.querySelector('.field-msg');
+    if(m) box.removeChild(m);
+  }
+  ['input','change'].forEach(function(ev){
+    document.addEventListener(ev, function(e){ if(e.target && e.target.id) clearFieldError(e.target.id); });
+  });
+  var lastMissing = [];   /* [{el, name}] del último focusFirst — la nota general los NOMBRA */
+  function focusFirst(){
+    /* KIOSK-18: marca TODOS los requeridos vacíos (no solo el primero), enfoca el primero y deja
+       los nombres en lastMissing. Maneja .required (no el valor a ciegas) para respetar el modo:
+       order/zip/date solo son required con plan, associate solo en kiosk (update() conmuta
+       .required). Así la validación del cliente coincide con la del server → sin 400 sorpresa. */
+    lastMissing = [];
+    var fields = ['cart-name','cart-email','cart-phone','cart-address',
+                  'cart-associate','cart-order','cart-zip','cart-date'];
+    for (var i=0; i<fields.length; i++){
+      var el = document.getElementById(fields[i]);
+      if (el && el.required && !el.value.trim()){
+        setFieldError(fields[i], 'Add the ' + FIELD_LABEL[fields[i]]);
+        lastMissing.push({ el: el, name: FIELD_LABEL[fields[i]] });
+      }
+    }
+    /* BE-1: foto del recibo requerida con plan (por files, no por value). */
+    var rp = document.getElementById('cart-receipt-photo');
+    if (savedItems.length > 0 && rp && !(rp.files && rp.files.length)){
+      setFieldError('cart-receipt-photo', 'Add a photo of the sales receipt');
+      lastMissing.push({ el: rp, name: FIELD_LABEL['cart-receipt-photo'] });
+    }
+    if(lastMissing.length){ lastMissing[0].el.focus(); return true; }
+    return false;
+  }
+  /* ── BE-1: foto del recibo (obligatoria con plan). Helpers a nivel IIFE para que clearCart
+     (fuera de if(cartForm)) pueda resetear. compressReceipt/uploadReceipt son puras. ───────── */
+  function resetReceiptPhoto(){
+    var inp = document.getElementById('cart-receipt-photo');
+    var thumb = document.getElementById('cart-receipt-thumb');
+    var prev = document.getElementById('cart-receipt-preview');
+    var stat = document.getElementById('cart-receipt-status');
+    var dz = document.getElementById('cart-dropzone');
+    if(inp) inp.value = '';
+    if(thumb && thumb.getAttribute('src')){ try{ URL.revokeObjectURL(thumb.src); }catch(_){} thumb.removeAttribute('src'); }
+    if(prev) prev.hidden = true;
+    if(stat) stat.textContent = '';
+    if(dz) dz.classList.remove('has-file','dragover');   /* vuelve al estado vacío (re-soltar) */
+  }
+  /* Comprime a JPEG q0.85, lado largo ≤2000px (sin upscale). El re-encode en canvas
+     STRIPPEA EXIF/GPS (privacidad). Devuelve Promise<Blob>. */
+  function compressReceipt(file){
+    return new Promise(function(resolve, reject){
+      if(!file){ reject(new Error('no_file')); return; }
+      var url = URL.createObjectURL(file);
+      var img = new Image();
+      img.onload = function(){
+        URL.revokeObjectURL(url);
+        var w = img.naturalWidth, h = img.naturalHeight;
+        if(!w || !h){ reject(new Error('decode')); return; }
+        var scale = Math.min(1, 2000 / Math.max(w, h));
+        var cw = Math.max(1, Math.round(w*scale)), ch = Math.max(1, Math.round(h*scale));
+        var c = document.createElement('canvas'); c.width = cw; c.height = ch;
+        c.getContext('2d').drawImage(img, 0, 0, cw, ch);
+        c.toBlob(function(b){ b ? resolve(b) : reject(new Error('encode')); }, 'image/jpeg', 0.85);
+      };
+      img.onerror = function(){ URL.revokeObjectURL(url); reject(new Error('decode')); };
+      img.src = url;
+    });
+  }
+  /* Sube el blob comprimido a la Function (bucket privado). Resuelve { path } | { error } | { rateLimited }. */
+  function uploadReceipt(blob){
+    var controller = new AbortController();
+    var timer = setTimeout(function(){ controller.abort(); }, 20000);
+    return fetch('/api/upload-receipt', {
+      method: 'POST', headers: { 'Content-Type': 'image/jpeg' }, body: blob, signal: controller.signal
+    }).then(function(res){
+      clearTimeout(timer);
+      if(res.status === 429){ var ra = parseInt(res.headers.get('Retry-After'),10); return { rateLimited:true, retryAfter: isNaN(ra)?30:ra }; }
+      if(!res.ok) return res.json().then(function(d){ return { error:(d&&d.error)||('http_'+res.status) }; }, function(){ return { error:'http_'+res.status }; });
+      return res.json().then(function(d){ return d && d.path ? { path:d.path } : { error:'no_path' }; });
+    }, function(err){ clearTimeout(timer); return { error: (err && err.name==='AbortError') ? 'timeout' : 'network' }; });
+  }
+
+  if(cartForm){
+    var payBtn = document.getElementById('cart-pay');
+    var cartNote = document.getElementById('cart-stripe-note');
+    var payHTML = payBtn ? payBtn.innerHTML : '';
+    var noteHTML = cartNote ? cartNote.innerHTML : '';
+    /* BE-1: preview + remove + drag-drop del recibo (cartNote ya existe aquí para los mensajes). */
+    var receiptInput = document.getElementById('cart-receipt-photo');
+    var receiptDropzone = document.getElementById('cart-dropzone');
+    if(receiptInput){
+      receiptInput.addEventListener('change', function(){
+        var f = receiptInput.files && receiptInput.files[0];
+        var thumb = document.getElementById('cart-receipt-thumb');
+        var prev = document.getElementById('cart-receipt-preview');
+        var stat = document.getElementById('cart-receipt-status');
+        if(!f){ resetReceiptPhoto(); return; }
+        if(!/^image\//.test(f.type || '')){ resetReceiptPhoto(); if(cartNote) cartNote.textContent = 'Please choose an image of your receipt.'; return; }
+        if(thumb){ if(thumb.getAttribute('src')){ try{ URL.revokeObjectURL(thumb.src); }catch(_){} } thumb.src = URL.createObjectURL(f); }
+        if(stat) stat.textContent = f.name || 'Receipt attached';
+        if(prev) prev.hidden = false;
+        if(receiptDropzone) receiptDropzone.classList.add('has-file');   /* prompt → preview */
+        if(cartNote) cartNote.innerHTML = noteHTML;   /* limpia error previo */
+      });
+    }
+    var receiptRemoveBtn = document.getElementById('cart-receipt-remove');
+    if(receiptRemoveBtn) receiptRemoveBtn.addEventListener('click', resetReceiptPhoto);
+    /* Drag-and-drop: el <input> overlay (inset:0, opacity:0) ACEPTA el drop NATIVAMENTE
+       (setea files + dispara change) → aquí SOLO el feedback visual .dragover, sin preventDefault
+       (no interferir con el drop nativo del input). Counter para no parpadear al cruzar hijos. */
+    if(receiptDropzone){
+      var dragDepth = 0;
+      receiptDropzone.addEventListener('dragenter', function(){ dragDepth++; receiptDropzone.classList.add('dragover'); });
+      receiptDropzone.addEventListener('dragleave', function(){ dragDepth = Math.max(0, dragDepth - 1); if(dragDepth === 0) receiptDropzone.classList.remove('dragover'); });
+      receiptDropzone.addEventListener('drop', function(){ dragDepth = 0; receiptDropzone.classList.remove('dragover'); });
+    }
+    cartForm.addEventListener('submit', function(e){
+      e.preventDefault();
+      if(cartMode === 'membership'){
+        /* Membership signup (stub): validate the visible contact fields only (no receipt),
+           then show the success view. No charge / no backend yet — flagged for the punch-list. */
+        var memNames = ['cart-name','cart-email','cart-phone','cart-address'];
+        for(var mi=0; mi<memNames.length; mi++){
+          var mEl = document.getElementById(memNames[mi]);
+          if(mEl && !mEl.value.trim()){ mEl.focus(); return; }
+        }
+        var mEmailEl = document.getElementById('cart-email');
+        if(!EMAIL_RE.test(mEmailEl.value.trim())){ mEmailEl.focus(); return; }
+        if(!phoneDigitsOk(document.getElementById('cart-phone').value.trim())){ document.getElementById('cart-phone').focus(); return; }
+        var sTitle = document.getElementById('cart-success-title');
+        if(sTitle) sTitle.textContent = 'Membership started';
+        cartViewForm.hidden = true; cartViewSuccess.hidden = false;
+        return;
+      }
+      if(savedItems.length === 0 && kitCount() === 0 && !savedMembership){ if(cartNote) cartNote.textContent = 'Your cart is empty.'; return; }
+      /* Membership standalone YA es comprable (Stripe price cableado): con membership pero sin plan,
+         el checkout va en mode:subscription y se cobra $19.99/mo. Bundled (con plan) va gratis. */
+      /* HTML5 required + el browser ya bloquea submit con campos vacíos visiblemente;
+         igualmente revalidamos email + phone (los browsers son tolerantes con `type=email`). */
+      var name = document.getElementById('cart-name').value.trim();
+      var emailEl = document.getElementById('cart-email');
+      var email = emailEl.value.trim();
+      var phone = document.getElementById('cart-phone').value.trim();
+      var address = document.getElementById('cart-address').value.trim();
+      /* Un solo guardia para TODOS los campos requeridos (según el modo, vía .required). */
+      if(focusFirst()){ if(cartNote) cartNote.textContent = 'Missing: ' + lastMissing.map(function(m){ return m.name; }).join(', ') + '.'; return; }
+      if(!EMAIL_RE.test(email)){ setFieldError('cart-email', 'That email doesn\'t look right — check it and try again.'); emailEl.focus(); if(cartNote) cartNote.textContent = 'Check the email address.'; return; }
+      if(!phoneDigitsOk(phone)){ setFieldError('cart-phone', 'Phone needs at least 7 digits.'); document.getElementById('cart-phone').focus(); if(cartNote) cartNote.textContent = 'Check the phone number.'; return; }
+      /* QA-7 (BUG-02/06 de Jakob): espejo del server — mensaje propio en vez de un 400 crudo */
+      var zipEl = document.getElementById('cart-zip');
+      var zipVal = zipEl ? zipEl.value.trim() : '';
+      if(zipVal && !ZIP_OK_RE.test(zipVal)){ setFieldError('cart-zip', 'ZIP should be 5 digits (or ZIP+4, like 84321-1234).'); zipEl.focus(); if(cartNote) cartNote.textContent = 'Check the ZIP code.'; return; }
+      if(/\d/.test(name)){ setFieldError('cart-name', 'Numbers don’t belong in a name — double-check it.'); document.getElementById('cart-name').focus(); if(cartNote) cartNote.textContent = 'Check the name.'; return; }
+      if(cartNote) cartNote.innerHTML = noteHTML;   /* clear any previous error */
+      /* Yearly es DISPLAY-ONLY (no comprable): si quedó una línea no-monthly en el carrito (p.ej. el toggle
+         1Year/3Year del hero + stepper/auto-add la creó), el server daría term_not_supported (400). La
+         bloqueamos con un mensaje claro ANTES de deshabilitar el botón — sin 400 crudo y sin cobrar de menos. */
+      if(savedItems.some(function(l){ return l.term !== 'monthly'; })){
+        if(cartNote) cartNote.textContent = 'Yearly plans aren’t available for checkout yet — switch the plan to Monthly to continue.';
+        return;
+      }
+      payBtn.disabled = true; payBtn.textContent = 'Redirecting to secure checkout…';
+      var deliver = KIOSK ? (((cartForm.querySelector('input[name="deliver"]:checked') || {}).value) || 'redirect') : 'redirect';
+      /* Carrito multi-línea: mandamos TODAS las líneas de plan + kits; el server recomputa
+         precios (planes desde PRICE_CENTS, kits desde care_kits) y arma el checkout mixto. */
+      var coPayload = {
+        email: email,
+        plans: savedItems.map(function(l){ return { cov:l.cov, term:l.term, type:l.type, count:l.count }; }),
+        kits: Object.keys(savedKits).map(function(n){ return { sku: KIT_SKU[n], quantity: savedKits[n] }; }),
+        membership: savedMembership,   /* de pago, $19.99 siempre (MEM-7); la incluida es entitlement */
+        full_name: name, phone: phone, address: address,
+        order: document.getElementById('cart-order').value.trim(),
+        zip: document.getElementById('cart-zip').value.trim(),
+        date: document.getElementById('cart-date').value,
+        associate: (document.getElementById('cart-associate') || {}).value || '',   /* KIOSK-1 */
+        referral_code: ((document.getElementById('cart-referral') || {}).value || '').trim() || undefined,   /* PORT-9: método B */
+        kiosk: KIOSK,                                                                 /* KIOSK-1: server exige associate+date en kiosk */
+        deliver: deliver,                                                            /* KIOSK-1: redirect | qr | email */
+        coverage: covPrefill || undefined                                           /* CA-1: order#/total/ítems capturados por Maya (undefined → sale del JSON) */
+      };
+      /* BE-1: con plan, la foto del recibo es OBLIGATORIA → comprimir + subir ANTES del checkout;
+         su path (string corto) viaja en el payload → lead → webhook. Kit-solo: sin recibo. */
+      var receiptStep;
+      if(savedItems.length > 0){
+        payBtn.textContent = 'Uploading receipt…';
+        var rfile = (document.getElementById('cart-receipt-photo') || {}).files;
+        receiptStep = compressReceipt(rfile && rfile[0])
+          .then(function(blob){ return uploadReceipt(blob); })
+          .catch(function(){ return { error: 'compress' }; });
+      } else {
+        receiptStep = Promise.resolve({ path: null });
+      }
+      receiptStep.then(function(rr){
+        if(rr && (rr.error || rr.rateLimited)){
+          /* Subida fallida → NO seguimos al checkout (la foto es requerida con plan). */
+          updateCartTotal();
+          if(rr.rateLimited){
+            var rs = rr.retryAfter || 30;
+            payBtn.disabled = true;
+            if(cartNote) cartNote.textContent = 'Too many attempts — please wait ' + rs + 's and try again.';
+            setTimeout(function(){ payBtn.disabled = false; updateCartTotal(); }, rs * 1000);
+          } else {
+            payBtn.disabled = false;
+            if(cartNote) cartNote.textContent = 'We couldn’t upload your receipt photo — please try again.';
+          }
+          return null;   /* corta la cadena */
+        }
+        coPayload.receipt_path = rr ? rr.path : null;
+        payBtn.textContent = 'Redirecting to secure checkout…';
+        return startCheckout(coPayload);
+      }).then(function(r){
+        if(r === null) return;   /* la subida del recibo falló (ya manejado) */
+        if(r && r.url){
+          /* KIOSK-1: si no es "pagar en el dispositivo", no redirigir → mostrar el handoff (QR / email enviado). */
+          if(KIOSK && deliver !== 'redirect'){ showHandoff(deliver, r.url, email, !!(r && r.emailed), r.id); return; }
+          window.location.href = r.url; return;   /* → Stripe-hosted payment */
+        }
+        /* failure: re-enable the button (no silent degrade — there is no url to follow).
+           updateCartTotal() reconstruye la etiqueta con el monto REAL del carrito; usar payHTML
+           la dejaba en "$9.99" (se capturó al iniciar, antes de tener líneas). */
+        updateCartTotal();
+        if(r && r.rateLimited){
+          /* BE-2: 429 → mensaje amable + deshabilitar el botón los segundos del Retry-After. */
+          var secs = r.retryAfter || 30;
+          payBtn.disabled = true;
+          if(cartNote) cartNote.textContent = 'Too many attempts — please wait ' + secs + 's and try again.';
+          setTimeout(function(){ payBtn.disabled = false; updateCartTotal(); }, secs * 1000);
+        } else {
+          payBtn.disabled = false;
+          if(cartNote) cartNote.textContent = (r && r.error) ? ('We couldn’t start checkout (' + r.error + ').') : 'We couldn’t start checkout. Please try again.';
+        }
+      });
+    });
+  }
+
+  /* ── KIOSK-1 Fase C: handoff de pago (QR / email enviado) + "Nueva venta" + auto-reset.
+     Reusa el MISMO drawer (3ª vista #cart-view-handoff). La lib QR (qrcode.min.js) se carga SOLO
+     en kiosk, on-demand (no penaliza el bundle público). */
+  var cartViewHandoff = document.getElementById('cart-view-handoff');
+  var qrLoadPromise = null;
+  function loadQrLib(){
+    if(window.qrcode) return Promise.resolve();
+    if(qrLoadPromise) return qrLoadPromise;
+    qrLoadPromise = new Promise(function(resolve, reject){
+      var s = document.createElement('script');
+      s.src = 'qrcode.min.js'; s.async = true;
+      s.onload = function(){ resolve(); };
+      s.onerror = function(){ reject(new Error('qr_lib_failed')); };
+      document.head.appendChild(s);
+    });
+    return qrLoadPromise;
+  }
+  function qrSvg(text, px){
+    var qr = window.qrcode(0, 'M'); qr.addData(text); qr.make();   /* EC level M, type auto */
+    var n = qr.getModuleCount(), quiet = 4, total = n + quiet * 2;
+    var cell = Math.max(2, Math.floor((px || 300) / total)), size = cell * total, rects = '';
+    for(var r = 0; r < n; r++) for(var c = 0; c < n; c++){
+      if(qr.isDark(r, c)) rects += '<rect x="' + ((c + quiet) * cell) + '" y="' + ((r + quiet) * cell) + '" width="' + cell + '" height="' + cell + '"/>';
+    }
+    return '<svg xmlns="http://www.w3.org/2000/svg" width="' + size + '" height="' + size + '" viewBox="0 0 ' + size + ' ' + size + '" shape-rendering="crispEdges" role="img" aria-label="Payment QR code"><rect width="' + size + '" height="' + size + '" fill="#fff"/><g fill="#000">' + rects + '</g></svg>';
+  }
+  var autoResetTimer = null;
+  function clearAutoReset(){ if(autoResetTimer){ clearTimeout(autoResetTimer); autoResetTimer = null; } }
+  function startAutoReset(){ clearAutoReset(); autoResetTimer = setTimeout(newSale, 120000); }   /* libera la pantalla a los 2 min */
+
+  /* KIOSK-1 Fase E: poll del estado de la Checkout Session mientras el cliente paga en SU teléfono
+     (no hay push hacia el kiosk). Un único pollTimer; se detiene en paid/expired/New sale/closeCart/timeout. */
+  var pollTimer = null, pollBusy = false;
+  function stopPoll(){ if(pollTimer){ clearInterval(pollTimer); pollTimer = null; } pollBusy = false; }
+  function startPoll(sessionId){
+    stopPoll();
+    var tries = 0;
+    pollTimer = setInterval(function(){
+      if(document.hidden) return;                  /* pausa en background (cheap) */
+      if(++tries > 45){ stopPoll(); return; }      /* tope ~3 min → queda el "New sale" manual */
+      if(pollBusy) return; pollBusy = true;
+      fetch('/api/checkout-status', {
+        method: 'POST', headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ session_id: sessionId })
+      }).then(function(res){ return res.json(); }).then(function(d){
+        if(d && d.done){ stopPoll(); showPaid(); }
+        else if(d && d.expired){ stopPoll(); showExpired(); }
+      }).catch(function(){ /* hipo de red → reintenta el próximo tick */ })
+        .then(function(){ pollBusy = false; });
+    }, 4000);
+  }
+  function showPaid(){
+    stopPoll();
+    if(cartViewHandoff) cartViewHandoff.hidden = true;
+    cartViewForm.hidden = true; cartViewSuccess.hidden = false;   /* reusa la success view "Payment received" */
+    startAutoReset();                                             /* venta lista → reset a la siguiente en 2 min */
+  }
+  function showExpired(){
+    stopPoll();
+    var sub = document.getElementById('cart-handoff-sub');
+    if(sub) sub.textContent = 'This payment link expired. Start a new purchase.';
+  }
+  function showHandoff(mode, url, email, emailed, sessionId){
+    cartViewForm.hidden = true; cartViewSuccess.hidden = true;
+    if(cartViewHandoff) cartViewHandoff.hidden = false;
+    var sub = document.getElementById('cart-handoff-sub');
+    var linkEl = document.getElementById('cart-handoff-link');
+    var qrBox = document.getElementById('cart-qr');
+    if(linkEl) linkEl.textContent = url;
+    var showQr = (mode === 'qr') || (mode === 'email' && !emailed);   /* email fallido → fallback al QR */
+    if(mode === 'email' && emailed){
+      if(sub) sub.textContent = 'Payment link sent to ' + email + '. They can pay from their email.';
+    } else if(mode === 'email'){
+      if(sub) sub.textContent = 'We couldn’t email the link — have the customer scan this code instead.';
+    } else {
+      if(sub) sub.textContent = 'Have the customer scan this code to pay securely.';
+    }
+    if(qrBox){
+      if(showQr){
+        loadQrLib().then(function(){ qrBox.innerHTML = qrSvg(url, 300); qrBox.hidden = false; })
+                   .catch(function(){ qrBox.hidden = true; if(sub) sub.textContent = 'Open this link to pay: ' + url; });
+      } else { qrBox.hidden = true; }
+    }
+    if(sessionId) startPoll(sessionId);   /* el poll gobierna la espera (sin auto-reset a mitad de pago) */
+  }
+  function resetKioskFields(){
+    ['cart-associate','cart-order','cart-zip','cart-name','cart-email','cart-phone','cart-address'].forEach(function(id){
+      var el = document.getElementById(id); if(el) el.value = '';
+    });
+    var d = document.getElementById('cart-date'); if(d) d.value = '';
+  }
+  function newSale(){
+    clearAutoReset(); stopPoll();
+    clearCart();                 /* vacía plans/kits/membership + re-render (ya existe) */
+    resetKioskFields();
+    if(cartViewHandoff) cartViewHandoff.hidden = true;
+    cartViewSuccess.hidden = true; cartViewForm.hidden = false;
+    closeCart();                 /* vuelve a las cards para la siguiente venta */
+    window.scrollTo(0, 0);       /* KIOSK-1: la próxima venta empieza desde el tope (cards de compra) */
+  }
+  var newsaleBtn = document.getElementById('cart-newsale');
+  if(newsaleBtn) newsaleBtn.addEventListener('click', newSale);
+  var newsaleSuccessBtn = document.getElementById('cart-newsale-success');
+  if(newsaleSuccessBtn) newsaleSuccessBtn.addEventListener('click', newSale);
+
+  /* C.5/BE-3: "Email my cart to myself" REAL — POST /api/email-cart; el server recomputa precios
+     y envía vía Resend. Éxito y fallo se dicen DE VERDAD (fin del stub del audit C5). El botón
+     sigue hidden hasta C.6. */
+  var emailSelfBtn = document.getElementById('cart-email-self');
+  var emailSelfStatus = document.getElementById('cart-email-status');
+  if(emailSelfBtn){
+    emailSelfBtn.addEventListener('click', function(){
+      var emailEl = document.getElementById('cart-email');
+      var email = (emailEl ? emailEl.value : '').trim();
+      if(!EMAIL_RE.test(email)){
+        if(emailSelfStatus) emailSelfStatus.textContent = 'Add your email above and we’ll send your cart.';
+        if(emailEl) emailEl.focus();
+        return;
+      }
+      emailSelfBtn.disabled = true;
+      if(emailSelfStatus) emailSelfStatus.textContent = 'Sending…';
+      fetch('/api/email-cart', {
+        method: 'POST', headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          email: email,
+          plans: savedItems.map(function(l){ return { cov:l.cov, term:l.term, type:l.type, count:l.count }; }),
+          kits: Object.keys(savedKits).map(function(n){ return { sku: KIT_SKU[n], quantity: savedKits[n] }; }),
+          membership: savedMembership
+        })
+      }).then(function(res){ return res.json().then(function(d){ return { ok: res.ok, d: d }; }, function(){ return { ok: res.ok, d: {} }; }); })
+        .then(function(r){
+          emailSelfBtn.disabled = false;
+          if(emailSelfStatus) emailSelfStatus.textContent = (r.ok && r.d && r.d.sent)
+            ? 'Sent a copy of your cart to ' + email + ' — no payment taken.'
+            : 'We couldn’t send it — please try again.';
+        }, function(){
+          emailSelfBtn.disabled = false;
+          if(emailSelfStatus) emailSelfStatus.textContent = 'We couldn’t send it — please try again.';
+        });
+    });
+  }
+
+  if(cartClose) cartClose.addEventListener('click', closeCart);
+  if(cartBackdrop) cartBackdrop.addEventListener('click', closeCart);
+  document.addEventListener('keydown', function(e){
+    if(e.key === 'Escape' && cartPanel && !cartPanel.hidden) closeCart();
+  });
+
+  /* Vacía TODO el carrito (planes + kits + membership) y re-sincroniza CADA pieza de UI dependiente.
+     Único punto de limpieza → evita cards "✓ In cart" stale cuando el carrito se vacía sin re-render
+     (era el bug del retorno ?paid: limpiaba savedItems pero no re-renderizaba las compare cards). */
+  function clearCart(){
+    savedItems.length = 0; persistCart();
+    savedKits = {}; persistKits();
+    savedMembership = false; persistMembership();
+    renderPlanLines(); renderCartKits(); renderMembershipLine();
+    renderCompareCards(); renderKitCards(); renderMembershipBtns();
+    update(); updateCartBadge(); updateCartTotal();
+    resetReceiptPhoto();   /* BE-1: limpia la foto del recibo al vaciar (incl. retorno ?paid) */
+  }
+  var cartClearBtn = document.getElementById('cart-clear');
+  if(cartClearBtn) cartClearBtn.addEventListener('click', function(){
+    if(savedItems.length === 0 && kitCount() === 0 && !savedMembership) return;
+    if(window.confirm('Empty your cart? This removes all plans, kits, and membership.')) clearCart();
+  });
+
+  /* Back from Stripe Checkout (Option A redirect to ?paid=1) → open the cart in its
+     success state. Reuses the existing success view; the 3-step flow is untouched. */
+  if(/[?&]paid=1(&|$)/.test(location.search)){
+    cartViewForm.hidden = true; cartViewSuccess.hidden = false;
+    cartPanel.hidden = false; cartBackdrop.hidden = false;
+    requestAnimationFrame(function(){ cartPanel.classList.add('open'); cartBackdrop.classList.add('open'); });
+    document.body.style.overflow = 'hidden';
+    clearCart();   /* pago exitoso → vaciar el carrito local Y re-renderizar todo (incl. compare cards) */
+    if(history.replaceState) history.replaceState({}, '', location.pathname);
+  }
+
+  /* Stripe Checkout cancel_url (?canceled=1) → reopen the cart on the form view with a
+     neutral message, so the user isn't dropped on the home with no context. */
+  if(/[?&]canceled=1(&|$)/.test(location.search)){
+    cartViewSuccess.hidden = true; cartViewForm.hidden = false;
+    cartPanel.hidden = false; cartBackdrop.hidden = false;
+    requestAnimationFrame(function(){ cartPanel.classList.add('open'); cartBackdrop.classList.add('open'); });
+    document.body.style.overflow = 'hidden';
+    var canceledNote = cartForm && cartForm.querySelector('.cart-note');
+    if(canceledNote) canceledNote.textContent = 'Checkout canceled — your plan wasn’t activated.';
+    if(history.replaceState) history.replaceState({}, '', location.pathname);
+  }
+
+  /* Term selector → setTerm() swaps the active term and re-prices. The coverage limit follows
+     the term automatically (read-out in Step 3). */
+  function setTerm(t){
+    if(!PLANS[t]) return;
+    state.term = t;
+    termBtns.forEach(function(b){ var on = b.dataset.term === t; b.classList.toggle('active', on); b.setAttribute('aria-checked', on ? 'true' : 'false'); });
+    update();
+    if(cartPanel && !cartPanel.hidden) cartFillSummary();
+  }
+  termBtns.forEach(function(b){ b.addEventListener('click', function(){ setTerm(b.dataset.term); }); });
+
+  /* Split CTA: "Checkout" → Adrian's existing flow (cart drawer → Stripe). "Keep shopping" →
+     save the configured plan to a client-side cart, confirm, bump the header cart badge, and
+     scroll on so they can add kits / a membership. (Saved items don't ride into checkout yet —
+     that's the multi-item cart pass; the header cart still opens the existing drawer.) */
+  function updateCartBadge(){
+    if(!navCartCount) return;
+    var total = 0;
+    for(var i = 0; i < savedItems.length; i++){ total += (savedItems[i].count || 0); }
+    total += kitCount();   /* care kits count toward the header badge too (KIT-3) */
+    if(savedMembership) total += 1;   /* la membership también cuenta como una línea del carrito */
+    navCartCount.textContent = String(total);
+    navCartCount.hidden = total === 0;
+  }
+  /* ── Device-local cart persistence (localStorage). The cart is per-device, never server-side, so it
+     survives reloads + return visits and clears after a successful payment. loadCart() VALIDATES
+     everything it reads — stored data is untrusted: unknown coverage/term is dropped, type falls back
+     to furniture, count is clamped 1..MAX_COUNT, price is recomputed, and only one line per cov+term
+     is kept (matches the cart's identity). */
+  function persistCart(){
+    try { localStorage.setItem(CART_KEY, JSON.stringify(savedItems)); } catch(_){}
+  }
+  function loadCart(){
+    var raw;
+    try { raw = localStorage.getItem(CART_KEY); } catch(_){ return []; }
+    if(!raw) return [];
+    var parsed;
+    try { parsed = JSON.parse(raw); } catch(_){ return []; }
+    if(!Array.isArray(parsed)) return [];
+    var out = [], seen = {};
+    for(var i = 0; i < parsed.length; i++){
+      var it = parsed[i];
+      if(!it || !KNOWN_COV[it.cov] || it.term !== 'monthly') continue;   /* drop unknown cov + términos no soportados: solo 'monthly' está wired en checkout (validate.mjs rechaza el resto); year1/year3 viven en PLANS solo para mostrar precio */
+      var key = it.cov + '|' + it.term;
+      if(seen[key]) continue;                                        /* one line per cov+term */
+      var type = TYPES.some(function(t){ return t.key === it.type; }) ? it.type : 'furniture';
+      var count = Math.max(1, Math.min(MAX_COUNT, parseInt(it.count, 10) || 0));
+      seen[key] = 1;
+      out.push({ cov:it.cov, term:it.term, type:type, count:count, price:PLANS[it.term].base[it.cov] * count });
+    }
+    return out;
+  }
+
+  /* ── Care kits cart (KIT-3). Kits are a one-time product, persisted separately from the plan cart.
+     Adding a kit from a #kits card stores it here, bumps the header badge, and lists it in the drawer.
+     NOTE: kit billing is NOT yet wired into Stripe checkout (one-time + subscription mix = the
+     multi-line checkout pass, CART-1.10); the "Pay …/mo" button still rings only the plan. */
+  function loadKits(){
+    var raw; try { raw = localStorage.getItem(KIT_KEY); } catch(_){ return {}; }
+    if(!raw) return {};
+    var p; try { p = JSON.parse(raw); } catch(_){ return {}; }
+    if(!p || typeof p !== 'object' || Array.isArray(p)) return {};
+    var out = {};
+    for(var k in p){ if(KIT_NAMES[k]){ var n = Math.max(0, Math.min(20, parseInt(p[k], 10) || 0)); if(n > 0) out[k] = n; } }
+    return out;
+  }
+  function persistKits(){ try { localStorage.setItem(KIT_KEY, JSON.stringify(savedKits)); } catch(_){} }
+  function kitCount(){ var t = 0; for(var k in savedKits){ t += savedKits[k]; } return t; }
+  function kitAdd(name){ if(!KIT_NAMES[name]) return; savedKits[name] = Math.min(20, (savedKits[name] || 0) + 1); persistKits(); }
+  function kitRemove(name){ if(!savedKits[name]) return; savedKits[name] -= 1; if(savedKits[name] <= 0) delete savedKits[name]; persistKits(); }
+  function renderKitCards(){ kitCardRenderers.forEach(function(r){ r(); }); }   /* re-render de todas las kit cards (stepper + estado del botón) */
+
+  /* ── MEMBERSHIP (línea recurrente del carrito, máx 1; producto aparte de los planes) ── */
+  function loadMembership(){ try { return localStorage.getItem(MEMBERSHIP_KEY) === '1'; } catch(_){ return false; } }
+  function persistMembership(){ try { localStorage.setItem(MEMBERSHIP_KEY, savedMembership ? '1' : '0'); } catch(_){} }
+  function membershipAdd(){ savedMembership = true; persistMembership(); }
+  function membershipRemove(){ savedMembership = false; persistMembership(); }
+  /* MEM-7 (14-ago): la membership DE PAGO vale SIEMPRE $19.99 — es la de "Cover your used
+     furniture" (mueble usado / otras fuentes). La incluida con el plan es un beneficio
+     automático (entitlement del server), NO una línea del carrito. Murió la Arquitectura B
+     (0/9.99/19.99 por composición del carrito). */
+  function membershipPrice(){ return MEMBERSHIP_PRICE; }
+  function renderMembershipBtns(){ membershipBtnRenderers.forEach(function(r){ r(); }); }
+  /* Una línea de membership en el drawer (cov + meta + precio + borrar), espejando renderCartKits.
+     Precio: $19.99/month SIEMPRE (MEM-7). */
+  function renderMembershipLine(){
+    var wrap = document.getElementById('cart-membership');
+    var list = document.getElementById('cart-membership-list');
+    if(!wrap || !list) return;
+    while(list.firstChild) list.removeChild(list.firstChild);
+    wrap.hidden = !savedMembership;
+    if(!savedMembership){ updateCartTotal(); return; }
+    var li = document.createElement('li'); li.className = 'cart-line membership';
+    var rm = document.createElement('button');
+    rm.type = 'button'; rm.className = 'cart-line-remove'; rm.setAttribute('aria-label', 'Remove membership'); rm.textContent = '×';
+    rm.addEventListener('click', function(){ membershipRemove(); renderMembershipLine(); updateCartBadge(); renderMembershipBtns(); });
+    var cov = document.createElement('div'); cov.className = 'cov'; cov.textContent = 'Repair Membership';
+    var meta = document.createElement('div'); meta.className = 'meta';
+    /* KIOSK-27: la linea del carrito es la membership DE PAGO (mueble usado); el meta lo dice
+       para no confundirla con la incluida, que ya viene gratis con el plan sin agregar nada. */
+    meta.textContent = 'For furniture you already own — repair coordination + member rates';
+    var price = document.createElement('div'); price.className = 'price';
+    price.textContent = fmt(membershipPrice());
+    var small = document.createElement('small'); small.textContent = '/month · cancel anytime';
+    price.appendChild(small);
+    li.appendChild(rm); li.appendChild(cov); li.appendChild(meta); li.appendChild(price);
+    list.appendChild(li);
+    updateCartTotal();
+  }
+  function renderCartKits(){
+    var wrap = document.getElementById('cart-kits');
+    var list = document.getElementById('cart-kits-list');
+    if(!wrap || !list) return;
+    while(list.firstChild) list.removeChild(list.firstChild);
+    var names = Object.keys(savedKits);
+    wrap.hidden = names.length === 0;
+    names.forEach(function(name){
+      var qty = savedKits[name];
+      var li = document.createElement('li'); li.className = 'cart-line kit';
+
+      var rm = document.createElement('button');
+      rm.type = 'button'; rm.className = 'cart-line-remove'; rm.setAttribute('aria-label', 'Remove ' + name); rm.textContent = '×';
+      rm.addEventListener('click', function(){ kitRemove(name); renderCartKits(); updateCartBadge(); renderKitCards(); });
+
+      var cov = document.createElement('div'); cov.className = 'cov'; cov.textContent = name + (qty > 1 ? ' ×' + qty : '');
+      var price = document.createElement('div'); price.className = 'price';
+      price.textContent = fmt(kitPrice(name) * qty);
+      var small = document.createElement('small'); small.textContent = 'one-time';
+      price.appendChild(small);
+
+      li.appendChild(rm); li.appendChild(cov); li.appendChild(price);
+      list.appendChild(li);
+    });
+    updateCartTotal();   /* kits changed → refresh the separate total + Pay button */
+  }
+
+  /* Cart lines are keyed by cov+term ONLY — the hero stepper and a section-2 card both point at the
+     same line for a given coverage, so they're always one shared count. `type` is a mutable label on
+     the line (the latest selection wins), not part of its identity. Every mutator calls persistCart(). */
+  function findLine(cov, term){
+    for(var i = 0; i < savedItems.length; i++){
+      var it = savedItems[i];
+      if(it.cov === cov && it.term === term) return it;
+    }
+    return null;
+  }
+  function cartCount(cov, term){ var l = findLine(cov, term); return l ? l.count : 0; }
+  /* Increment the shared line (re-adding the same coverage bumps its count, capped at MAX_COUNT). */
+  function cartAdd(cov, term, type, count){
+    var it = findLine(cov, term);
+    if(it){
+      it.count = Math.min(MAX_COUNT, it.count + count);
+      it.type = type;
+      it.price = PLANS[term].base[cov] * it.count;
+      persistCart();
+      return it;
+    }
+    var n = Math.min(MAX_COUNT, count);
+    var line = { cov:cov, term:term, type:type, count:n, price:PLANS[term].base[cov] * n };
+    savedItems.push(line);
+    persistCart();
+    return line;
+  }
+  /* Set the shared line to an exact count (0 removes it) — used by the absolute hero stepper. */
+  function cartSet(cov, term, type, n){
+    n = Math.max(0, Math.min(MAX_COUNT, n));
+    var it = findLine(cov, term);
+    if(n <= 0){ if(it) savedItems.splice(savedItems.indexOf(it), 1); persistCart(); return null; }
+    if(it){ it.count = n; it.type = type; it.price = PLANS[term].base[cov] * n; persistCart(); return it; }
+    var line = { cov:cov, term:term, type:type, count:n, price:PLANS[term].base[cov] * n };
+    savedItems.push(line);
+    persistCart();
+    return line;
+  }
+  /* compareCardRenderers se declara arriba (junto a kitCardRenderers) por el hoisting del handler ?paid=1. */
+  function renderCompareCards(){ compareCardRenderers.forEach(function(r){ r(); }); }
+  if(navCart){ navCart.addEventListener('click', function(){ openCart(); }); }
+
+  /* ══ PREFILL-1 (08-jul): checkout prellenado con la sesión del dashboard ══
+     Lee localStorage.furnfx_session (la MISMA llave/formato que account.html; el bloque legacy
+     "Etapa 3" de más abajo usa sessionStorage y NO participa aquí). Con sesión válida, account-me
+     confirma y trae el perfil → se prellenan los campos VACÍOS y el email queda BLOQUEADO: así la
+     compra suma garantizado a la cuenta actual (la identidad es el email; un typo aquí crearía una
+     segunda cuenta). "Not you? Sign out" borra la sesión y devuelve el checkout anónimo.
+     También enciende el menú "Dashboard" (nav + drawer). Todo fail-soft: sin sesión o con
+     account-me caído, el checkout queda EXACTAMENTE como siempre. */
+  (function(){
+    var emailIn = document.getElementById('cart-email');
+    var note = document.getElementById('prefill-note');
+    if(!emailIn || !note) return;
+    var sess = null;
+    try{
+      sess = JSON.parse(localStorage.getItem('furnfx_session') || 'null');
+      if(!sess || !sess.access_token || (sess.expires_at && sess.expires_at <= Math.floor(Date.now()/1000) + 30)) sess = null;
+    }catch(_){ sess = null; }
+    if(!sess) return;
+    fetch('/api/account-me', { headers: { Authorization: 'Bearer ' + sess.access_token } })
+      .then(function(res){ if(!res.ok) throw new Error('no'); return res.json(); })
+      .then(function(d){
+        if(!d || !d.ok || !d.email) return;
+        var prof = d.profile || {};
+        var nameIn = document.getElementById('cart-name');
+        var phoneIn = document.getElementById('cart-phone');
+        var addrIn = document.getElementById('cart-address');
+        var filled = [];   /* solo lo que llenamos nosotros se vacía en el sign out */
+        emailIn.value = d.email; emailIn.readOnly = true;
+        if(nameIn && !nameIn.value && prof.full_name){ nameIn.value = prof.full_name; filled.push(nameIn); }
+        if(phoneIn && !phoneIn.value && prof.phone){ phoneIn.value = prof.phone; filled.push(phoneIn); }
+        if(addrIn && !addrIn.value && prof.address){ addrIn.value = prof.address; filled.push(addrIn); }
+        document.getElementById('prefill-email').textContent = d.email;
+        note.hidden = false;
+        var navLi = document.getElementById('nav-dash-li');
+        var drawerLi = document.getElementById('drawer-dash-li');
+        if(navLi) navLi.hidden = false;
+        if(drawerLi) drawerLi.hidden = false;
+        var out = document.getElementById('prefill-signout');
+        if(out) out.addEventListener('click', function(){
+          try{ localStorage.removeItem('furnfx_session'); }catch(_){}
+          emailIn.readOnly = false; emailIn.value = '';
+          filled.forEach(function(inp){ inp.value = ''; });
+          note.hidden = true;
+          if(navLi) navLi.hidden = true;
+          if(drawerLi) drawerLi.hidden = true;
+        });
+      })
+      .catch(function(){ /* sesión vencida o backend caído → checkout anónimo, sin ruido */ });
+  })();
+
+  /* ══ GIFT-1 (spec §F7): compra de gift coupons. El precio REAL lo calcula el server
+     (meses × precio de lista); este mapa es solo display. El canje del amigo va por
+     promotion code en la pantalla de pago de Stripe (allow_promotion_codes). ══ */
+  (function(){
+    var bd = document.getElementById('gift-backdrop');
+    if(!bd) return;
+    var GIFT_MONTHS = 3;
+    var GIFT_CENTS = { 'stain': 999, 'stain-mech': 1999, 'membership': 1999 };
+    var tierSel = document.getElementById('gift-tier');
+    var totalEl = document.getElementById('gift-total');
+    var gmsg = document.getElementById('gift-msg');
+    var gbtn = document.getElementById('gift-submit');
+    function gfmt(c){ return '$' + (c / 100).toFixed(2); }
+    function grefresh(){ totalEl.textContent = GIFT_MONTHS + ' months · total ' + gfmt((GIFT_CENTS[tierSel.value] || 0) * GIFT_MONTHS); }
+    tierSel.addEventListener('change', grefresh);
+    document.querySelectorAll('.js-gift-coupon').forEach(function(g){
+      g.addEventListener('click', function(ev){ ev.preventDefault(); gmsg.textContent = ''; grefresh(); bd.hidden = false; });
+    });
+    /* DASH-11: /#gift (CTA del dashboard) aterriza con el overlay ya abierto */
+    if(location.hash === '#gift'){ gmsg.textContent = ''; grefresh(); bd.hidden = false; }
+    document.getElementById('gift-close').addEventListener('click', function(){ bd.hidden = true; });
+    bd.addEventListener('click', function(ev){ if(ev.target === bd) bd.hidden = true; });
+    gbtn.addEventListener('click', function(){
+      var email = (document.getElementById('gift-email').value || '').trim();
+      if(!email || email.indexOf('@') < 0){ gmsg.textContent = 'Add your email first.'; return; }
+      gbtn.disabled = true; gbtn.textContent = 'Opening payment…'; gmsg.textContent = '';
+      fetch('/api/create-gift-checkout', {
+        method: 'POST', headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email: email, tier: tierSel.value })
+      })
+        .then(function(res){ return res.json().then(function(d){ return { s: res.status, d: d }; }, function(){ return { s: 0, d: {} }; }); })
+        .then(function(r){
+          if(r.d && r.d.url){ location.assign(r.d.url); return; }
+          gbtn.disabled = false; gbtn.textContent = 'Continue to payment';
+          gmsg.textContent = r.s === 503 ? 'Gifts aren’t available just yet.' : 'Something went wrong, try again.';
+        })
+        .catch(function(){
+          gbtn.disabled = false; gbtn.textContent = 'Continue to payment';
+          gmsg.textContent = 'Something went wrong, try again.';
+        });
+    });
+  })();
+  if(cfgCheckout){
+    cfgCheckout.addEventListener('click', function(e){
+      e.preventDefault();
+      if(state.term !== 'monthly'){ setTerm('monthly'); return; }   /* defensa: yearly no comprable → cambia a monthly en vez de abrir drawer vacío */
+      if(state.count < 1) setCount(1);   /* nothing configured yet → add 1 of the shown plan so the drawer isn't $0 */
+      openCart();
+    });
+  }
+  if(cfgToMonthly){ cfgToMonthly.addEventListener('click', function(e){ e.preventDefault(); setTerm('monthly'); }); }
+  var cfgSavedTimer;
+  if(cfgKeep){
+    cfgKeep.addEventListener('click', function(e){
+      e.preventDefault();
+      /* The stepper already writes the cart live (single source of truth), so "Keep shopping" just
+         confirms what's saved and scrolls on — there's nothing to add here. */
+      if(state.count > 0 && cfgSaved){
+        cfgSaved.hidden = false;
+        clearTimeout(cfgSavedTimer);
+        cfgSavedTimer = setTimeout(function(){ cfgSaved.hidden = true; }, 4000);
+      }
+      var next = document.getElementById('compare');
+      if(next) next.scrollIntoView({ behavior:'smooth', block:'start' });
+    });
+  }
+
+  /* ── Comparison cards: two fixed MONTHLY plans (Stain / Mechanical), SYNCED with the hero build via
+     the shared cart. Each card's stepper is a LIVE editor of that plan's monthly cart line (keyed
+     cov+monthly); the hero stepper edits the very same line, so the two always show one shared count.
+     Editing a card reflects back into the hero (reflectToHero): the count syncs and the hero coverage
+     toggle auto-switches to the edited card. */
+  (function compareCards(){
+    var TERM = 'monthly';
+    [{ cov:'stain', pre:'cmp-stain' }, { cov:'stain-mech', pre:'cmp-mech' }].forEach(function(c){
+      var countEl  = document.getElementById(c.pre + '-count');
+      var decBtn   = document.getElementById(c.pre + '-dec');
+      var incBtn   = document.getElementById(c.pre + '-inc');
+      var totalEl  = document.getElementById(c.pre + '-total');
+      var article  = document.querySelector('.compare-col[data-cov="' + c.cov + '"]');
+      if(!article) return;
+      var selType = 'furniture';   /* label por defecto del type (el dropdown se reemplazó por el Coverage Assistant) */
+
+      function base(){ return PLANS.monthly.base[c.cov]; }
+      /* Identidad de línea = cov+term (type es etiqueta, NO identidad — ver CLAUDE.md). Reusa findLine
+         para que la card nunca difiera de savedItems/drawer (elimina el footgun del param `type`). */
+      function lineFor(){ return findLine(c.cov, TERM); }
+      function add(){ cartAdd(c.cov, TERM, selType, 1); render(); updateCartBadge(); reflectToHero(c.cov); }
+      function sub(){
+        var line = lineFor();
+        if(!line) return;
+        line.count -= 1;
+        if(line.count <= 0) savedItems.splice(savedItems.indexOf(line), 1);
+        else line.price = base() * line.count;
+        persistCart();
+        render(); updateCartBadge(); reflectToHero(c.cov);
+      }
+      if(incBtn) incBtn.addEventListener('click', add);
+      if(decBtn) decBtn.addEventListener('click', sub);
+
+      /* CTA row (hero parity, so the user can buy without scrolling back up):
+         - "Save to cart": ensure this plan is in the cart (add 1 if the stepper is at 0). The
+           confirmation is the existing "already in your cart" line; no-op when already added.
+         - "Checkout": ensure ≥1, then point the cart drawer at THIS plan (reflectToHero) and open it
+           → Stripe. Single-plan flow, same as the hero (multi-line checkout is the future cart pass). */
+      var saveBtn = document.getElementById(c.pre + '-save');
+      var saveHTML = saveBtn ? saveBtn.innerHTML : '';   /* "Save to cart →" original, para restaurar */
+      var checkoutBtn = document.getElementById(c.pre + '-checkout');
+      function save(){
+        if(cartCount(c.cov, TERM) < 1){ cartAdd(c.cov, TERM, selType, 1); render(); updateCartBadge(); reflectToHero(c.cov); }
+      }
+      function checkout(){
+        if(cartCount(c.cov, TERM) < 1){ cartAdd(c.cov, TERM, selType, 1); render(); updateCartBadge(); }
+        reflectToHero(c.cov);   /* the drawer reads hero state → show this plan */
+        openCart();
+      }
+      if(saveBtn) saveBtn.addEventListener('click', save);
+      if(checkoutBtn) checkoutBtn.addEventListener('click', checkout);
+
+      function render(){
+        var line = lineFor();   /* a monthly line of this coverage drives the displayed type + count */
+        if(line) selType = line.type;
+        var count = line ? line.count : 0;
+        countEl.textContent = String(count);
+        totalEl.textContent = fmt(base() * count);
+        decBtn.disabled = count <= 0;
+        incBtn.disabled = count >= MAX_COUNT;
+        /* "Save to cart" → "✓ In cart" (deshabilitado) cuando el plan ya está en el carrito. El estado
+           vive en el MISMO botón → no inserta el viejo <p> que estiraba la card (Doug ~17:00). El
+           stepper de cantidad y "Checkout" siguen activos. */
+        if(saveBtn){
+          var inCart = count > 0;
+          saveBtn.disabled = inCart;
+          saveBtn.classList.toggle('btn-incart', inCart);
+          saveBtn.innerHTML = inCart ? '&#10003; In cart' : saveHTML;
+        }
+        article.classList.toggle('in-cart', count > 0);
+      }
+      compareCardRenderers.push(render);
+      render();
+    });
+  })();
+
+  /* Hydrate the hero from the persisted cart. The hero state defaults to stain/monthly, but the
+     saved line may be a different coverage (e.g. stain-mech) or term — in which case the default
+     line isn't in the cart and update() would leave state.count at 0, so the drawer shows $0 while
+     the badge counts the real (other-coverage) line. Point the hero at the first saved line instead,
+     routing through setTerm()/setCov() so the coverage + term toggles stay visually in sync. */
+  if(savedItems.length && !findLine(state.cov, state.term)){
+    var hydrateLine = savedItems[0];
+    state.type = hydrateLine.type;
+    setTerm(hydrateLine.term);   /* syncs term toggle + state.term, runs update() */
+    setCov(hydrateLine.cov);     /* syncs coverage toggle + state.cov, runs update() */
+  } else {
+    update();
+  }
+  updateCartBadge();   /* reflect the hydrated (or just-cleared) device-local cart in the header badge */
+
+  // DASHBOARD MOCK
+  var dashItem = document.getElementById('dash-item');
+  var dashStatus = document.getElementById('dash-status');
+  var dashCov = document.getElementById('dash-cov');
+  var dashPrice = document.getElementById('dash-price');
+  var dashPauseLabel = document.getElementById('dash-pause-label');
+  var dashUpgradeLabel = document.getElementById('dash-upgrade-label');
+  var dashToast = document.getElementById('dash-toast');
+  var dash = { paused:false, upgraded:false };
+  var dashToastTimer;
+
+  function dashToastShow(msg){
+    dashToast.textContent = msg;
+    dashToast.classList.add('show');
+    clearTimeout(dashToastTimer);
+    dashToastTimer = setTimeout(function(){ dashToast.classList.remove('show'); }, 4200);
+  }
+
+  document.getElementById('dash-pause').addEventListener('click', function(){
+    dash.paused = !dash.paused;
+    dashItem.classList.toggle('paused', dash.paused);
+    dashStatus.textContent = dash.paused ? 'Paused' : 'Active';
+    dashPauseLabel.textContent = dash.paused ? 'Resume' : 'Pause';
+    dashToastShow(dash.paused
+      ? 'Paused. No charge next month. Resume anytime — your coverage history stays intact.'
+      : 'Resumed. Coverage active again starting today.'
+    );
+  });
+  document.getElementById('dash-upgrade').addEventListener('click', function(){
+    dash.upgraded = !dash.upgraded;
+    if(dash.upgraded){
+      dashCov.textContent = 'Stain + mechanical · upgraded just now';
+      dashPrice.textContent = '$19.99';
+      dashUpgradeLabel.textContent = 'Downgrade';
+      dashToastShow('Upgraded to stain + mechanical. Mechanical coverage starts immediately — no waiting period.');
+    } else {
+      dashCov.textContent = 'Stain protection · downgraded just now';
+      dashPrice.textContent = '$9.99';
+      dashUpgradeLabel.textContent = 'Upgrade';
+      dashToastShow('Downgraded to stain protection. Next bill reflects the new rate.');
+    }
+  });
+  document.getElementById('dash-claim').addEventListener('click', function(){
+    dashToastShow('Claim filed. A concierge will reach out within 1 hour — most claims are processed the same day.');
+  });
+
+  /* ============================================================
+   * AUTH + ACCOUNT HYDRATION (Etapa 3)
+   * ------------------------------------------------------------
+   * After paying, Supabase emails an invite link that redirects to
+   * `/#access_token=…&refresh_token=…&type=invite`. The <head> script
+   * already moved that hash to `window.__authHash` and cleaned the URL.
+   * Here we consume it: persist the access_token in sessionStorage
+   * (NOT localStorage — per-tab scope, dies on close) and call the
+   * `get-my-account` Function to hydrate the dashboard above with the
+   * user's real coverage. The refresh_token is INTENTIONALLY discarded —
+   * sessions are 1h; if they expire we ask the user to use the email
+   * link again. Refresh flow can come later, when Cancel/Claim need it.
+   * ============================================================ */
+  var SESSION_KEY = 'furnfx_session';
+  var ACCOUNT_ENDPOINT = '/api/get-my-account';
+  var PIECE_LABELS = {
+    sofa: 'Sofa', sectional: 'Sectional', recliner: 'Recliner',
+    dining: 'Dining table', bed: 'Bed', other: 'Furniture piece'
+  };
+  var TIER_LABELS = {
+    stain: 'Stain protection',
+    stain_mech: 'Stain + Mechanical protection'
+  };
+
+  function parseAuthHash(h){
+    var out = {};
+    if(!h) return out;
+    h.split('&').forEach(function(part){
+      var i = part.indexOf('=');
+      if(i < 0) return;
+      out[decodeURIComponent(part.slice(0,i))] = decodeURIComponent(part.slice(i+1) || '');
+    });
+    return out;
+  }
+  function getSession(){
+    try{
+      var raw = sessionStorage.getItem(SESSION_KEY);
+      if(!raw) return null;
+      var s = JSON.parse(raw);
+      if(!s.access_token || !s.expires_at || s.expires_at <= Date.now()){
+        sessionStorage.removeItem(SESSION_KEY);
+        return null;
+      }
+      return s;
+    } catch(_){ return null; }
+  }
+  function setSession(at, expires_in){
+    try{
+      sessionStorage.setItem(SESSION_KEY, JSON.stringify({
+        access_token: at,
+        expires_at: Date.now() + ((parseInt(expires_in,10) || 3600) * 1000)
+      }));
+    } catch(_){}
+  }
+  function clearSession(){
+    try{ sessionStorage.removeItem(SESSION_KEY); } catch(_){}
+  }
+
+  function centsUsd(c){
+    if(typeof c !== 'number') return '';
+    return '$' + (c/100).toFixed(2);
+  }
+  function pieceLabel(t){ return PIECE_LABELS[t] || 'Furniture piece'; }
+  function tierLabel(t){ return TIER_LABELS[t] || 'Coverage'; }
+
+  function renderDashItems(pieces){
+    var container = document.querySelector('.dash-items');
+    if(!container) return;
+    while(container.firstChild) container.removeChild(container.firstChild);
+    pieces.forEach(function(p, i){
+      var row = document.createElement('div');
+      row.className = 'dash-items-row' + (i === 0 ? ' selected' : '');
+      var name = document.createElement('span');
+      name.className = 'name';
+      if(i === 0){
+        var check = document.createElement('span');
+        check.className = 'check';
+        check.textContent = '✓';
+        name.appendChild(check);
+      }
+      name.appendChild(document.createTextNode(pieceLabel(p.piece_type)));
+      var pill = document.createElement('span');
+      pill.className = 'pill';
+      pill.textContent = 'Active';
+      row.appendChild(name);
+      row.appendChild(pill);
+      container.appendChild(row);
+    });
+  }
+
+  function hydrateDashboard(account){
+    var subs = (account.subscriptions || []);
+    var activeProtection = subs.find(function(s){ return s.status === 'active' && s.kind === 'protection'; });
+    var activeMembership = subs.find(function(s){ return s.status === 'active' && s.kind === 'membership'; });
+
+    /* Membership-only (sin protección): tarjeta propia — no hay cobertura/piezas que mostrar. */
+    if(!activeProtection && activeMembership) return hydrateMembershipOnly(activeMembership);
+
+    /* Prefer an active protection sub; fall back to whatever's first (la coverage card asume tier/piezas). */
+    var primary = activeProtection || subs.find(function(s){ return s.status === 'active'; }) || subs[0];
+    if(!primary) return false;
+    var pieces = primary.covered_pieces || [];
+
+    var greet = document.querySelector('.dash-greet-h');
+    if(greet) greet.textContent = 'Your coverage.';
+
+    var count = document.querySelector('.dash-section-label .count');
+    if(count) count.textContent = '(' + pieces.length + ')';
+
+    renderDashItems(pieces);
+
+    var firstPiece = pieces[0];
+    var nameEl = document.querySelector('#dash-item .dash-item-name');
+    if(nameEl && firstPiece) nameEl.textContent = pieceLabel(firstPiece.piece_type);
+    if(dashCov){
+      var since = '';
+      if(primary.started_at){
+        try{ since = new Date(primary.started_at).toLocaleDateString(); } catch(_){}
+      }
+      /* La membership es gratis con cualquier plan → todo titular de protección la tiene (derivado). */
+      var memNote = (activeMembership || activeProtection) ? ' · Repair Membership included' : '';
+      dashCov.textContent = tierLabel(primary.tier) + (since ? ' · active since ' + since : ' · active') + memNote;
+    }
+    if(dashStatus){
+      var st = primary.status || 'active';
+      dashStatus.textContent = st.charAt(0).toUpperCase() + st.slice(1);
+    }
+    if(dashPrice) dashPrice.textContent = centsUsd(primary.monthly_cents);
+    return true;
+  }
+
+  /* Tarjeta de membership standalone (kind='membership'): sin tier ni piezas cubiertas. */
+  function hydrateMembershipOnly(sub){
+    var greet = document.querySelector('.dash-greet-h');
+    if(greet) greet.textContent = 'Your membership.';
+    var count = document.querySelector('.dash-section-label .count');
+    if(count) count.textContent = '';
+    var container = document.querySelector('.dash-items');
+    if(container){
+      while(container.firstChild) container.removeChild(container.firstChild);
+      var row = document.createElement('div');
+      row.className = 'dash-items-row selected';
+      var name = document.createElement('span'); name.className = 'name';
+      name.appendChild(document.createTextNode('Whole-home repair coordination + member rates'));
+      var pill = document.createElement('span'); pill.className = 'pill'; pill.textContent = 'Member';
+      row.appendChild(name); row.appendChild(pill);
+      container.appendChild(row);
+    }
+    var nameEl = document.querySelector('#dash-item .dash-item-name');
+    if(nameEl) nameEl.textContent = 'Repair Membership';
+    if(dashCov){
+      var since = '';
+      if(sub.started_at){ try{ since = new Date(sub.started_at).toLocaleDateString(); } catch(_){} }
+      dashCov.textContent = 'Repair Membership' + (since ? ' · active since ' + since : ' · active');
+    }
+    if(dashStatus){ var st = sub.status || 'active'; dashStatus.textContent = st.charAt(0).toUpperCase() + st.slice(1); }
+    if(dashPrice) dashPrice.textContent = centsUsd(sub.monthly_cents);
+    return true;
+  }
+
+  /* Retry with backoff: race window between webhook (writes the subscription)
+   * and the user clicking the email very fast. Total wait if dry: 1+2+4 = 7s. */
+  var ACCOUNT_RETRY_DELAYS = [0, 1000, 2000, 4000];
+
+  function loadAccount(session, attempt){
+    attempt = attempt || 0;
+    return fetch(ACCOUNT_ENDPOINT, {
+      headers: { 'Authorization': 'Bearer ' + session.access_token }
+    }).then(function(res){
+      if(res.status === 401){
+        clearSession();
+        dashToastShow('Your session expired. Please use the link in your email again.');
+        return null;
+      }
+      if(!res.ok){
+        console.error('[account] HTTP', res.status);
+        dashToastShow('We couldn’t load your account. Please refresh.');
+        return null;
+      }
+      return res.json();
+    }).then(function(data){
+      if(!data) return null;
+      var hasSub = data.subscriptions && data.subscriptions.length > 0;
+      if(!hasSub && attempt < ACCOUNT_RETRY_DELAYS.length - 1){
+        if(attempt === 0) dashToastShow('Setting up your coverage…');
+        return new Promise(function(resolve){
+          setTimeout(function(){
+            resolve(loadAccount(session, attempt + 1));
+          }, ACCOUNT_RETRY_DELAYS[attempt + 1]);
+        });
+      }
+      if(!hasSub){
+        dashToastShow('We’re still activating your plan. Refresh in a minute, or check your email.');
+        return null;
+      }
+      hydrateDashboard(data);
+      return data;
+    }).catch(function(err){
+      console.error('[account] fetch error:', err);
+      return null;
+    });
+  }
+
+  /* Consume the auth hash captured in <head>. The toast lives inside the .dash
+   * section (mid-page) — scroll there so the user sees the message instead of
+   * landing at the top with an invisible toast firing off-screen. */
+  var __justActivated = false;
+  var __scrollDash = false;
+  if(window.__authHash){
+    var __params = parseAuthHash(window.__authHash);
+    if(__params.error){
+      var __desc = (__params.error_description || __params.error || 'Activation link is invalid or has expired.').replace(/\+/g, ' ');
+      dashToastShow(__desc);
+      __scrollDash = true;
+    } else if(__params.access_token){
+      setSession(__params.access_token, __params.expires_in);
+      __justActivated = (__params.type === 'invite' || __params.type === 'recovery' || __params.type === 'signup');
+    }
+    window.__authHash = null;
+  }
+  if(__scrollDash){
+    var __dashErr = document.querySelector('.dash');
+    if(__dashErr) __dashErr.scrollIntoView({ behavior: 'smooth' });
+  }
+
+  /* If we have a live session, hydrate. No session = anonymous visitor → leave the
+   * mock dashboard as a marketing teaser (Doug's call: "everything posts to dashboard"
+   * applies once logged in; the teaser is fine for prospects). */
+  var __session = getSession();
+  if(__session){
+    loadAccount(__session, 0).then(function(account){
+      if(account && __justActivated){
+        var __dash = document.querySelector('.dash');
+        if(__dash){
+          dashToastShow('Your plan is active. Welcome.');
+          __dash.scrollIntoView({ behavior: 'smooth' });
+        }
+      }
+    });
+  }
+
+  /* CARE KIT CARDS — mismo patrón que las #compare cards: stepper de cantidad + "Add to cart"
+     que pasa a "✓ In cart" (deshabilitado) + "Checkout" que abre el carrito. Reemplaza el viejo
+     "click = +1 + toast" (que agregaba de más por accidente). */
+  (function kitCards(){
+    document.querySelectorAll('.kit-card').forEach(function(card){
+      var addBtn = card.querySelector('.kit-add-btn');
+      if(!addBtn) return;
+      var name = addBtn.dataset.kit;
+      var addHTML = addBtn.innerHTML;                 /* "Add to cart →" original, para restaurar */
+      var countEl = card.querySelector('.kit-count');
+      var decBtn = card.querySelector('.kit-dec');
+      var incBtn = card.querySelector('.kit-inc');
+      var checkoutBtn = card.querySelector('.kit-checkout-btn');
+      var priceEl = card.querySelector('.kit-price');
+      if(priceEl) priceEl.textContent = fmt(kitPrice(name));   /* precio real del kit (display) */
+
+      function render(){
+        var qty = savedKits[name] || 0;
+        if(countEl) countEl.textContent = String(qty);
+        if(decBtn) decBtn.disabled = qty <= 0;
+        if(incBtn) incBtn.disabled = qty >= 20;
+        var inCart = qty > 0;
+        addBtn.disabled = inCart;
+        addBtn.classList.toggle('btn-incart', inCart);
+        addBtn.innerHTML = inCart ? '&#10003; In cart' : addHTML;
+        card.classList.toggle('in-cart', inCart);
+      }
+      function sync(){ render(); renderCartKits(); updateCartBadge(); }   /* refresca card + drawer + badge */
+
+      addBtn.addEventListener('click', function(){ if(!savedKits[name]){ kitAdd(name); sync(); } });
+      if(incBtn) incBtn.addEventListener('click', function(){ kitAdd(name); sync(); });
+      if(decBtn) decBtn.addEventListener('click', function(){ kitRemove(name); sync(); });
+      if(checkoutBtn) checkoutBtn.addEventListener('click', function(){ if(!savedKits[name]) kitAdd(name); sync(); openCart(); });
+
+      kitCardRenderers.push(render);
+      render();
+    });
+  })();
+
+  // CHAT WIDGET
+  var chatBtn = document.getElementById('chat-btn');
+  var chatPanel = document.getElementById('chat-panel');
+  var chatBody = document.getElementById('chat-body');
+  var chatForm = document.getElementById('chat-form');
+  var chatInput = document.getElementById('chat-input');
+
+  function chatOpen(){
+    chatPanel.classList.add('open');
+    chatBtn.classList.add('open');
+    chatBtn.setAttribute('aria-expanded','true');
+    setTimeout(function(){ chatInput.focus(); }, 280);
+  }
+  function chatClose(){
+    chatPanel.classList.remove('open');
+    chatBtn.classList.remove('open');
+    chatBtn.setAttribute('aria-expanded','false');
+  }
+  chatBtn.addEventListener('click', function(){
+    if(chatPanel.classList.contains('open')){ chatClose(); return; }
+    /* Apertura GENERAL (no desde una card): chat normal. */
+    covTier = null;
+    covConvId = null;                                        /* chat general → el server NO lo persiste como lead de cobertura */
+    chatOpen();
+  });
+
+  function chatPush(text, who){
+    var d = document.createElement('div');
+    d.className = 'chat-msg ' + who;
+    d.textContent = text;
+    chatBody.appendChild(d);
+    chatBody.scrollTop = chatBody.scrollHeight;
+    return d;
+  }
+
+  /* Maya speaks via the chat Function (Claude). If there's no API key (local dev /
+     preview) or the call fails, we fall back to canned replies so the widget still works. */
+  var FALLBACK_REPLIES = [
+    "Great question — happy to walk you through it. What piece are you thinking about covering?",
+    "Totally fair — you can cancel any month and your account stays open if you want to restart later.",
+    "We offer monthly, 1-year, and 3-year terms — coverage up to $5,000, $7,500, or $10,000. Monthly starts at $9.99/mo. Want the details on one?",
+    "Got it — let me grab a teammate who can pull up your situation. What’s the best number to reach you?"
+  ];
+  var fallbackIdx = 0;
+  /* Seed history with Maya's opening line (matches the greeting rendered in the panel). */
+  var chatHistory = [{ role: 'assistant', content: 'Hi there! I’m Maya on the Furniture-Rx team. Anything I can help you sort out about the plans or membership?' }];
+  var covKnown = null;   /* QA-5: último `coverage` capturado — viaja como body.known para que Maya no re-pregunte tras el truncado */
+
+  function chatFallback(typing){
+    if(typing) typing.remove();
+    var reply = FALLBACK_REPLIES[fallbackIdx % FALLBACK_REPLIES.length];
+    fallbackIdx++;
+    chatPush(reply, 'them');
+    chatHistory.push({ role: 'assistant', content: reply });
+  }
+
+  chatForm.addEventListener('submit', function(e){
+    e.preventDefault();
+    var msg = chatInput.value.trim();
+    if(!msg) return;
+    chatPush(msg, 'me');
+    chatHistory.push({ role: 'user', content: msg });
+    chatInput.value = '';
+    var typing = chatPush('Maya is typing…', 'them typing');
+
+    var controller = new AbortController();
+    var timer = setTimeout(function(){ controller.abort(); }, 20000);
+    fetch('/api/chat', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify((function(){
+        var b = { messages: chatHistory };
+        if(covConvId) b.conversation_id = covConvId;
+        if(covKnown) b.known = covKnown;   /* QA-5 */
+        return b;
+      })()),
+      signal: controller.signal
+    }).then(function(res){
+      clearTimeout(timer);
+      if(res.status === 429){
+        /* BE-2: rate-limited → mensaje amable (DISTINTO del fallback enlatado) + cooldown del envío. */
+        typing.remove();
+        var ra = parseInt(res.headers.get('Retry-After'), 10);
+        var secs = isNaN(ra) ? 30 : ra;
+        chatPush('I’m getting a lot of messages right now — give me about ' + secs + 's and try again.', 'them');
+        var sendBtn = chatForm.querySelector('button');
+        chatInput.disabled = true; if(sendBtn) sendBtn.disabled = true;
+        setTimeout(function(){ chatInput.disabled = false; if(sendBtn) sendBtn.disabled = false; chatInput.focus(); }, secs * 1000);
+        return { __handled: true };
+      }
+      if(!res.ok) throw new Error('chat ' + res.status);
+      return res.json();
+    }).then(function(d){
+      if(d && d.__handled) return;   /* 429 ya manejado arriba */
+      if(d && d.reply){
+        typing.remove();
+        chatPush(d.reply, 'them');
+        chatHistory.push({ role: 'assistant', content: d.reply });
+        if(d.coverage){ covKnown = d.coverage; applyCoverage(d.coverage); }   /* Coverage Assistant: pre-llena la card + QA-5 memoria */
+      } else {
+        chatFallback(typing);   /* no_key / unexpected shape → canned reply */
+      }
+    }).catch(function(){
+      clearTimeout(timer);
+      chatFallback(typing);
+    });
+  });
+
+  /* ── Coverage Assistant (CA-1): botón por card → abre Maya sembrada para ese tier, al lado
+     OPUESTO de la card (no la tapa). Maya (server, tool size_coverage) devuelve `coverage` → pre-llenamos.
+     El SERVER manda el sizing/precio (coverage-policy, flag-driven); el LLM nunca fija precio. */
+  var COV_LABEL = { 'stain':'Stain protection ($9.99/mo)', 'stain-mech':'Stain + Structure ($19.99/mo)' };
+  var covTier = null;       /* tier de la conversación de cobertura activa (null = chat general) */
+  var covPrefill = null;    /* {sales_order_number, sales_order_total, item_count, note} para el checkout */
+  var covConvId = null;     /* id de ESTA conversación de cobertura → el server upsertea 1 lead por id (chat completo + summary) */
+  var covDoneFor = null;    /* MAYA-8c: el mensaje "Done…" sale UNA vez por conversación (el 2º tool-call, con email/tel, llena en silencio) */
+  function covGenId(){      /* UUID estable por conversación; fallback si crypto.randomUUID no está disponible */
+    try { return crypto.randomUUID(); } catch(e){}
+    return 'cv-' + Date.now().toString(36) + '-' + Math.random().toString(36).slice(2, 10);
+  }
+
+  function seedCoverage(cov){
+    /* Conversación de cobertura FRESCA. chat.mjs (sanitizeMessages) DESCARTA los turnos `assistant`
+       iniciales y exige empezar con `user` → sembramos un turno `user` SINTÉTICO (sobrevive y
+       transmite tier+intención) + el opener `assistant` (solo el opener se muestra en pantalla). */
+    chatBody.innerHTML = '';
+    /* MAYA-7 (Doug: "just like a natural conversation… I don't know where that size your stain
+       coverage came from"): Maya se presenta y arranca el guion por el NOMBRE. */
+    /* MAYA-8c: contacto al FINAL (NN/g sensitive-last + "value before data") — el saludo solo pide el nombre */
+    var opener = "Hi, I'm Maya, your sales assistant. I'll get your " + (COV_LABEL[cov] || cov) + " set up. Let's start with your first and last name.";
+    chatPush(opener, 'them');
+    chatHistory = [
+      { role: 'user', content: 'I just bought furniture and want to set up my ' + cov + ' protection plan from my sales order.' },
+      { role: 'assistant', content: opener }
+    ];
+  }
+
+  function applyCoverage(cv){
+    var tier = cv.cov || covTier;
+    if(!tier) return;
+    /* Confiamos en el count del SERVER (premium-matched); clamp defensivo. El PRECIO lo recalcula el
+       server en el checkout. cartSet solo muta savedItems → refrescamos la UI a mano (renderCompareCards...). */
+    var n = Math.max(0, Math.min(MAX_COUNT, parseInt(cv.recommended_plans, 10) || 0));
+    if(n > 0) cartSet(tier, 'monthly', 'furniture', n);
+    renderCompareCards(); updateCartBadge(); reflectToHero(tier);
+    if(cv.sales_order_number){
+      var ord = document.getElementById('cart-order');
+      if(ord) ord.value = cv.sales_order_number;
+    }
+    /* MAYA-8 (Doug: "when you get here it's mostly filled out, including the delivery date"):
+       TODO lo que Maya capturó aterriza en la card; el cliente solo revisa, sube el recibo y paga.
+       Respeta campos bloqueados (email readonly por sesión, PREFILL-1) y dispara 'input' para que
+       la máscara del teléfono y la limpieza de errores reaccionen como si lo hubieran tecleado. */
+    function covFill(id, v){
+      if(!v) return;
+      var f = document.getElementById(id);
+      if(!f || f.readOnly) return;
+      f.value = v;
+      try{ f.dispatchEvent(new Event('input', { bubbles: true })); }catch(_){}
+    }
+    covFill('cart-name', cv.customer_name);
+    covFill('cart-email', cv.customer_email);
+    covFill('cart-phone', cv.customer_phone);
+    covFill('cart-address', cv.delivery_address);
+    covFill('cart-zip', cv.delivery_zip);
+    covFill('cart-date', cv.delivery_date);
+    covPrefill = {
+      sales_order_number: cv.sales_order_number || '',
+      sales_order_total:  cv.sales_order_total,
+      item_count:         cv.item_count,
+      note:               cv.note || ''
+    };
+    if(n > 0 && covDoneFor !== covConvId){
+      covDoneFor = covConvId;
+      /* MAYA-9 road signs DETERMINISTAS (no dependen del LLM): recibo + exactitud + siguiente paso */
+      chatPush('Done. I set ' + n + ' plan' + (n > 1 ? 's' : '') + ' on your ' + (COV_LABEL[tier] || tier) + ' and filled in your details. Two reminders for checkout: add a photo of your sales receipt to ensure coverage, and check the box confirming your info is accurate. Next step: tap Review & check out.', 'them');
+      /* CTA in-chat: abre el drawer de checkout (el hero ya refleja este plan vía reflectToHero arriba). */
+      var coCta = document.createElement('button');
+      coCta.type = 'button';
+      coCta.className = 'chat-cta';
+      coCta.textContent = 'Review & check out →';
+      coCta.addEventListener('click', function(){ chatClose(); openCart(); });
+      chatBody.appendChild(coCta);
+      chatBody.scrollTop = chatBody.scrollHeight;
+    }
+  }
+
+  document.querySelectorAll('.cov-assist-trigger').forEach(function(btn){
+    btn.addEventListener('click', function(){
+      var cov = btn.getAttribute('data-cov');
+      covTier = cov;
+      covConvId = covGenId();                                /* conversación de cobertura NUEVA → id nuevo (1 lead upserteado por el server) */
+      /* MAYA-3 (Doug 02-jul 26:16 "let's keep in a single place"): Maya abre SIEMPRE en su posición fija — fuera el flip por card */
+      seedCoverage(cov);
+      if(!chatPanel.classList.contains('open')) chatOpen();
+      else chatInput.focus();
+    });
+  });
+
+  // HOW IT WORKS POPUP (Path 3): instructions modal; "Build plan" CTA scrolls to the builder.
+  var howtoBtn = document.getElementById('final-howto');
+  var howtoModal = document.getElementById('howto-modal');
+  var howtoBackdrop = document.getElementById('howto-backdrop');
+  var howtoCloseBtn = document.getElementById('howto-close');
+  var howtoBuild = document.getElementById('howto-build');
+  function howtoOpen(){
+    if(!howtoModal) return;
+    howtoModal.hidden = false; howtoBackdrop.hidden = false;
+    requestAnimationFrame(function(){ howtoModal.classList.add('open'); howtoBackdrop.classList.add('open'); });
+    document.body.style.overflow = 'hidden';
+    setTimeout(function(){ if(howtoCloseBtn) howtoCloseBtn.focus(); }, 300);
+  }
+  function howtoClose(){
+    if(!howtoModal) return;
+    howtoModal.classList.remove('open'); howtoBackdrop.classList.remove('open');
+    document.body.style.overflow = '';
+    setTimeout(function(){ howtoModal.hidden = true; howtoBackdrop.hidden = true; }, 280);
+  }
+  if(howtoBtn) howtoBtn.addEventListener('click', howtoOpen);
+  if(howtoCloseBtn) howtoCloseBtn.addEventListener('click', howtoClose);
+  if(howtoBackdrop) howtoBackdrop.addEventListener('click', howtoClose);
+  if(howtoBuild) howtoBuild.addEventListener('click', howtoClose);   /* the anchor scrolls to #configurator natively; just close the modal */
+  document.addEventListener('keydown', function(e){ if(e.key === 'Escape' && howtoModal && !howtoModal.hidden) howtoClose(); });
+
+  // MEMBERSHIP TERMS popup: opened from "See membership details" + the drawer's membership T&C link.
+  var memtermsModal = document.getElementById('memterms-modal');
+  var memtermsBackdrop = document.getElementById('memterms-backdrop');
+  var memtermsCloseBtn = document.getElementById('memterms-close');
+  function memtermsOpen(e){
+    if(e) e.preventDefault();
+    if(!memtermsModal) return;
+    memtermsModal.hidden = false; memtermsBackdrop.hidden = false;
+    requestAnimationFrame(function(){ memtermsModal.classList.add('open'); memtermsBackdrop.classList.add('open'); });
+    document.body.style.overflow = 'hidden';
+    setTimeout(function(){ if(memtermsCloseBtn) memtermsCloseBtn.focus(); }, 300);
+  }
+  function memtermsClose(){
+    if(!memtermsModal) return;
+    memtermsModal.classList.remove('open'); memtermsBackdrop.classList.remove('open');
+    /* keep scroll locked if the cart drawer is still open underneath (terms can open from it) */
+    document.body.style.overflow = (cartPanel && !cartPanel.hidden) ? 'hidden' : '';
+    setTimeout(function(){ memtermsModal.hidden = true; memtermsBackdrop.hidden = true; }, 280);
+  }
+  var memDetailsLink = document.getElementById('mem-details-link');
+  var memtermsDrawerLink = document.getElementById('memterms-drawer-link');
+  if(memDetailsLink) memDetailsLink.addEventListener('click', memtermsOpen);
+  if(memtermsDrawerLink) memtermsDrawerLink.addEventListener('click', memtermsOpen);
+  if(memtermsCloseBtn) memtermsCloseBtn.addEventListener('click', memtermsClose);
+  if(memtermsBackdrop) memtermsBackdrop.addEventListener('click', memtermsClose);
+  document.addEventListener('keydown', function(e){ if(e.key === 'Escape' && memtermsModal && !memtermsModal.hidden) memtermsClose(); });
+
+})();
+</script>
+
+</body>
+</html>

@@ -1,0 +1,119 @@
+# Furniture-Rx — sitio estático de un solo archivo + imágenes de los care kits.
+# Publica SOLO index.html y kit_assets/: el build los copia a dist/ y se sirve esa
+# carpeta, de modo que nada más del repo (CLAUDE.md con la lógica de pricing, etc.)
+# quede accesible en la web. Cambiar index.html y hacer push redepliega automáticamente.
+[build]
+  command = "npm run build"
+  publish = "dist"
+
+# Netlify Functions (lado servidor). create-lead captura el lead del checkout con la
+# service_role key (env vars SUPABASE_URL + SUPABASE_SERVICE_ROLE_KEY, nunca en el repo).
+[functions]
+  directory = "netlify/functions"
+  node_bundler = "esbuild"
+
+# ── SEC-1 (auditoría 28-jul, hallazgo 1): NINGÚN .env se sirve jamás. Este site publica dist/, que en
+#    la copia LOCAL arrastra residuo de un build viejo (dist/kiosk/.env, dist/tech/.env) — el CI construye
+#    dist limpio, pero un `netlify deploy` manual subiría ese residuo. `force = true` hace que la regla
+#    GANE sobre el archivo estático, así que el contenido no se sirve ni existiendo el archivo; el 404 se
+#    responde con index.html, que siempre existe en la raíz de publicación (determinista).
+#    Quirúrgico sobre .env a propósito: /.well-known/ debe seguir accesible (Netlify lo usa para HTTPS).
+#    Candado permanente: tools/tests/sec1-dotfiles.test.mjs + gate G17. Spec: misc/spec-sec1-dotfiles.md.
+[[redirects]]
+  from = "/.env"
+  to = "/index.html"
+  status = 404
+  force = true
+
+[[redirects]]
+  from = "/.env*"
+  to = "/index.html"
+  status = 404
+  force = true
+
+[[redirects]]
+  from = "/kiosk/.env*"
+  to = "/index.html"
+  status = 404
+  force = true
+
+[[redirects]]
+  from = "/tech/.env*"
+  to = "/index.html"
+  status = 404
+  force = true
+
+# Costura /api/* → backend (seam S1). El front llama `/api/<fn>`; este rewrite (200, mismo origen)
+# lo resuelve a las Functions locales HOY. MAÑANA, si la API se muda a otro host/site, basta cambiar
+# el `to` por la URL del backend (proxy 200) — sin tocar una línea del front. El webhook de Stripe NO
+# pasa por aquí: Stripe apunta directo a /.netlify/functions/stripe-webhook (firma raw intacta).
+[[redirects]]
+  from = "/api/*"
+  to = "/.netlify/functions/:splat"
+  status = 200
+
+# AUTH-1: atajo memorizable del login del customer.
+[[redirects]]
+  from = "/login"
+  to = "/account.html"
+  status = 301
+
+# DASH-5: la URL que Doug pidió textual ("[dominio]/dashboard", 24-jun) — el link "Log in to your
+# dashboard" de la sección de planes (D2C y kiosk) apunta aquí. dashboard.html (legacy) también
+# redirige a account.html, pero vía HTML (ver ese archivo); esta es la ruta canónica limpia.
+[[redirects]]
+  from = "/dashboard"
+  to = "/account.html"
+  status = 301
+
+# KIOSK-16: URL corta TECLEABLE del pago — /p/<code> reescribe a pay-redirect, que responde
+# 302 a la Stripe Checkout Session (o página amable si expiró/no existe). Fallback manual del QR.
+[[redirects]]
+  from = "/p/*"
+  to = "/.netlify/functions/pay-redirect?code=:splat"
+  status = 200
+
+# KIOSK-22: URL corta PERMANENTE de sales-mode — /s/<code> reescribe a sales-mode-redirect, que
+# acuña un handoff one-time y responde 302 al kiosk en modo venta (?pt=). El bookmark + QR del dealer.
+[[redirects]]
+  from = "/s/*"
+  to = "/.netlify/functions/sales-mode-redirect?code=:splat"
+  status = 200
+
+# DEAL-5: link DURABLE de onboarding de Connect — /stripeOnboarding/<code> reescribe al resolver, que
+# acuña el Account Link de Stripe en el momento del click (los de Stripe caducan en minutos y son de un
+# solo uso). En prod el link vive en el dominio del PORTAL; esta regla es la que hace funcionar dev.
+[[redirects]]
+  from = "/stripeOnboarding/*"
+  to = "/.netlify/functions/stripe-onboarding-redirect?code=:splat"
+  status = 200
+
+# El KIOSK ya NO se sirve desde este site: deploya como SITE PROPIO desde la carpeta /kiosk/ (base dir
+# kiosk, publish ".", /api proxeado al backend central — ver kiosk/DEPLOY.md). Por eso acá no hay rewrite
+# de kiosk ni kiosk.html en dist/.
+
+# Desarrollo local con `netlify dev`: puerto FIJO 8888 para que coincida con
+# SITE_URL → el retorno de Stripe (success_url/cancel_url) cae en localhost.
+# Sirve desde dist/ (igual que prod) para NO exponer .env/CLAUDE.md/SQL por el dev server.
+# Tras editar index.html hay que regenerar dist (ver script "build" en package.json).
+[dev]
+  framework = "#static"
+  publish = "dist"
+  port = 8888
+  autoLaunch = false
+
+# ── Security response headers (audit 2026-07-02). Payments + PII site: harden clickjacking
+#    (frame-ancestors + X-Frame-Options), the account.html?t=<token> magic-link (Referrer-Policy so the
+#    query-string token isn't sent cross-origin), MIME sniffing (nosniff), transport (HSTS), and add a CSP.
+#    The app never writes dynamic/user data via innerHTML, so 'unsafe-inline' only covers the inline
+#    <style> + IIFE (no build step for nonces); qrcode.min.js is same-origin and eval-free. Only external
+#    resources are Google Fonts (style+font) and Supabase Storage (receipt <img>). No iframes/CDNs/analytics.
+[[headers]]
+  for = "/*"
+  [headers.values]
+    X-Frame-Options = "DENY"
+    X-Content-Type-Options = "nosniff"
+    Referrer-Policy = "strict-origin-when-cross-origin"
+    Strict-Transport-Security = "max-age=31536000"
+    Permissions-Policy = "geolocation=(), microphone=(), browsing-topics=()"
+    Content-Security-Policy = "default-src 'self'; base-uri 'self'; object-src 'none'; frame-ancestors 'none'; form-action 'self'; img-src 'self' data: blob: https://*.supabase.co; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; script-src 'self' 'unsafe-inline'; connect-src 'self' https://*.supabase.co; upgrade-insecure-requests"

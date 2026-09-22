@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Your account · FurnitureRx</title>
+<meta name="robots" content="noindex, nofollow">
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%23d4541e'/%3E%3Ctext x='32' y='45' font-family='Georgia,serif' font-size='36' font-style='italic' font-weight='600' fill='%23fff' text-anchor='middle'%3ERx%3C/text%3E%3C/svg%3E">
+<script>
+/* Consolidación del dashboard (08-jul-2026, spec-dash-block-08jul §A4).
+ * Esta página fue el dashboard post-login v1 (DASH-4), con placeholders de pause/claim que
+ * mentían ("coming soon"). La cuenta REAL vive en /account.html (login AUTH-1/2 + vista ?t=).
+ * Redirect INMEDIATO preservando search Y hash: los tokens de GoTrue (invite/recovery) viajan
+ * en el hash y account.html sabe consumirlos. location.replace = no ensucia el historial.
+ * El archivo se conserva como redirect (no se borra) por si Doug entrega su propia versión
+ * del dashboard (DASH-3/6): esta URL seguirá viva. Versión anterior: git log dashboard.html. */
+location.replace('/account.html' + location.search + location.hash);
+</script>
+<!-- Fallback sin JS (pierde el hash; el link manual queda por si el refresh también falla) -->
+<meta http-equiv="refresh" content="0;url=/account.html">
+</head>
+<body>
+<p><a href="/account.html">Continue to your account &rarr;</a></p>
+</body>
+</html>

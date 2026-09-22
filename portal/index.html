@@ -1,0 +1,774 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>FurnitureRx Subscription Portal</title>
+<link rel="stylesheet" href="assets/css/portal.css">
+</head>
+<body>
+
+<!-- ============ LANDING (pre-login) ============ -->
+<div id="view-landing" class="view on">
+  <div class="landing">
+    <div class="lnav">
+      <div class="brand"><div class="mark">RAP</div><div><b>FurnitureRx</b><span>Subscription Portal</span></div></div>
+      <div class="sp"></div>
+      <button class="btn gold" onclick="showLogin()">Log in</button>
+    </div>
+    <div class="hero">
+      <div class="eyebrow">FurnitureRx Subscription Portal</div>
+      <h1>Your subscription sales, all in one place.</h1>
+      <p class="sub">Track every FurnitureRx subscription you sell, see your referral credit and Stripe payouts, and manage your stores and associates.</p>
+      <div class="cta">
+        <button class="btn gold" onclick="showLogin()">Log in to your dashboard</button>
+        <button class="btn ghost" style="background:transparent;color:#fff;border-color:rgba(255,255,255,.25)" onclick="openReseller()">New here? Become a reseller →</button>
+        <a class="link" id="kioskLanding" href="https://kiosk.furniturerx.net/" target="_blank" rel="noopener">Go to the kiosk →</a>
+      </div>
+    </div>
+    <div class="valuestrip">
+      <div class="vcard"><h4>See every sale</h4><p>Subscriptions by store and associate, with cancellations, unique subscribers, and next-period estimates.</p></div>
+      <div class="vcard"><h4>Track your credit</h4><p>Referral-code campaigns and Stripe commission deposits, so you can reconcile against your own system.</p></div>
+      <div class="vcard"><h4>Pull your data</h4><p>Export subscribers to CSV/Excel/JSON or schedule an API feed straight into your systems.</p></div>
+    </div>
+  </div>
+</div>
+
+<!-- ============ LOGIN (real auth — reusa /api/auth-login, mismo patrón que account.html) ============ -->
+<div id="view-login" class="view">
+  <div class="landing">
+    <div class="lnav">
+      <div class="brand"><div class="mark">RAP</div><div><b>FurnitureRx</b><span>Subscription Portal</span></div></div>
+      <div class="sp"></div>
+      <button class="btn ghost" style="background:transparent;color:#fff;border-color:rgba(255,255,255,.25)" onclick="showLanding()">← Back</button>
+    </div>
+    <div class="loginwrap">
+      <div class="eyebrow">Sign in</div>
+      <h1>Log in to your dashboard</h1>
+      <p class="sub">Your role and world come from your login.</p>
+      <div class="card panel">
+        <form id="login-form" onsubmit="return doLogin(event)">
+          <div class="form-grid" style="grid-template-columns:1fr">
+            <div class="field"><label for="login-email">Email</label><input id="login-email" type="email" autocomplete="username" placeholder="you@company.com" required></div>
+            <div class="field"><label for="login-pw">Password</label><input id="login-pw" type="password" autocomplete="current-password" placeholder="••••••••" required></div>
+          </div>
+          <div id="login-err" class="banner warn" role="alert" hidden style="margin-top:12px"></div>
+          <button id="login-btn" class="btn gold" type="submit" style="margin-top:14px">Sign in</button>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ============ APP ============ -->
+<div id="app" style="display:none">
+  <header class="topbar">
+    <!-- PORT-27: hamburguesa (solo ≤900px, ver portal.css); reversible = quitar este botón + #navScrim + el bloque CSS/JS PORT-27 -->
+    <button class="navtoggle" id="navToggle" aria-label="Open menu" aria-expanded="false" aria-controls="sideNav" onclick="toggleNav()">☰</button>
+    <div class="brand"><div class="mark">RAP</div><div><b>FurnitureRx</b><span>Subscription Portal</span></div></div>
+    <!-- PORT-20b: el spacer central del topbar aloja el badge de scope (idea de Adrian):
+         prominente a simple vista, sin franja invasiva. Solo admin con dealer elegido. -->
+    <div class="sp" style="display:flex;justify-content:center">
+      <span class="viewing-pill" id="viewingPill" role="status" aria-live="polite"></span>
+    </div>
+    <div class="hello">Welcome, <b id="userName">—</b></div>
+    <!-- admin: selector cross-world (World) + reseller (Viewing) -->
+    <div class="who" id="hdr-admin" style="display:none"><span class="lbl">World</span>
+      <select id="worldSelect" onchange="onWorldPick()" aria-label="World">
+        <option value="retailer">Retailer</option>
+        <option value="technician">Technician</option>
+      </select>
+      <span class="lbl">Viewing</span>
+      <select id="dealerSelect" onchange="onDealerPick()" aria-label="Viewing dealer"><option value="all">All</option></select>
+      <div class="avatar" id="adminAv">RA</div></div>
+    <!-- non-admin: identidad fija de su org/sub -->
+    <div class="who" id="hdr-user" style="display:none"><div class="t"><b id="orgName">—</b><span id="orgId">—</span></div><div class="avatar" id="orgAv">—</div></div>
+    <button class="logout" onclick="logout()">Log out</button>
+  </header>
+
+
+  <div class="navscrim" id="navScrim" onclick="closeNav()" aria-hidden="true"></div>
+  <div class="shell">
+    <nav class="side" id="sideNav">
+      <div class="grp">Subscription Program</div>
+      <a data-screen="dashboard" class="on">▚ Dashboard</a>
+      <a id="kioskNav" href="https://kiosk.furniturerx.net/" target="_blank" rel="noopener" title="Opens the kiosk signed in as the reseller: every sale from there credits them automatically, no code needed.">⇗ Open kiosk signed in <span class="ext">↗</span></a>
+      <!-- PORT-28: el dealer ve y descarga SU propio QR sin pedirlo. Junto a "Open kiosk signed in"
+           porque es la otra forma de llegar al mismo kiosco (esta, para vender sin login). -->
+      <a id="salesQrNav" data-roles="admin org sub" onclick="openMyKioskQr()">▦ Sales Mode QR</a>
+
+      <div class="grp">Subscription Sales</div>
+      <a data-screen="salesstats">▤ Sales Stats</a>
+      <a data-screen="subscribers">☰ Subscribers</a>
+      <!-- KIT-1: "I need some way to tell the people in the office: Doug bought a kit, ship him a kit" -->
+      <a data-screen="kitorders" data-roles="admin">▤ Kit Orders</a>
+      <a data-screen="referrals" data-roles="admin org">✦ Referral Codes</a>
+
+      <!-- PODAS 16-jul (Doug, textual): Track Requests "you can delete this for now"; AI Assistant
+           "if that's too much, don't include"; Announcements "you don't really need this right now";
+           API Access "I don't know how doable… not sure"; Approval Queue murió con el maker-checker;
+           Reseller Inquiries "I don't think you need that right now". El código queda dormido.
+           Create Service Request vive DENTRO del Customer Record ("should be inside of here"). -->
+      <div class="grp">Support</div>
+      <!-- Ago-10 (Doug): "View Cust Record" podado del nav — se llega SOLO por Subscribers (lista buscable).
+           La vista #view-custrecord sigue viva (Subscribers, botón "Look up a customer", reconciliación). -->
+      <a data-screen="contact">☎ Contact / Hotline</a>
+      <a data-screen="resources">▤ Resources</a>
+
+      <div class="grp" data-roles="admin org">Stripe System API</div>
+      <a data-screen="downloads" data-roles="admin org">⤓ Data Downloads</a>
+      <a data-screen="stripe" data-roles="admin org">◎ Stripe Account</a>
+
+      <div class="grp" data-roles="admin">Admin</div>
+      <a data-screen="dealeradmin" data-roles="admin">▣ <span data-lex="navAdmin">Dealer Admin</span></a>
+      <a data-screen="pricing" data-roles="admin">$ Pricing &amp; Plans</a>
+      <a data-screen="audit" data-roles="admin">◷ Audit Log</a>
+      <!-- PORT-18: Stores & Logins se fusionó DENTRO de Dealer Admin (nav item podado, view dormida) -->
+
+      <div class="hotline">
+        <b>24/7 Reseller Hotline</b>
+        <!-- PORT-31 (email Emmy 14-ago): número PROPIO de resellers; el 833 queda para clientes. -->
+        <a href="#" onclick="return false">1-888-850-0057</a>
+        <small>service@raptns.com</small>
+      </div>
+    </nav>
+
+    <main>
+      <!-- DASHBOARD — PORT-16 (mock de Doug): headline numbers del MES + quick links +
+           recent activity CON SCROLL ("this would need a scroll"). Data real de portal-stats. -->
+      <section id="view-dashboard" class="view on">
+        <div class="vhead"><div><div class="eyebrow">Welcome back</div><h1>Dashboard</h1><p>Your subscription program at a glance — one month snapshot.</p></div></div>
+        <div class="scopebar" id="scope-line">Loading your identity…</div>
+        <div class="stats">
+          <div class="stat"><div class="n" id="st-active">—</div><div class="l">Active subscriptions</div><div class="d up" id="st-active-d"></div></div>
+          <div class="stat blue"><div class="n" id="st-value">—</div><div class="l">Monthly value</div><div class="d">across active subs</div></div>
+          <div class="stat amber"><div class="n" id="st-cancel">—</div><div class="l">Cancellation rate</div><div class="d" id="st-cancel-d"></div></div>
+          <div class="stat green"><div class="n" id="st-comm">—</div><div class="l">Commission (mo)</div><div class="d">Stripe deposits</div></div>
+        </div>
+        <div class="grid2">
+          <div class="card panel"><h3>Jump back in</h3><p class="sub">Quick links into your most-used views.</p>
+            <div style="display:flex;flex-wrap:wrap;gap:8px">
+              <button class="btn ghost sm" onclick="show('salesstats')">Sales Stats →</button>
+              <button class="btn ghost sm" onclick="show('subscribers')">Look up a customer →</button>
+              <button class="btn ghost sm" data-roles="admin org" onclick="show('referrals')">Referral codes →</button>
+            </div>
+          </div>
+          <div class="card panel"><h3>Recent activity</h3><p class="sub">Latest subscriptions attributed to you.</p>
+            <div class="tblwrap" style="max-height:200px"><table class="tbl"><tbody id="dash-recent"></tbody></table></div>
+          </div>
+        </div>
+        <div class="card panel" style="margin-top:14px">
+          <h3>Your access</h3><p class="sub">Derived from your login (role + world). Server-enforced.</p>
+          <div class="kv">
+            <div class="f"><span>Name</span><b id="dash-name">—</b></div>
+            <div class="f"><span>Role</span><b id="dash-role">—</b></div>
+            <div class="f"><span>World</span><b id="dash-world">—</b></div>
+            <div class="f"><span>Organization</span><b id="dash-org">—</b></div>
+          </div>
+        </div>
+      </section>
+
+      <!-- SALES STATS — PORT-16 (mock de Doug): totales + estimates + by location + by associate,
+           con el time filter del mock. Data real de portal-stats. -->
+      <section id="view-salesstats" class="view">
+        <div class="vhead"><div><div class="eyebrow">Subscription Sales</div><h1>Sales Stats</h1><p>Totals roll up dealer → location → associate.</p></div>
+          <div class="filters" style="margin:0"><select id="ss-period" onchange="loadSalesStats()" aria-label="Stats period">
+            <option value="all">Since inception</option>
+            <option value="year" selected>This year</option>
+            <option value="month">This month</option>
+            <option value="today">Today</option>
+            <option value="range">Custom range…</option>
+          </select>
+          <span class="rangebox" id="ss-range"><input type="date" id="ss-from" onchange="loadSalesStats()" aria-label="Stats from date"><span style="color:var(--muted);font-size:12px">to</span><input type="date" id="ss-to" onchange="loadSalesStats()" aria-label="Stats to date"></span></div></div>
+        <div class="scopebar" id="ss-scope"></div>
+        <div class="stats">
+          <div class="stat"><div class="n" id="ss-active">—</div><div class="l">Active subscribers</div></div>
+          <div class="stat blue"><div class="n" id="ss-unique">—</div><div class="l">Unique subscribers</div></div>
+          <div class="stat amber"><div class="n" id="ss-cancels">—</div><div class="l">Cancellations</div><div class="d" id="ss-rate"></div></div>
+          <div class="stat green"><div class="n" id="ss-deposits">—</div><div class="l" id="ss-deposits-l">Stripe deposits</div></div>
+        </div>
+        <!-- PORT-24A (review Doug 17-jul): "turn this into cards… I mean you can use the same thing"
+             (señalando los stat cards de arriba). La tira suelta de estimates+Program (que se salía
+             del viewport) es ahora una 2ª fila de 4 stat cards IGUAL a la de arriba: los 2 estimates
+             + Stain / Stain+protection con su estado. Program display-only (pill Active). -->
+        <div class="stats">
+          <div class="stat"><div class="n" id="ss-next-month">—</div><div class="l">Next-month estimate</div></div>
+          <div class="stat"><div class="n" id="ss-next-year">—</div><div class="l">Next-year estimate</div></div>
+          <div class="stat"><div class="n">$9.99</div><div class="l">Stain program</div><div class="d"><span class="pill active">Active</span></div></div>
+          <div class="stat"><div class="n">$19.99</div><div class="l">Stain + protection program</div><div class="d"><span class="pill active">Active</span></div></div>
+        </div>
+        <div class="block"><div class="bh"><h2 data-lex="byLoc">By location</h2><span style="font-size:11px;color:var(--muted)">scroll →</span></div>
+          <div class="scroll-x"><div class="rows" id="ss-locations"></div></div>
+        </div>
+        <div class="block" data-world="retailer"><div class="bh"><h2>By sales associate</h2><span style="font-size:11px;color:var(--muted)">scroll →</span></div>
+          <div class="scroll-x"><div class="rows" id="ss-associates"></div></div>
+        </div>
+      </section>
+      <section id="view-subscribers" class="view">
+        <div class="vhead"><div><div class="eyebrow">Subscription Sales</div><h1>Subscribers</h1><p>Active subscribers attributed to you.</p></div>
+          <button class="btn primary sm" data-roles="admin org" onclick="exportSubs()">⤓ Export to Excel</button></div>
+        <div class="scopebar" id="subs-scope"></div>
+        <!-- PORT-24B (review Doug 17-jul): "each contract terminates 30 days from the start date…
+             these have to be serialized… put that up here in this setting" -->
+        <p class="finenote">Each contract terminates 30 calendar days from the start date. Contract numbers are serialized <b>RX-#####-N</b> — the <b>-N</b> is the latest payment number.</p>
+        <!-- PORT-16d: filtros + pager del mock ("I did put a filter in"), client-side sobre las filas cargadas -->
+        <div class="filters">
+          <input type="search" id="f-search" placeholder="Search name, contract #…" oninput="renderSubs(true)" aria-label="Search subscribers">
+          <select id="f-assoc" onchange="renderSubs(true)" aria-label="Filter by associate"><option value="" data-lex="fAssoc">All associates</option></select>
+          <select id="f-store" onchange="renderSubs(true)" aria-label="Filter by store"><option value="" data-lex="fStore">All stores</option></select>
+          <select id="f-date" onchange="toggleRange();renderSubs(true)" aria-label="Filter by date">
+            <option value="all">All dates</option>
+            <option value="today">Today</option>
+            <option value="mtd">Month to date</option>
+            <option value="month">This month</option>
+            <option value="ytd">Year to date</option>
+            <option value="year">This year</option>
+            <option value="range">Custom range…</option>
+          </select>
+          <span class="rangebox" id="rangeInputs"><input type="date" id="f-from" onchange="renderSubs(true)" aria-label="From date"><span style="color:var(--muted);font-size:12px">to</span><input type="date" id="f-to" onchange="renderSubs(true)" aria-label="To date"><button class="btn ghost sm" onclick="renderSubs(true)">Apply</button></span>
+        </div>
+        <div class="card">
+          <div class="tblwrap"><table class="tbl">
+            <!-- PORT-24B: columnas sortables; End → SR (open/closed); Associate → RSA (LEX) -->
+            <thead><tr><th class="sortable" data-sort="start_date" onclick="sortSubs('start_date')">Start</th><th>SR</th><th class="sortable" data-sort="program" onclick="sortSubs('program')">Program</th><th class="sortable" data-sort="name" onclick="sortSubs('name')">Name</th><th class="sortable" data-sort="payments" onclick="sortSubs('payments')">Pmts</th><th class="sortable" data-sort="person_id" data-lex="colAssoc" onclick="sortSubs('person_id')">RSA</th><th class="sortable" data-sort="store_name" data-lex="colStore" onclick="sortSubs('store_name')">Store</th><th class="sortable" data-sort="contract_number" onclick="sortSubs('contract_number')">Contract #</th><th class="sortable" data-sort="status" onclick="sortSubs('status')">Status</th><th></th></tr></thead>
+            <tbody id="subs-body"></tbody>
+          </table></div>
+          <div class="tblfoot"><span>Showing <b id="subs-count">0</b> of <b id="subs-total">0</b> subscribers</span>
+            <div class="pager"><button class="btn ghost sm" onclick="pageSubs(-1)">‹ Prev</button><button class="btn ghost sm" onclick="pageSubs(1)">Next ›</button><select id="pg-size" onchange="renderSubs(true)" aria-label="Page size"><option value="50">50 / page</option><option value="100">100 / page</option><option value="250">250 / page</option></select></div>
+          </div>
+        </div>
+      </section>
+      <!-- PORT-9: método B (Doug 15-jul) — códigos que RAP genera para el dealer; el cliente los
+           teclea en el cart (kiosk/tech/D2C). Crear = admin; ver = admin + org. -->
+      <section id="view-referrals" class="view" data-roles="admin org">
+        <div class="vhead"><div><div class="eyebrow">Subscription Sales</div><h1>Referral Codes</h1><p>Codes credit the dealer when used at online checkout.</p></div>
+          <div style="display:flex;gap:8px;align-items:center">
+            <input id="ref-label" data-roles="admin" placeholder="Campaign label (optional)" style="border:1px solid var(--line);border-radius:9px;padding:8px 11px;font-size:12.5px">
+            <button class="btn primary sm" data-roles="admin" onclick="createReferral()">＋ Generate code</button>
+          </div></div>
+        <div class="scopebar" id="ref-scope"></div>
+        <!-- banner del mock (línea 470). Ago-16: el texto iba partido en trozos con <b> intercalados y
+             se leía como columnas sueltas ("need to clean this up"). Pasa a UN solo <p> corrido, con
+             el copy entregado palabra por palabra; no reescribir sin pedido. -->
+        <div class="banner info"><p>Codes are generated by RAP admin on your behalf, just contact us when you want a new code and we will generate it for you.  Use your referral code to embed in your on line shopping carts, email promotions, second chance offers, or convert existing Plans to subscription plans.  After RAP generates your code you login to your admin portal and copy it .<br>When a customer uses your code, your store gets credit for the sale.</p></div>
+        <div class="card">
+          <div class="tblwrap"><table class="tbl">
+            <thead><tr><th>Code</th><th>Campaign</th><th>Uses</th><th>Attributed subs</th><th>Credit earned</th><th>Reseller</th><th>Status</th><th>Created</th><th>Share link</th></tr></thead>
+            <tbody id="ref-body"></tbody>
+          </table></div>
+          <div class="tblfoot"><span>Showing <b id="ref-count">0</b> codes</span></div>
+        </div>
+      </section>
+      <section id="view-custrecord" class="view">
+        <div class="vhead"><div><div class="eyebrow">Support</div><h1>Customer record</h1></div>
+          <!-- PORT-24C (Doug 17-jul): "just call these quick actions"; fuera la nota "view-only… key to claims" -->
+          <div><div style="font-size:10px;font-weight:800;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);text-align:right;margin-bottom:5px">Quick actions</div>
+            <div style="display:flex;gap:8px;flex-wrap:wrap;justify-content:flex-end">
+              <button class="btn ghost sm" onclick="resendDashLink()">Resend dashboard link</button>
+              <button class="btn ghost sm" onclick="resendTerms()">Resend T&amp;C</button>
+              <button class="btn ghost sm" onclick="printTerms()">Print T&amp;C (PDF)</button>
+              <button class="btn ghost sm" onclick="cancelSubscription()">Cancel subscription</button>
+            </div></div>
+        </div>
+        <div class="scopebar" id="cr-scope"></div>
+        <div id="cust-empty" class="stub"><b>Pick a subscriber</b>Open one from the Subscribers list to see the full record.</div>
+        <div id="cust-card" class="card panel" hidden>
+          <!-- PORT-24C: header con master + activo (Doug: "master subscription number… active subscription number") -->
+          <div style="display:flex;align-items:center;gap:10px;margin-bottom:14px;flex-wrap:wrap"><b id="cr-name" style="font-family:var(--serif);font-size:18px;color:var(--navy)">—</b><span id="cr-status" class="pill active">—</span><span id="cr-master" class="pill gold">—</span><span id="cr-contract" class="pill">—</span></div>
+          <div class="kv">
+            <div class="f"><span>Contact</span><b id="cr-contact">—</b></div>
+            <div class="f"><span>Address</span><b id="cr-address">—</b></div>
+            <div class="f"><span>Start date</span><b id="cr-start">—</b></div>
+            <div class="f"><span>Payments</span><b id="cr-payments">—</b></div>
+            <div class="f"><span>Program</span><b id="cr-program">—</b></div>
+            <div class="f"><span data-lex="order">Sales order #</span><b id="cr-order">—</b></div>
+            <div class="f"><span data-lex="svcDate">Delivery date</span><b id="cr-fulfil">—</b></div>
+            <div class="f"><span data-lex="assoc">Sales associate</span><b id="cr-associate">—</b></div>
+            <div class="f"><span data-lex="dealerStore">Dealer / Store</span><b id="cr-dealerstore">—</b></div>
+            <div class="f"><span>Receipt</span><b id="cr-receipt">—</b></div>
+            <div class="f"><span>Terms &amp; conditions</span><b id="cr-terms">—</b></div>
+            <!-- PORT-24C: Stripe sub visible para dealer pero enmascarado ("just a hash"); admin ve el id -->
+            <div class="f"><span>Stripe subscription</span><b id="cr-stripe">—</b></div>
+          </div>
+          <div class="block"><div class="bh"><h2>Maya checkout summary</h2></div>
+            <div class="banner info" id="cr-maya" style="margin:0">—</div>
+          </div>
+          <!-- PORT-24C: SERVICE REQUESTS dentro del record (Doug 17-jul): últimos 5 (click puebla el
+               form) + form partido notas | menú de categorías single-select (6º Resolved cierra). -->
+          <div class="block"><div class="bh"><h2>Service requests</h2><span style="font-size:11px;color:var(--muted)">routes to RAP's service center · not a claim</span></div>
+            <div class="tblwrap" id="sr-list-wrap" style="max-height:170px;margin-bottom:14px"><table class="tbl"><thead><tr><th>SR #</th><th>Date</th><th>Item</th><th>Status</th></tr></thead><tbody id="sr-list"></tbody></table></div>
+            <div class="sr-grid">
+              <div>
+                <div class="form-grid">
+                  <div class="field"><label>Contract #</label><input id="sr-contract" placeholder="RX-10001-1"></div>
+                  <div class="field"><label>Contact</label><input id="sr-contact" placeholder="Email or phone"></div>
+                  <div class="field"><label>First name</label><input id="sr-first" placeholder="Jane"></div>
+                  <div class="field"><label>Last name</label><input id="sr-last" placeholder="Doe"></div>
+                </div>
+                <div class="field" style="margin-top:12px"><label>Notes</label><textarea id="sr-body" placeholder="Describe what the customer needs."></textarea></div>
+              </div>
+              <div>
+                <label style="font-size:12px;font-weight:800;color:var(--navy)">Service item</label>
+                <!-- PORT-24C ESTRICTO: SOLO los ítems que Doug nombró (cancel plan, contact customer)
+                     + Resolved. El resto del menú lo delegó ("ask Bob… add later") → pendiente su lista;
+                     el grid 2-col queda listo para crecer sin inventar ítems. -->
+                <div class="sr-menu" id="sr-cats">
+                  <label class="sr-cat"><input type="checkbox" value="Cancel plan" onclick="pickSRCat(this)"> Cancel plan</label>
+                  <label class="sr-cat"><input type="checkbox" value="Contact customer" onclick="pickSRCat(this)"> Contact customer</label>
+                  <label class="sr-cat sr-resolved"><input type="checkbox" value="__resolved__" onclick="pickSRCat(this)"> Resolved (close)</label>
+                </div>
+                <div class="sr-loaded" id="sr-loaded" hidden>Editing <b id="sr-cur-num">—</b> · <span id="sr-cur-date">—</span> · <span id="sr-cur-status">—</span></div>
+              </div>
+            </div>
+            <div id="sr-msg" class="banner info" hidden style="margin-top:12px"></div>
+            <div style="margin-top:14px;display:flex;gap:8px"><button class="btn primary" onclick="submitSR()">Submit new service request</button><button class="btn ghost" onclick="clearSR()">Clear</button></div>
+          </div>
+        </div>
+      </section>
+      <section id="view-tracksr" class="view">
+        <div class="vhead"><div><div class="eyebrow">Support</div><h1>Track Requests</h1><p>Status + history of the requests you raised.</p></div>
+          <button class="btn primary sm" onclick="show('createsr')">＋ New request</button></div>
+        <div id="track-list"></div>
+      </section>
+      <section id="view-assistant" class="view"><div class="vhead"><div><div class="eyebrow">Support</div><h1>AI Assistant</h1></div></div><div class="stub"><b>Coming soon</b>Assistant that drafts service requests (later phase).</div></section>
+      <!-- PORT-24D (review Doug 17-jul, ~29:50): "kind of ugly, clean this up" → 4 cards.
+           PORT-31 (email Emmy 14-ago): la línea de RESELLERS es 1-888-850-0057, separada del 833
+           de clientes ("we want to keep the hotline separate", Doug 14-ago). Las cards se
+           diferencian por PROPÓSITO; contactos dedicados por card se rellenan luego. -->
+      <section id="view-contact" class="view"><div class="vhead"><div><div class="eyebrow">Support</div><h1>Contact / Hotline</h1></div></div>
+        <div class="cardgrid">
+          <div class="card contactcard"><div class="rc-t">Sales</div><p class="rc-d">New subscriptions and dealer setup.</p><div class="rc-ch"><span>☎</span><b>1-888-850-0057</b></div><div class="rc-ch"><span>✉</span><b>service@raptns.com</b></div></div>
+          <div class="card contactcard"><div class="rc-t">Claim service</div><p class="rc-d">File or check a protection claim.</p><div class="rc-ch"><span>☎</span><b>1-888-850-0057</b></div><div class="rc-ch"><span>✉</span><b>service@raptns.com</b></div></div>
+          <div class="card contactcard"><div class="rc-t">Subscription help</div><p class="rc-d">Billing, cancellations, dashboard access.</p><div class="rc-ch"><span>☎</span><b>1-888-850-0057</b></div><div class="rc-ch"><span>✉</span><b>service@raptns.com</b></div></div>
+          <div class="card contactcard"><div class="rc-t">Escalation</div><p class="rc-d">Unresolved issues and priority support.</p><div class="rc-ch"><span>☎</span><b>1-888-850-0057</b></div><div class="rc-ch"><span>✉</span><b>service@raptns.com</b></div></div>
+        </div>
+      </section>
+      <section id="view-announce" class="view"><div class="vhead"><div><div class="eyebrow">Support</div><h1>Announcements</h1></div></div><div class="stub"><b>Coming soon</b>RAP notices feed (later phase).</div></section>
+      <!-- PORT-24D (review Doug 17-jul, ~30:40): grid 3×4; cada card = título → contenido (PDF,
+           video, POS, info al cliente). "If there's nothing there, it's just blank, fill later."
+           Solo se nombran las categorías que Doug citó; el resto quedan en blanco (cero assets fake). -->
+      <section id="view-resources" class="view"><div class="vhead"><div><div class="eyebrow">Support</div><h1>Resources</h1></div></div>
+        <!-- Ago-11 v2 (ChangesBLS.srt + decisiones Ago-11): dos tabs. Available (todos, ver primero) +
+             Add a resource (solo admin). El dealer solo ve Available; no sube ni borra. -->
+        <div class="restabs" role="tablist" aria-label="Resources">
+          <button type="button" class="restab on" id="restab-available" role="tab" aria-selected="true" onclick="showResTab('available')">Available</button>
+          <button type="button" class="restab" id="restab-add" role="tab" aria-selected="false" data-roles="admin" onclick="showResTab('add')">Add a resource</button>
+        </div>
+        <div id="res-panel-available" class="res-panel" role="tabpanel" aria-labelledby="restab-available">
+          <div id="res-list" class="cardgrid"><div class="stub"><b>Loading…</b></div></div>
+        </div>
+        <div id="res-panel-add" class="res-panel" role="tabpanel" aria-labelledby="restab-add" hidden data-roles="admin">
+          <div id="res-added" class="banner info" hidden style="margin-bottom:14px"></div>
+          <div id="res-upload" class="block" data-roles="admin"><div class="bh"><h2>Upload a resource</h2></div>
+          <div class="card panel">
+            <p class="sub">Upload sales material and choose which dealers get it. PDF up to 20MB, PNG/JPG up to 10MB, or a link for video.</p>
+            <div class="filters" style="flex-wrap:wrap">
+              <select id="res-type" aria-label="Resource type" onchange="onResTypeChange()">
+                <option value="sell_sheet">Sell sheet (PDF)</option>
+                <option value="selling_pos">Selling POS for retailers</option>
+                <option value="product_overview">Product overview (video)</option>
+                <option value="customer_info">Customer information</option>
+              </select>
+              <input id="res-title" type="text" placeholder="Title" style="min-width:160px;flex:1" aria-label="Title" oninput="refreshResUploadBtn()">
+            </div>
+            <input id="res-desc" type="text" class="res-field" placeholder="Short description (optional)" style="width:100%;margin:8px 0" aria-label="Description">
+
+            <!-- Contenido: dropzone (archivo) o link (video), según el tipo. La dropzone envuelve el
+                 mismo #res-file (sr-only, operable por teclado); uploadResource sigue leyendo .files. -->
+            <div id="res-file-wrap">
+              <!-- patrón del kiosk (BE-1): el <input type=file> es un overlay transparente que acepta
+                   clic Y drop nativamente; el JS solo da el feedback visual .dragover. -->
+              <div class="dropzone" id="res-drop">
+                <input id="res-file" type="file" accept=".pdf,.png,.jpg,.jpeg" class="dz-input" aria-label="Upload file" aria-describedby="res-drop-hint">
+                <div class="dz-prompt">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 16V4M7 9l5-5 5 5"/><path d="M4 17v2a1 1 0 0 0 1 1h14a1 1 0 0 0 1-1v-2"/></svg>
+                  <span class="dz-main">Drag a file here <span class="dz-or">or click to browse</span></span>
+                  <span class="dz-sub" id="res-drop-hint">PDF up to 20MB · PNG/JPG up to 10MB</span>
+                </div>
+              </div>
+              <div id="res-drop-file" class="dz-file" hidden></div>
+              <div id="res-drop-err" class="banner warn" hidden style="margin-top:8px"></div>
+            </div>
+            <div id="res-link-wrap" hidden>
+              <input id="res-link" type="url" class="res-field" placeholder="https://… (video link)" style="width:100%" aria-label="Link URL" oninput="refreshResUploadBtn()">
+              <div class="sub" style="margin-top:4px">YouTube, Vimeo or Drive link.</div>
+            </div>
+
+            <!-- Audiencia: todos vs específicos (segmented + chips + buscador + contador). -->
+            <div style="margin-top:12px">
+              <div class="sub" style="font-weight:700;color:var(--navy);margin-bottom:6px">Visible for</div>
+              <div class="segmented" role="radiogroup" aria-label="Audience">
+                <label class="seg on" id="res-seg-all"><input type="radio" name="res-target" value="all" checked onchange="toggleResTargets()" class="sr-only">Everyone</label>
+                <label class="seg" id="res-seg-some"><input type="radio" name="res-target" value="some" onchange="toggleResTargets()" class="sr-only">Specific dealers</label>
+              </div>
+              <div id="res-all-note" class="sub" style="margin-top:6px">Visible to all dealers.</div>
+              <div id="res-some" hidden style="margin-top:8px">
+                <div class="filters" style="flex-wrap:wrap;align-items:center">
+                  <input id="res-search" type="search" placeholder="Search dealers…" oninput="resSearch()" aria-label="Search dealers" style="min-width:140px;flex:1">
+                  <button type="button" class="btn ghost sm" onclick="resSelectAll()">Select all</button>
+                  <button type="button" class="btn ghost sm" onclick="resClearDealers()">Clear</button>
+                  <span id="res-count" class="sub" aria-live="polite">0 of 0 selected</span>
+                </div>
+                <div id="res-dealers" role="group" aria-label="Choose dealers" style="margin-top:8px;max-height:200px;overflow:auto;display:flex;flex-wrap:wrap;gap:8px"></div>
+              </div>
+            </div>
+
+            <button class="btn primary sm" id="res-upload-btn" onclick="uploadResource()" disabled style="margin-top:12px">Upload</button>
+          </div>
+        </div>
+        </div>
+      </section>
+      <section id="view-downloads" class="view" data-roles="admin org"><div class="vhead"><div><div class="eyebrow">Stripe System API</div><h1>Data Downloads</h1></div></div><div class="stub"><b>Coming soon</b>Exports + audit (PORT-6).</div></section>
+      <section id="view-api" class="view" data-roles="admin org"><div class="vhead"><div><div class="eyebrow">Stripe System API</div><h1>API Access</h1></div></div><div class="stub"><b>Coming soon</b>RAP-mediated credentials + feeds (PORT-6).</div></section>
+      <!-- PORT-8: comisiones del ledger propio. §5.9 HARD: jamás el revenue bruto de RAP. -->
+      <section id="view-stripe" class="view" data-roles="admin org">
+        <div class="vhead"><div><div class="eyebrow">Stripe System API</div><h1>Stripe Account</h1><p>Your commission only — fixed per payment received ($2 Stain / $8 Stain+Structure), with your Stripe/reinsurance split.</p></div></div>
+        <div class="scopebar" id="comm-scope"></div>
+        <!-- PORT-24D (review Doug 17-jul, ~32:40): los totales → 3 stat cards.
+             Total cash = To commission + To reinsurance ("you don't have to say allocated"). -->
+        <div class="stats three">
+          <div class="stat"><div class="n" id="comm-total">$0.00</div><div class="l">Total cash</div><div class="d">commission received</div></div>
+          <div class="stat green"><div class="n" id="comm-cash">$0.00</div><div class="l">To commission</div><div class="d">to your Stripe</div></div>
+          <div class="stat blue"><div class="n" id="comm-rein">$0.00</div><div class="l">To reinsurance</div><div class="d">underwriting split</div></div>
+        </div>
+        <!-- PORT-24D (~35:30): "duplicate the Subscribers page and replace the Stripe page" →
+             reconciliación. El contable descarga y cuadra cada pago contra Stripe. -->
+        <div class="filters">
+          <a class="btn primary sm" href="https://dashboard.stripe.com/" target="_blank" rel="noopener">↗ Log in to your Stripe account</a>
+          <button class="btn ghost sm" onclick="exportRecon()">⤓ Export to Excel</button>
+          <span class="fspacer"></span>
+          <input type="search" id="rec-search" placeholder="Search name, contract #…" oninput="renderRecon()">
+          <select id="rec-date" onchange="renderRecon()">
+            <option value="all">All dates</option>
+            <option value="mtd">Month to date</option>
+            <option value="month">This month</option>
+            <option value="ytd">Year to date</option>
+            <option value="year">This year</option>
+          </select>
+        </div>
+        <div class="card">
+          <div class="tblwrap"><table class="tbl">
+            <thead><tr><th>Start</th><th>Name</th><th>Contract #</th><th>Status</th><th>Stripe payment #</th><th>Payment date</th><th></th></tr></thead>
+            <tbody id="recon-body"></tbody>
+          </table></div>
+          <div class="tblfoot"><span>Showing <b id="recon-count">0</b> of <b id="recon-total">0</b> payments</span></div>
+        </div>
+      </section>
+      <!-- PORT-18: Dealer/Company Admin — pantalla del mock (481-509) con data real.
+           El org se elige en "Viewing"; Stores & Logins vive aquí como subset read-only (v1). -->
+      <section id="view-dealeradmin" class="view" data-roles="admin">
+        <div class="vhead"><div><div class="eyebrow">Admin</div><h1 data-lex="aH1">Dealer Admin</h1><p>Master data for the selected reseller.</p></div>
+          <button class="btn primary sm" onclick="saveDealerAdmin()">Save changes</button></div>
+        <div class="card panel" id="da-card">
+          <h3 id="da-h3">—</h3><p class="sub" id="da-sub">Pick a reseller in "Viewing" to load its record.</p>
+          <div class="form-grid">
+            <div class="field"><label data-lex="aName">Dealer name</label><input id="da-name"></div>
+            <div class="field"><label data-lex="aId">Dealer RAP ID</label><input id="da-rapid" readonly></div>
+            <!-- DEAL-1: el alpha SÍ es editable (el RAP ID no) — es el código con el que
+                 el reporte de underwriting identifica al dealer y se carga a mano. -->
+            <div class="field"><label>Alpha code</label><input id="da-alpha" maxlength="3" placeholder="BLS" aria-describedby="da-alpha-h"><small id="da-alpha-h" class="sub">3 letters. Used by the underwriting report.</small></div>
+            <div class="field full"><label>HQ address</label><input id="da-hq"></div>
+            <div class="field"><label>Kiosk access — start</label><input type="date" id="da-start"></div>
+            <div class="field"><label>Kiosk access — end</label><input type="date" id="da-end"></div>
+          </div>
+          <div class="block"><div class="bh"><h2>Key contacts</h2></div>
+            <div class="scroll-x"><table class="tbl"><thead><tr><th>Role</th><th>Name</th><th>Email</th><th>Phone</th></tr></thead><tbody id="da-contacts"></tbody></table></div>
+          </div>
+          <div class="block"><div class="bh"><h2>Access &amp; credentials</h2></div>
+            <div style="display:grid;gap:10px">
+              <div class="toggle-row"><div class="lab"><b>Sell through kiosk</b><p>Allow this dealer to complete sales on the kiosk.</p></div><button class="sw" id="da-sell" onclick="toggleDealerFlag('selling_enabled', this)"></button></div>
+              <div class="toggle-row"><div class="lab"><b>Dashboard access</b><p>Allow this dealer to log into the portal.</p></div><button class="sw" id="da-dash" onclick="toggleDealerFlag('dashboard_enabled', this)"></button></div>
+              <!-- PORT-21: exclusión de agregados sin borrar nada (dealer que se va, piloto, demo) -->
+              <div class="toggle-row"><div class="lab"><b>Include in admin reports</b><p>When off, this reseller is excluded from cross-reseller totals; its own record stays intact and viewable.</p></div><button class="sw" id="da-rollup" onclick="toggleDealerFlag('include_in_rollups', this)"></button></div>
+              <div class="toggle-row"><div class="lab"><b>Login</b><p id="da-login-sub">No password is stored or shown.</p></div>
+                <div style="display:flex;gap:6px;align-items:center;flex-wrap:wrap">
+                  <input id="da-login-email" placeholder="login email" style="border:1px solid var(--line);border-radius:9px;padding:8px 11px;font-size:12.5px;min-width:160px;flex:1">
+                  <button class="btn ghost sm" onclick="dealerLoginAction('reset')">Reset password</button>
+                  <button class="btn ghost sm" onclick="dealerLoginAction('invite')">Resend invite</button>
+                </div></div>
+            </div>
+          </div>
+          <!-- PORT-25 (Doug 18-jul): "add the T&C sku number to the dealer setup for subscription".
+               Por plan SKU: el T&C SKU (terms_version) + doc URL del dealer, sobre plan_terms (ya existe).
+               La genérica es el fallback; la fila del dealer, cuando existe, gana al primer pago. -->
+          <div class="block"><div class="bh"><h2>Terms &amp; conditions</h2></div>
+            <div class="card panel">
+              <p class="sub">The T&amp;C SKU (terms version) sent to the customer at first payment, per plan SKU. Leave a SKU on generic unless this dealer has its own contract.</p>
+              <div class="pt-row" data-sku="stain">
+                <div class="pt-head"><b>Stain</b><span class="pt-status" id="pt-stain-status">—</span></div>
+                <div class="form-grid">
+                  <div class="field"><label>T&amp;C SKU</label><input id="pt-stain-version" placeholder="on generic"></div>
+                  <div class="field"><label>Document URL</label><input id="pt-stain-url" placeholder="optional — https://…"></div>
+                </div>
+                <div class="pt-actions">
+                  <button class="btn primary sm" onclick="savePlanTerms('stain')">Save</button>
+                  <button class="btn ghost sm" id="pt-stain-clear" onclick="clearPlanTerms('stain')" hidden>Use generic</button>
+                </div>
+              </div>
+              <div class="pt-row" data-sku="stain_mech">
+                <div class="pt-head"><b>Stain + Structure</b><span class="pt-status" id="pt-stain_mech-status">—</span></div>
+                <div class="form-grid">
+                  <div class="field"><label>T&amp;C SKU</label><input id="pt-stain_mech-version" placeholder="on generic"></div>
+                  <div class="field"><label>Document URL</label><input id="pt-stain_mech-url" placeholder="optional — https://…"></div>
+                </div>
+                <div class="pt-actions">
+                  <button class="btn primary sm" onclick="savePlanTerms('stain_mech')">Save</button>
+                  <button class="btn ghost sm" id="pt-stain_mech-clear" onclick="clearPlanTerms('stain_mech')" hidden>Use generic</button>
+                </div>
+              </div>
+            </div>
+          </div>
+          <!-- KIOSK-22 (Doug 18-jul #1+#2): link permanente que abre el kiosk listo para vender SIN
+               login. Ubicado junto a "Access & credentials" (es otra credencial de acceso del dealer,
+               hermana del toggle "Sell through kiosk"), no al fondo — consenso IA/UX 20-jul: la config
+               per-dealer vive en Dealer Admin, elevada y no enterrada; su ausencia debe "gritar". -->
+          <div class="block"><div class="bh"><h2>Sales-mode link</h2></div>
+            <div class="card panel">
+              <p class="sub">A permanent link that opens the kiosk ready to sell with no login. Bookmark it on every device or print the QR. The dashboard stays protected; every sale is attributed to this dealer.</p>
+              <div id="sm-none" class="banner warn" hidden><span>⚠</span><span>No sales-mode link yet. Generate one so this dealer can sell with no login.</span></div>
+              <div id="sm-active" hidden>
+                <div class="filters" style="margin:0 0 8px">
+                  <input id="sm-url" type="text" readonly aria-label="Sales-mode URL" style="min-width:280px;flex:1">
+                  <button class="btn ghost sm" onclick="copySalesUrl()">Copy</button>
+                  <button class="btn ghost sm" onclick="downloadSalesQr()">⤓ Download QR</button>
+                </div>
+                <div id="sm-qr" class="sm-qrbox"></div>
+              </div>
+              <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:10px">
+                <button class="btn primary sm" id="sm-gen" onclick="generateSalesMode()">Generate link</button>
+                <button class="btn ghost sm" id="sm-disable" onclick="disableSalesMode()" hidden>Disable</button>
+              </div>
+            </div>
+          </div>
+          <!-- Ago-11 (Doug/Adrian, ChangesBLS.srt 00:37–02:05): onboarding de Stripe por dealer.
+               Genera el Connect link, guarda el acct_id y muestra el estado. Hermano del "Sales-mode
+               link" (otra credencial de cobro del dealer). Backend: portal-stripe-onboard. -->
+          <div class="block"><div class="bh"><h2>Stripe payouts</h2></div>
+            <div class="card panel">
+              <p class="sub">Connect this dealer's Stripe account so their commission can be paid out. Generate an onboarding link and send it to the dealer; they enter their business and bank details independently. We store their account id automatically.</p>
+              <div id="so-status" class="sub" style="font-weight:600">Checking&hellip;</div>
+              <div id="so-link" hidden style="margin-top:8px">
+                <div class="filters" style="margin:0">
+                  <input id="so-url" type="text" readonly aria-label="Stripe onboarding link" style="min-width:280px;flex:1">
+                  <button class="btn ghost sm" onclick="copyStripeUrl()">Copy</button>
+                </div>
+                <p class="sub" style="margin:6px 0 0">Send this link to the dealer. It opens Stripe's secure onboarding.</p>
+              </div>
+              <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:10px">
+                <button class="btn primary sm" id="so-gen" onclick="generateStripeOnboarding()">Generate onboarding link</button>
+                <button class="btn ghost sm" id="so-refresh" onclick="refreshStripeStatus()">Refresh status</button>
+              </div>
+            </div>
+          </div>
+          <div class="block"><div class="bh"><h2>Stores &amp; Logins</h2></div>
+            <div class="scroll-x"><table class="tbl"><thead><tr><th data-lex="colStore">Store</th><th>Location</th><th>Status</th></tr></thead><tbody id="da-stores"></tbody></table></div>
+          </div>
+        </div>
+      </section>
+      <!-- PORT-12a (Doug 15-jul): "Just show it for now" — catálogo canónico del server, SIN edición. -->
+      <section id="view-pricing" class="view" data-roles="admin">
+        <div class="vhead"><div><div class="eyebrow">Admin</div><h1>Pricing &amp; Plans</h1><p>Display-only. Prices are Dev-controlled; changing them is a backend operation.</p></div></div>
+        <div class="card">
+          <div class="tblwrap"><table class="tbl">
+            <thead><tr><th>Plan SKU</th><th>Label</th><th>Monthly</th><th>Covers</th></tr></thead>
+            <tbody id="plans-body"></tbody>
+          </table></div>
+          <div class="tblfoot"><span>Two flavors only (Stain, Stain+Structure) — plans are all-in-one across categories; the Plan SKU is the key, not the piece type.</span></div>
+        </div>
+      </section>
+      <section id="view-approvals" class="view" data-roles="admin"><div class="vhead"><div><div class="eyebrow">Admin</div><h1>Approval Queue</h1></div></div><div class="stub"><b>Coming soon</b>Maker-checker (PORT-12).</div></section>
+      <section id="view-audit" class="view" data-roles="admin">
+        <div class="vhead"><div><div class="eyebrow">Admin</div><h1>Audit Log</h1><p>Who did what, when. Exports carry PII, so they are logged.</p></div></div>
+        <div class="card"><div class="tblwrap"><table class="tbl">
+          <thead><tr><th>When</th><th>Actor</th><th>Role</th><th>Action</th><th>Target</th><th>Details</th></tr></thead>
+          <tbody id="audit-body"></tbody>
+        </table></div><div class="tblfoot"><span>Showing <b id="audit-count">0</b> events</span></div></div>
+      </section>
+      <section id="view-stores" class="view" data-roles="admin"><div class="vhead"><div><div class="eyebrow">Admin</div><h1>Stores &amp; Logins</h1></div></div><div class="stub"><b>Coming soon</b>Sub-entity manager (PORT-12).</div></section>
+      <section id="view-inquiries" class="view" data-roles="admin"><div class="vhead"><div><div class="eyebrow">Admin</div><h1>Reseller Inquiries</h1></div></div><div class="stub"><b>Live backend</b>Leads land via <code>/api/portal-inquiries</code> (PORT-13). List UI connects next.</div></section>
+
+      <!-- KIT-1 (Doug, reunión kits): "on the admin logon a page for kit fulfillment… it's a copy of
+           the subscription page, but it's just for kits". Columnas que enumeró: order date, kit type,
+           kit quantity, customer first/last name, retail, shipping and handling, y "the last one being
+           shipping confirmation". Tres botones (Address / Enter shipping / Shipped) + View, que se
+           queda ("you can leave the view thing… that can stay there"). Spec: misc/spec-kit-orders.md -->
+      <section id="view-kitorders" class="view" data-roles="admin">
+        <div class="vhead"><div><div class="eyebrow">Admin</div><h1>Kit Orders</h1><p>Care kits to ship from the office. One row per kit type.</p></div></div>
+        <div class="scopebar" id="kit-scope"></div>
+        <p class="finenote">Kits ship individually: a customer who buys several kit types has one row per kit, each with its own tracking number.</p>
+        <!-- Filtros heredados de Subscribers ("you still want all this stuff"). Store/associate no
+             existen para una orden de kit, así que su equivalente útil es kit type + estado. -->
+        <div class="filters">
+          <input type="search" id="kit-search" placeholder="Search customer, kit, tracking…" oninput="renderKits(true)" aria-label="Search kit orders">
+          <select id="kit-kit" onchange="renderKits(true)" aria-label="Filter by kit"><option value="">All kits</option></select>
+          <select id="kit-status" onchange="renderKits(true)" aria-label="Filter by status">
+            <option value="">All statuses</option>
+            <option value="pending">Pending</option>
+            <option value="shipped">Shipped</option>
+          </select>
+          <select id="kit-fdate" onchange="toggleKitRange();renderKits(true)" aria-label="Filter by date">
+            <option value="all">All dates</option>
+            <option value="today">Today</option>
+            <option value="mtd">Month to date</option>
+            <option value="month">This month</option>
+            <option value="ytd">Year to date</option>
+            <option value="year">This year</option>
+            <option value="range">Custom range…</option>
+          </select>
+          <span class="rangebox" id="kitRangeInputs"><input type="date" id="kit-from" onchange="renderKits(true)" aria-label="From date"><span style="color:var(--muted);font-size:12px">to</span><input type="date" id="kit-to" onchange="renderKits(true)" aria-label="To date"><button class="btn ghost sm" onclick="renderKits(true)">Apply</button></span>
+          <!-- KIT-11 (Doug 13-ago: "Can they export that list?… maybe Excel") — exporta lo FILTRADO,
+               mismo criterio que Subscribers (PORT-24B). -->
+          <button class="btn primary sm" onclick="exportKits()">⤓ Export to Excel</button>
+        </div>
+        <div class="card">
+          <div class="tblwrap"><table class="tbl">
+            <!-- S&H es CONDICIONAL: Doug la enumeró ("quantity, type of kit, retail, shipping and
+                 handling") pero hoy no existe el dato en ningún lado (el $13.50 fue una instrucción
+                 contable a Javon). Se oculta mientras ninguna orden traiga importe y aparece sola
+                 en cuanto haya el primero. Ver renderKits(). -->
+            <thead><tr><th>Order date</th><th>Kit</th><th>Qty</th><th>Customer</th><th>Retail</th><th id="kit-th-sh">S&amp;H</th><th title="Shipping confirmation number from UPS or whatever carrier">Tracking #</th><th>Status</th><th></th><th></th></tr></thead>
+            <tbody id="kit-body"></tbody>
+          </table></div>
+          <div class="tblfoot"><span>Showing <b id="kit-count">0</b> of <b id="kit-total">0</b> kit orders</span>
+            <div class="pager"><button class="btn ghost sm" onclick="pageKits(-1)">‹ Prev</button><button class="btn ghost sm" onclick="pageKits(1)">Next ›</button><select id="kit-pg-size" onchange="renderKits(true)" aria-label="Page size"><option value="50">50 / page</option><option value="100">100 / page</option><option value="250">250 / page</option></select></div>
+          </div>
+        </div>
+      </section>
+    </main>
+  </div>
+</div>
+
+<!-- KIT-1: View se queda ("that can stay there") — la orden en total. -->
+<div class="overlay" id="kit-detail-modal"><div class="modal" role="dialog" aria-modal="true" aria-label="Kit order">
+  <div class="modal-h"><b>Kit order</b><button class="x" onclick="closeKitDetail()" aria-label="Close">×</button></div>
+  <div class="modal-b">
+    <div id="kit-detail-body"></div>
+    <div style="display:flex;gap:8px;justify-content:flex-end;margin-top:18px">
+      <!-- KIT-10: la reversión ya no es un botón — borrar el tracking # devuelve la fila a Pending. -->
+      <button class="btn primary" onclick="closeKitDetail()">Close</button>
+    </div>
+  </div>
+</div></div>
+
+<!-- KIT-3: popup del ship-to. Doug: "to save space with this pop-up you can show the customer's
+     address… let them print the address". El bloque #kit-addr-body es lo único que sale en papel
+     (@media print), para que la etiqueta no lleve el cromo del portal. -->
+<div class="overlay" id="kit-addr-modal"><div class="modal" role="dialog" aria-modal="true" aria-label="Ship to">
+  <div class="modal-h"><b>Ship to</b><button class="x" onclick="closeKitAddress()" aria-label="Close">×</button></div>
+  <div class="modal-b">
+    <!-- vista de lectura: es lo ÚNICO que sale en papel (@media print) -->
+    <div id="kit-addr-read">
+      <div id="kit-addr-body" class="shipto"></div>
+      <p class="finenote" id="kit-addr-src" hidden></p>
+    </div>
+    <!-- edición: la oficina corrige la dirección o la teclea cuando no existe en ningún lado -->
+    <div id="kit-addr-edit" hidden>
+      <div class="field"><label for="kit-addr-name">Name</label><input id="kit-addr-name" autocomplete="off"></div>
+      <div class="field" style="margin-top:10px"><label for="kit-addr-street">Address</label><textarea id="kit-addr-street" rows="2" placeholder="Street, City, State ZIP"></textarea></div>
+      <div class="form-grid" style="margin-top:10px">
+        <div class="field"><label for="kit-addr-zip">ZIP</label><input id="kit-addr-zip" placeholder="75001" autocomplete="off"></div>
+        <div class="field"><label for="kit-addr-phone">Phone</label><input id="kit-addr-phone" autocomplete="off"></div>
+      </div>
+      <div class="banner err" id="kit-addr-err" hidden>Enter a valid address (ZIP must be 5 digits).</div>
+    </div>
+    <div style="display:flex;gap:8px;justify-content:flex-end;margin-top:18px" id="kit-addr-actions">
+      <button class="btn ghost" onclick="closeKitAddress()">Close</button>
+      <button class="btn ghost" id="kit-addr-editbtn" onclick="editKitAddress()">✎ Edit</button>
+      <button class="btn ghost" id="kit-addr-cancel" onclick="cancelKitAddress()" hidden>Cancel</button>
+      <button class="btn primary" id="kit-addr-save" onclick="saveKitAddress()" hidden>Save</button>
+      <button class="btn primary" id="kit-addr-print" onclick="printKitAddress()">🖶 Print</button>
+    </div>
+  </div>
+</div></div>
+
+<!-- PORT-28: el QR de venta del dealer, en su propia sesión. El QR y la URL son CLICKEABLES (abren
+     su kiosco en sales-mode) + copiar + descargar para imprimir en tienda. Si RAP aún no le generó
+     el link, el MISMO modal explica qué falta en vez de dejarlo en blanco. -->
+<div class="overlay" id="smq-modal"><div class="modal" role="dialog" aria-modal="true" aria-labelledby="smq-title">
+  <div class="modal-h"><b id="smq-title">Sales Mode QR</b><button class="x" onclick="closeMyKioskQr()" aria-label="Close">×</button></div>
+  <div class="modal-b">
+    <p class="sub" id="smq-intro">Print this QR in your store or open it on any device: it launches your kiosk ready to sell with no login, and every sale is credited to you.</p>
+    <!-- PORT-28b: para el admin el QR es el del dealer que tenga en "Viewing"; se nombra para que
+         no se confunda de dealer al copiarlo o descargarlo. Vacío (y oculto) para el dealer. -->
+    <p class="finenote" id="smq-of" hidden></p>
+    <div id="smq-loading" class="sub">Loading…</div>
+    <!-- PORT-28b: admin con Viewing = All (vista cross-dealer): no hay un QR "suyo" que mostrar. -->
+    <div id="smq-pick" class="banner warn" hidden><span>⚠</span><span>Pick a reseller in <b>Viewing</b> (top bar) to see its sales-mode QR.</span></div>
+    <div id="smq-none" class="banner warn" hidden><span>⚠</span><span>Your sales-mode link isn’t set up yet. Contact us and we’ll turn it on for your store.</span></div>
+    <div id="smq-active" hidden>
+      <a id="smq-qrlink" href="#" target="_blank" rel="noopener" title="Open your kiosk in sales mode">
+        <div id="smq-qr" class="sm-qrbox"></div>
+      </a>
+      <div class="filters" style="margin:10px 0 0">
+        <input id="smq-url" type="text" readonly aria-label="Your sales-mode URL" style="min-width:240px;flex:1">
+        <button class="btn ghost sm" onclick="copySalesUrl(myKioskUrl, '#smq-url')">Copy</button>
+        <button class="btn ghost sm" onclick="downloadSalesQr(myKioskUrl)">⤓ Download QR</button>
+      </div>
+      <p class="finenote">Tap the QR to open it here, or scan it from a phone.</p>
+    </div>
+    <div style="display:flex;gap:8px;justify-content:flex-end;margin-top:18px">
+      <button class="btn primary" onclick="closeMyKioskQr()">Close</button>
+    </div>
+  </div>
+</div></div>
+
+<!-- KIT-4 + KIT-10: popup de captura. Doug: "somebody enters the shipping information… and then
+     the date" + "if there's a tracking number, we presume it's shipped". Guardar con número marca
+     Shipped; guardar vacío devuelve la fila a Pending. Sin carrier: "this is strictly manual". -->
+<div class="overlay" id="kit-ship-modal"><div class="modal" role="dialog" aria-modal="true" aria-labelledby="kit-ship-title">
+  <div class="modal-h"><b id="kit-ship-title">Enter tracking number</b><button class="x" onclick="closeKitShipping()" aria-label="Close">×</button></div>
+  <div class="modal-b">
+    <div class="field"><label for="kit-ref">Tracking number</label><input id="kit-ref" placeholder="e.g. 1Z999AA10123456784" autocomplete="off"></div>
+    <div class="field" style="margin-top:12px"><label for="kit-date">Date</label><input type="date" id="kit-date"></div>
+    <p class="finenote">Saving a tracking number marks the kit as Shipped. Clearing it moves the kit back to Pending.</p>
+    <div style="display:flex;gap:8px;justify-content:flex-end;margin-top:18px">
+      <button class="btn ghost" onclick="closeKitShipping()">Cancel</button>
+      <button class="btn primary" id="kit-ship-save" onclick="saveKitShipping()">Save</button>
+    </div>
+  </div>
+</div></div>
+
+<!-- become-a-reseller popup -->
+<div class="overlay" id="reseller"><div class="modal" role="dialog" aria-modal="true" aria-label="Become a reseller">
+  <div class="modal-h"><b>Become a reseller</b><button class="x" onclick="closeReseller()" aria-label="Close">×</button></div>
+  <div class="modal-b"><p style="font-size:12.5px;color:var(--muted);margin:0 0 14px">We'll follow up to get you set up.</p>
+    <form id="reseller-form" onsubmit="return submitReseller(event)">
+      <div class="form-grid" style="grid-template-columns:1fr">
+        <div class="field"><label for="rs-name">Name</label><input id="rs-name" placeholder="Your name" required></div>
+        <div class="field"><label for="rs-email">Email</label><input id="rs-email" type="email" placeholder="you@company.com" required></div>
+        <div class="field"><label for="rs-phone">Phone</label><input id="rs-phone" placeholder="(555) 555-0100"></div>
+        <div class="field"><label for="rs-world">Which best describes you?</label>
+          <select id="rs-world">
+            <option value="retailer">Furniture retailer</option>
+            <option value="technician">Repair technician</option>
+          </select>
+        </div>
+      </div>
+      <!-- honeypot: oculto para humanos; los bots lo rellenan -->
+      <input id="rs-company-url" name="company_url" tabindex="-1" autocomplete="off" style="position:absolute;left:-9999px" aria-hidden="true">
+      <div id="rs-msg" class="banner info" hidden style="margin-top:12px"></div>
+      <button class="btn gold" style="margin-top:14px" type="submit">Request access</button>
+    </form>
+  </div>
+</div></div>
+
+<!-- PORT-24C: modal de confirmación + resultado para las Quick actions (reemplaza el toast chico) -->
+<div class="overlay" id="action-modal"><div class="modal" role="dialog" aria-modal="true" aria-labelledby="am-title">
+  <div class="modal-h" id="am-head"><b id="am-title">—</b><button class="x" onclick="closeAM()" aria-label="Close">×</button></div>
+  <div class="modal-b">
+    <p id="am-msg" style="font-size:13.5px;color:var(--ink);margin:0 0 18px;line-height:1.5">—</p>
+    <div style="display:flex;gap:8px;justify-content:flex-end">
+      <button class="btn ghost" id="am-cancel" onclick="closeAM()">Cancel</button>
+      <!-- Salida alternativa opcional (p. ej. "arregla el motivo del aviso" en vez de ignorarlo) -->
+      <button class="btn primary" id="am-alt" hidden></button>
+      <button class="btn primary" id="am-confirm">Confirm</button>
+      <button class="btn primary" id="am-close" onclick="closeAM()" hidden>Close</button>
+    </div>
+  </div>
+</div></div>
+
+<div class="toasts" id="toasts" role="status" aria-live="polite"></div>
+
+<script src="assets/js/portal.js"></script>
+</body>
+</html>

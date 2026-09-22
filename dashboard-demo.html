@@ -1,0 +1,968 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex, nofollow">
+<title>Your dashboard · Furniture-Rx (demo)</title>
+<meta name="description" content="Furniture-Rx account dashboard — demo with sample data.">
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,500;0,9..144,600;1,9..144,500;1,9..144,600&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+<style>
+/* ============================================================
+   FURNITURE-RX · ACCOUNT DASHBOARD (DEMO)
+   Tokens copied verbatim from index.html :root (house style).
+   MODEL: one subscription = one $19.99/mo plan covering MULTIPLE
+   items from the uploaded sales receipt. A member can hold many
+   subscriptions. Pause/Cancel/Claim act at the PLAN level.
+   White cards on navy-wash · single navy-deep anchor · sparing
+   orange · 4px orange left rim is the signature gesture.
+   ============================================================ */
+:root{
+  --paper:        #ffffff;
+  --paper-cool:   #f3f5f8;
+  --paper-cool2:  #eaeef3;
+  --ink:          #0e1418;
+  --ink-80:       rgba(14,20,24,.82);
+  --ink-65:       rgba(14,20,24,.65);
+  --ink-45:       rgba(14,20,24,.45);
+  --navy-deep:    #081729;
+  --navy-wash:    #eef2f7;
+  --orange:       #d4541e;
+  --orange-hover: #b33e0f;
+  --orange-soft:  rgba(212,84,30,.12);
+  --gold:         #c89446;
+  --scarlet:      #c0392b;
+  --success:      #2f6b3a;
+  --rule:         #e6e8eb;
+  --rule-strong:  #c8ccd1;
+
+  --display: "Fraunces", Georgia, serif;
+  --body:    "Inter", system-ui, -apple-system, sans-serif;
+
+  --sp-section: clamp(64px, 8vw, 112px);
+  --sp-block:   clamp(32px, 4vw, 56px);
+  --container:  1080px;
+  --gutter:     clamp(20px, 4vw, 40px);
+
+  --ease: cubic-bezier(.2,.6,.2,1);
+  --t-fast: 160ms;
+  --t-med:  280ms;
+  --t-slow: 520ms;
+
+  --rim: 4px;
+  --shadow-card: 0 1px 2px rgba(14,20,24,.04), 0 12px 32px rgba(14,20,24,.06);
+  --shadow-lift: 0 4px 12px rgba(14,20,24,.06), 0 24px 56px rgba(14,20,24,.10);
+}
+
+*,*::before,*::after{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{margin:0;font-family:var(--body);font-size:16px;line-height:1.55;color:var(--ink);background:var(--navy-wash);-webkit-font-smoothing:antialiased;text-rendering:optimizeLegibility}
+h1,h2,h3,h4{font-family:var(--display);font-weight:500;letter-spacing:-.022em;line-height:1.05;margin:0;color:var(--ink);font-variation-settings:"opsz" 96}
+p{margin:0 0 1em}p:last-child{margin-bottom:0}
+a{color:var(--ink);text-decoration:underline;text-decoration-thickness:1px;text-underline-offset:3px;text-decoration-color:var(--rule-strong);transition:text-decoration-color var(--t-fast) var(--ease)}
+a:hover{text-decoration-color:var(--ink)}
+button{font:inherit;cursor:pointer}
+svg{display:block}
+
+.container{width:100%;max-width:var(--container);margin:0 auto;padding-left:var(--gutter);padding-right:var(--gutter)}
+.eyebrow{font-family:var(--body);font-weight:600;font-size:11px;letter-spacing:.18em;text-transform:uppercase;color:var(--ink-45);margin:0 0 6px;display:inline-block}
+
+/* ---------- buttons (subset of index.html) ---------- */
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;padding:13px 22px;font-family:var(--body);font-weight:600;font-size:.9375rem;line-height:1;text-decoration:none;border-radius:3px;border:1.5px solid transparent;cursor:pointer;white-space:nowrap;transition:background-color var(--t-med) var(--ease),color var(--t-med) var(--ease),border-color var(--t-med) var(--ease),transform var(--t-fast) var(--ease),box-shadow var(--t-med) var(--ease)}
+.btn:focus-visible{outline:2px solid var(--orange);outline-offset:3px}
+.btn-accent{background:var(--orange);color:#fff;border-color:var(--orange);box-shadow:0 1px 0 rgba(0,0,0,.05),0 8px 20px rgba(212,84,30,.22)}
+.btn-accent:hover{background:var(--orange-hover);border-color:var(--orange-hover)}
+.btn-ink{background:var(--ink);color:#fff;border-color:var(--ink)}
+.btn-ink:hover{background:var(--orange);border-color:var(--orange)}
+.btn-ghost{background:transparent;color:var(--ink);border-color:var(--ink)}
+.btn-ghost:hover{background:var(--ink);color:#fff}
+.btn-quiet{background:transparent;color:var(--ink-65);border-color:var(--rule-strong)}
+.btn-quiet:hover{border-color:var(--ink);color:var(--ink);background:rgba(14,20,24,.03)}
+.btn-sm{padding:10px 16px;font-size:.825rem}
+.btn-block{width:100%}
+
+/* ============================================================
+   APP BAR
+   ============================================================ */
+.appbar{position:sticky;top:0;z-index:40;background:rgba(255,255,255,.94);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);border-bottom:1px solid var(--rule)}
+.appbar-inner{display:flex;align-items:center;justify-content:space-between;gap:20px;height:64px}
+.appbar .brand{display:flex;align-items:baseline;gap:10px;text-decoration:none}
+.appbar .brand .mark{font-family:var(--display);font-weight:600;font-size:1.3rem;color:var(--ink);letter-spacing:-.02em;font-variation-settings:"opsz" 24}
+.appbar .brand .mark em{font-style:italic;color:var(--orange);font-weight:500}
+.appbar .brand .tag{font-size:.625rem;color:var(--ink-45);letter-spacing:.16em;text-transform:uppercase;font-weight:600}
+.appbar-right{display:flex;align-items:center;gap:14px}
+.appbar-right .who{display:none;flex-direction:column;align-items:flex-end;line-height:1.2}
+.appbar-right .who .n{font-size:.8125rem;font-weight:600;color:var(--ink)}
+.appbar-right .who .e{font-size:.6875rem;color:var(--ink-45)}
+.avatar{width:38px;height:38px;border-radius:50%;background:var(--navy-deep);color:#fff;display:flex;align-items:center;justify-content:center;font-family:var(--display);font-weight:500;font-size:.95rem;flex:none}
+.appbar-right .signout{font-size:.8125rem;color:var(--ink-65);text-decoration:none;border:1px solid var(--rule);border-radius:99px;padding:8px 14px;transition:border-color var(--t-fast) var(--ease),color var(--t-fast) var(--ease)}
+.appbar-right .signout:hover{border-color:var(--ink);color:var(--ink)}
+@media(min-width:560px){.appbar-right .who{display:flex}}
+
+/* ============================================================
+   PAGE
+   ============================================================ */
+.page{padding:clamp(28px,4vw,48px) 0 var(--sp-section)}
+.dash-head{margin-bottom:26px}
+.dash-head .eyebrow{color:var(--gold)}
+.dash-head h1{font-size:clamp(1.9rem,3.6vw,2.75rem);line-height:1.04;letter-spacing:-.025em}
+.dash-head .sub{margin-top:8px;color:var(--ink-65);font-size:.95rem}
+.dash-head .sub strong{color:var(--ink);font-weight:600}
+
+/* stat row */
+.stat-row{display:grid;grid-template-columns:1fr;gap:14px;margin-bottom:var(--sp-block)}
+@media(min-width:560px){.stat-row{grid-template-columns:repeat(2,1fr)}}
+@media(min-width:880px){.stat-row{grid-template-columns:repeat(4,1fr)}}
+.stat-card{background:var(--paper);border:1px solid var(--rule);border-radius:6px;padding:18px 20px;box-shadow:var(--shadow-card);position:relative;overflow:hidden}
+.stat-card.lead::before{content:"";position:absolute;left:0;top:0;bottom:0;width:var(--rim);background:var(--orange)}
+.stat-card .k{font-size:.6875rem;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--ink-45);font-family:var(--body)}
+.stat-card .v{font-family:var(--display);font-weight:500;font-size:1.9rem;line-height:1.05;letter-spacing:-.02em;color:var(--ink);margin-top:8px;font-variation-settings:"opsz" 40}
+.stat-card .v small{font-size:.8125rem;color:var(--ink-65);font-weight:400;font-family:var(--body);letter-spacing:0}
+.stat-card .meta{font-size:.78rem;color:var(--ink-65);margin-top:4px}
+.usebar{height:6px;border-radius:99px;background:var(--paper-cool2);margin-top:0;overflow:hidden}
+.usebar > span{display:block;height:100%;background:var(--orange);border-radius:99px;transition:width var(--t-slow) var(--ease)}
+
+/* ============================================================
+   PANELS
+   ============================================================ */
+.panel{background:var(--paper);border:1px solid var(--rule);border-radius:6px;box-shadow:var(--shadow-card);margin-bottom:20px;position:relative;overflow:hidden}
+.panel.rimmed::before{content:"";position:absolute;left:0;top:0;bottom:0;width:var(--rim);background:var(--orange);z-index:1}
+.panel-head{display:flex;align-items:center;justify-content:space-between;gap:14px;padding:20px 24px;border-bottom:1px solid var(--rule)}
+.panel-head h2{font-size:1.25rem;font-weight:500;letter-spacing:-.018em;font-variation-settings:"opsz" 24}
+.panel-head .ph-sub{font-size:.8rem;color:var(--ink-45);margin-top:2px}
+.panel-body{padding:22px 24px}
+.panel-foot{padding:14px 24px;border-top:1px solid var(--rule);display:flex;gap:16px;flex-wrap:wrap;font-size:.8rem;background:var(--paper-cool)}
+.panel-foot a{color:var(--ink-65);text-decoration:none;border-bottom:1px solid transparent;transition:color var(--t-fast) var(--ease),border-color var(--t-fast) var(--ease)}
+.panel-foot a:hover{color:var(--ink);border-bottom-color:var(--ink-45)}
+
+/* ---------- pills ---------- */
+.pill{font-size:.625rem;font-weight:700;letter-spacing:.12em;text-transform:uppercase;padding:4px 10px;border-radius:99px;font-family:var(--body);white-space:nowrap}
+.pill-active{background:rgba(47,107,58,.12);color:var(--success)}
+.pill-paused{background:rgba(14,20,24,.08);color:var(--ink-65)}
+.pill-canceled{background:rgba(192,57,43,.1);color:var(--scarlet)}
+
+/* ---------- action chips ---------- */
+.chip{background:var(--paper);border:1px solid var(--rule);border-radius:99px;padding:9px 15px;font-size:.8125rem;font-weight:500;color:var(--ink);cursor:pointer;display:inline-flex;align-items:center;gap:6px;font-family:var(--body);transition:background-color var(--t-fast) var(--ease),border-color var(--t-fast) var(--ease),color var(--t-fast) var(--ease)}
+.chip:hover{border-color:var(--ink);background:var(--paper-cool)}
+.chip.primary{background:var(--orange);color:#fff;border-color:var(--orange)}
+.chip.primary:hover{background:var(--orange-hover);border-color:var(--orange-hover)}
+.chip.danger{color:var(--scarlet);border-color:var(--rule)}
+.chip.danger:hover{background:rgba(192,57,43,.08);border-color:var(--scarlet);color:var(--scarlet)}
+.chip svg{width:15px;height:15px;stroke:currentColor;stroke-width:1.8;fill:none}
+
+/* ============================================================
+   PLAN (SUBSCRIPTION) CARDS — one plan = $19.99/mo, many items
+   ============================================================ */
+.plan-card{border:1px solid var(--rule);border-radius:6px;padding:20px;margin-bottom:16px;transition:opacity var(--t-med) var(--ease),border-color var(--t-med) var(--ease),background-color var(--t-med) var(--ease)}
+.plan-card:last-of-type{margin-bottom:0}
+.plan-card.paused{opacity:.74;border-style:dashed;background:var(--paper-cool)}
+.plan-card.canceled{opacity:.56;border-style:dashed;background:var(--paper-cool)}
+.plan-top{display:flex;align-items:flex-start;justify-content:space-between;gap:16px;flex-wrap:wrap}
+.plan-name{font-family:var(--display);font-weight:500;font-size:1.25rem;letter-spacing:-.015em;font-variation-settings:"opsz" 24}
+.plan-meta{font-size:.8125rem;color:var(--ink-65);margin-top:5px;display:flex;align-items:center;flex-wrap:wrap;gap:0}
+.plan-meta .sep{color:var(--rule-strong);margin:0 7px}
+.plan-right{text-align:right}
+.plan-price{font-family:var(--display);font-weight:500;font-size:1.4rem;letter-spacing:-.018em;font-variation-settings:"opsz" 28}
+.plan-price small{font-size:.72rem;color:var(--ink-65);font-weight:400;font-family:var(--body)}
+.plan-cov{margin:16px 0}
+.plan-cov .cov-line{display:flex;justify-content:space-between;gap:10px;font-size:.78rem;color:var(--ink-65);margin-bottom:6px}
+.plan-cov .cov-line b{color:var(--ink);font-weight:600}
+.plan-items{border:1px solid var(--rule);border-radius:5px;background:var(--paper);overflow:hidden}
+.plan-item-row{display:flex;align-items:center;gap:12px;padding:11px 14px;border-bottom:1px solid var(--rule);font-size:.875rem;font-family:var(--body)}
+.plan-item-row:last-child{border-bottom:none}
+.plan-item-row .pi-ic{width:30px;height:30px;border-radius:6px;background:var(--navy-wash);color:var(--navy-deep);display:flex;align-items:center;justify-content:center;flex:none}
+.plan-item-row .pi-ic svg{width:17px;height:17px;stroke:currentColor;stroke-width:1.6;fill:none}
+.plan-item-row .pi-name{font-weight:500;flex:1;color:var(--ink)}
+.plan-item-row .pi-retail{color:var(--ink-65);font-size:.8rem;white-space:nowrap}
+.plan-actions{display:flex;flex-wrap:wrap;gap:8px;padding-top:14px;margin-top:16px;border-top:1px solid var(--rule)}
+
+/* add-a-plan dashed tile */
+.cov-add{display:flex;align-items:center;justify-content:center;gap:8px;border:1px dashed var(--rule-strong);border-radius:6px;padding:16px;margin-top:16px;font-size:.875rem;font-weight:600;color:var(--ink-65);text-decoration:none;background:var(--paper-cool);transition:border-color var(--t-fast) var(--ease),color var(--t-fast) var(--ease),background-color var(--t-fast) var(--ease)}
+.cov-add:hover{border-color:var(--orange);color:var(--orange);background:var(--orange-soft)}
+.cov-add svg{width:18px;height:18px;stroke:currentColor;stroke-width:1.8;fill:none}
+
+/* account-details rows */
+.detail-row{display:flex;align-items:center;justify-content:space-between;gap:14px;padding:14px 0;border-bottom:1px solid var(--rule)}
+.detail-row:last-child{border-bottom:none}
+.detail-row .dk{font-size:.7rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--ink-45);flex:0 0 38%}
+.detail-row .dv{font-size:.92rem;color:var(--ink);text-align:right;flex:1}
+
+/* ---------- claims ---------- */
+.claim{border:1px solid var(--rule);border-radius:5px;padding:18px 20px;margin-bottom:14px}
+.claim:last-child{margin-bottom:0}
+.claim-top{display:flex;align-items:flex-start;justify-content:space-between;gap:14px;flex-wrap:wrap;margin-bottom:14px}
+.claim-no{font-size:.7rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--ink-45);font-family:var(--body)}
+.claim-h{font-family:var(--display);font-weight:500;font-size:1.05rem;letter-spacing:-.01em;margin-top:2px}
+.claim-sub{font-size:.8rem;color:var(--ink-65);margin-top:2px}
+.stepper{display:flex;align-items:flex-start;gap:0;margin-top:6px}
+.step{flex:1;text-align:center;position:relative;font-size:.7rem;color:var(--ink-45);font-family:var(--body);font-weight:600}
+.step .node{width:18px;height:18px;border-radius:50%;background:var(--paper);border:2px solid var(--rule-strong);margin:0 auto 7px;position:relative;z-index:1;transition:background-color var(--t-med),border-color var(--t-med)}
+.step::before{content:"";position:absolute;top:8px;left:-50%;width:100%;height:2px;background:var(--rule-strong)}
+.step:first-child::before{display:none}
+.step.done .node{background:var(--success);border-color:var(--success)}
+.step.done::before{background:var(--success)}
+.step.current .node{background:var(--orange);border-color:var(--orange);box-shadow:0 0 0 4px var(--orange-soft)}
+.step.current{color:var(--orange)}
+.step.done{color:var(--ink-65)}
+
+/* ---------- billing ---------- */
+.bill-method{display:flex;align-items:center;justify-content:space-between;gap:14px;padding:16px 18px;border:1px solid var(--rule);border-radius:5px;margin-bottom:14px;background:var(--paper-cool)}
+.bill-method:nth-of-type(2){margin-bottom:18px}
+.bill-method .pm{display:flex;align-items:center;gap:12px}
+.bill-method .card-ic{width:42px;height:30px;border-radius:4px;background:var(--navy-deep);display:flex;align-items:center;justify-content:center;flex:none}
+.bill-method .card-ic svg{width:22px;height:22px;stroke:#fff;stroke-width:1.6;fill:none}
+.bill-method .pm-text .l{font-size:.875rem;font-weight:600}
+.bill-method .pm-text .s{font-size:.75rem;color:var(--ink-65)}
+.bill-table{width:100%;border-collapse:collapse;font-size:.85rem;font-family:var(--body)}
+.bill-table th,.bill-table td{padding:11px 0;text-align:right;border-bottom:1px solid var(--rule);font-weight:500}
+.bill-table th:first-child,.bill-table td:first-child{text-align:left;color:var(--ink-65)}
+.bill-table th{font-size:.6875rem;letter-spacing:.1em;text-transform:uppercase;color:var(--ink-45);font-weight:700;border-bottom-color:var(--rule-strong)}
+.bill-table tr:last-child td{border-bottom:none}
+.bill-table .paid{color:var(--success);font-weight:600}
+
+/* ---------- membership card ---------- */
+.mem .panel-body{display:grid;grid-template-columns:1fr;gap:18px}
+.mem-benefits{list-style:none;padding:0;margin:0;display:flex;flex-direction:column;gap:12px}
+.mem-benefits li{padding-left:28px;position:relative;font-size:.9rem;color:var(--ink);line-height:1.5}
+.mem-benefits li::before{content:"";position:absolute;left:0;top:5px;width:15px;height:9px;border-left:2.5px solid var(--orange);border-bottom:2.5px solid var(--orange);transform:rotate(-45deg)}
+.mem-benefits li strong{font-weight:700}
+
+/* ---------- activity feed ---------- */
+.feed{display:flex;flex-direction:column}
+.feed-row{display:flex;gap:12px;align-items:flex-start;font-size:.85rem;color:var(--ink-80);font-family:var(--body);line-height:1.5;padding:11px 0;border-bottom:1px solid var(--rule)}
+.feed-row:last-child{border-bottom:none}
+.feed-row .dot{width:7px;height:7px;border-radius:50%;background:var(--orange);margin-top:7px;flex-shrink:0}
+.feed-row .dot.muted{background:var(--ink-45)}
+.feed-row .meta{color:var(--ink-45);font-size:.75rem;display:block;margin-top:1px}
+
+/* ---------- referral strip (gold rim) ---------- */
+.refer-inner{display:flex;flex-direction:column;gap:18px;align-items:flex-start;padding:26px clamp(20px,3vw,32px);background:var(--paper);border:1px solid var(--rule);border-radius:6px;position:relative;overflow:hidden;box-shadow:var(--shadow-card)}
+.refer-inner::before{content:"";position:absolute;left:0;top:0;bottom:0;width:var(--rim);background:var(--gold)}
+.refer-inner::after{content:"";position:absolute;top:-40%;right:-10%;width:50%;height:180%;background:radial-gradient(ellipse 50% 50% at center,rgba(200,148,70,.18),transparent 65%);pointer-events:none}
+.refer-copy{position:relative;z-index:1;max-width:560px}
+.refer-copy .eyebrow{color:var(--gold)}
+.refer-copy h2{font-size:clamp(1.4rem,2.6vw,1.9rem);letter-spacing:-.02em;line-height:1.1;margin:0 0 8px}
+.refer-copy h2 em{font-style:italic;color:var(--gold);font-weight:500}
+.refer-copy p{font-size:.9rem;color:var(--ink-65);line-height:1.55;margin:0}
+.refer-cta{position:relative;z-index:1}
+.refer-code{display:inline-flex;align-items:center;gap:10px;background:var(--paper-cool);border:1px dashed var(--rule-strong);border-radius:4px;padding:10px 14px;font-family:var(--body);font-weight:700;letter-spacing:.08em;color:var(--ink)}
+.refer-code button{background:none;border:0;color:var(--orange);font-weight:600;font-size:.8rem;cursor:pointer;text-decoration:underline;text-underline-offset:2px}
+
+/* ============================================================
+   TOAST
+   ============================================================ */
+.toast-wrap{position:fixed;left:50%;bottom:24px;transform:translateX(-50%);z-index:200;display:flex;flex-direction:column;gap:10px;align-items:center;width:calc(100% - 32px);max-width:460px;pointer-events:none}
+.toast{pointer-events:auto;width:100%;background:var(--navy-deep);color:#fff;border-radius:6px;padding:13px 16px;font-size:.875rem;display:flex;align-items:center;justify-content:space-between;gap:14px;box-shadow:var(--shadow-lift);border-left:var(--rim) solid var(--orange);opacity:0;transform:translateY(12px);transition:opacity var(--t-med) var(--ease),transform var(--t-med) var(--ease)}
+.toast.show{opacity:1;transform:translateY(0)}
+.toast.success{border-left-color:var(--success)}
+.toast .undo{background:none;border:0;color:var(--gold);font-weight:700;font-size:.8rem;cursor:pointer;white-space:nowrap;text-decoration:underline;text-underline-offset:2px}
+
+/* ============================================================
+   MODAL
+   ============================================================ */
+.modal-backdrop{position:fixed;inset:0;background:rgba(8,23,41,.5);z-index:150;opacity:0;pointer-events:none;transition:opacity var(--t-med) var(--ease);display:flex;align-items:flex-end;justify-content:center;padding:0}
+.modal-backdrop.open{opacity:1;pointer-events:auto}
+.modal{width:100%;max-width:520px;max-height:92vh;overflow-y:auto;background:var(--paper);border-radius:12px 12px 0 0;box-shadow:var(--shadow-lift);transform:translateY(24px);transition:transform var(--t-med) var(--ease);position:relative}
+.modal::before{content:"";position:absolute;left:0;top:0;right:0;height:var(--rim);background:var(--orange);border-radius:12px 12px 0 0}
+.modal-backdrop.open .modal{transform:translateY(0)}
+.modal-head{display:flex;align-items:flex-start;justify-content:space-between;gap:14px;padding:24px 24px 12px}
+.modal-head h3{font-size:1.4rem;font-weight:500;letter-spacing:-.018em;font-variation-settings:"opsz" 28}
+.modal-head .sub{font-size:.85rem;color:var(--ink-65);margin-top:4px}
+.modal-close{background:transparent;border:0;padding:8px;margin:-8px;font-size:22px;line-height:1;color:var(--ink-45);cursor:pointer}
+.modal-close:hover{color:var(--ink)}
+.modal-body{padding:8px 24px 24px}
+.modal-foot{padding:16px 24px 24px;display:flex;gap:10px}
+.modal-foot .btn{flex:1}
+@media(min-width:560px){
+  .modal-backdrop{align-items:center;padding:20px}
+  .modal{border-radius:12px}
+  .modal::before{border-radius:12px 12px 0 0}
+}
+
+/* form bits */
+.field{margin-bottom:16px}
+.field > label{display:block;font-size:.7rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--ink-45);margin-bottom:8px}
+.field input,.field select,.field textarea{width:100%;padding:12px 14px;border:1px solid var(--rule);border-radius:5px;font-family:var(--body);font-size:.95rem;color:var(--ink);background:var(--paper)}
+.field textarea{resize:vertical;min-height:84px}
+.field input:focus,.field select:focus,.field textarea:focus{outline:2px solid var(--orange);outline-offset:1px;border-color:var(--orange)}
+.footnote{margin-top:8px;font-size:.75rem;color:var(--ink-45);line-height:1.5}
+
+.demo-flag{display:inline-flex;align-items:center;gap:6px;font-size:.6875rem;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--gold);border:1px solid var(--gold);border-radius:99px;padding:4px 10px}
+
+footer.site-foot{border-top:1px solid var(--rule);background:var(--paper);padding:28px 0;margin-top:8px}
+.site-foot-inner{display:flex;flex-direction:column;gap:10px;align-items:flex-start;justify-content:space-between}
+.site-foot .links{display:flex;gap:18px;flex-wrap:wrap;font-size:.8rem}
+.site-foot .links a{color:var(--ink-65);text-decoration:none}
+.site-foot .links a:hover{color:var(--ink)}
+.site-foot .legal{font-size:.75rem;color:var(--ink-45)}
+@media(min-width:660px){.site-foot-inner{flex-direction:row;align-items:center}}
+
+@media (prefers-reduced-motion:reduce){*{animation-duration:.01ms!important;transition-duration:.01ms!important}}
+</style>
+</head>
+<body>
+
+<!-- ============================ APP BAR ============================ -->
+<header class="appbar">
+  <div class="container appbar-inner">
+    <a class="brand" href="/">
+      <span class="mark">Furniture&#8209;<em>Rx</em></span>
+      <span class="tag">Account</span>
+    </a>
+    <div class="appbar-right">
+      <span class="demo-flag" title="Sample data — not a live account">Demo</span>
+      <div class="who">
+        <span class="n" id="who-name">Jamie Rivera</span>
+        <span class="e" id="who-email">jamie@example.com</span>
+      </div>
+      <span class="avatar" id="who-avatar" aria-hidden="true">JR</span>
+      <a class="signout" href="/">Sign out</a>
+    </div>
+  </div>
+</header>
+
+<main class="page">
+  <div class="container">
+
+    <!-- ===================== HEADER ===================== -->
+    <div class="dash-head">
+      <span class="eyebrow">Welcome back</span>
+      <h1 id="greet">Your coverage, Jamie.</h1>
+      <p class="sub" id="head-sub">Member since <strong>April 2026</strong> · renews every 30 days</p>
+    </div>
+
+    <!-- ===================== STAT ROW ===================== -->
+    <div class="stat-row" id="stat-row"><!-- rendered --></div>
+
+    <!-- ===================== PLANS (SUBSCRIPTIONS) ===================== -->
+    <section class="panel rimmed">
+      <div class="panel-head">
+        <div>
+          <h2>Your plans</h2>
+          <div class="ph-sub" id="subs-sub">—</div>
+        </div>
+        <a class="btn btn-quiet btn-sm" href="/#configurator">+ New plan</a>
+      </div>
+      <div class="panel-body">
+        <div id="subs-list"><!-- rendered --></div>
+      </div>
+      <div class="panel-foot">
+        <a href="/terms/">Read plan terms &amp; conditions</a>
+        <a href="#" id="foot-claim">File a claim</a>
+      </div>
+    </section>
+
+    <!-- ===================== CLAIMS ===================== -->
+    <section class="panel">
+      <div class="panel-head">
+        <div>
+          <h2>Claims</h2>
+          <div class="ph-sub" id="claims-sub">—</div>
+        </div>
+        <button class="btn btn-accent btn-sm" id="btn-claim">File a claim</button>
+      </div>
+      <div class="panel-body" id="claims-body"><!-- rendered --></div>
+    </section>
+
+    <!-- ===================== MEMBERSHIP ===================== -->
+    <section class="panel rimmed mem">
+      <div class="panel-head">
+        <div>
+          <h2>Repair Membership</h2>
+          <div class="ph-sub">A separate subscription · whole-home repair coordination</div>
+        </div>
+        <span class="pill pill-active" id="mem-status">Active</span>
+      </div>
+      <div class="panel-body">
+        <ul class="mem-benefits">
+          <li><strong>Priority repair coordination</strong> — we line up the technician, you don't chase anyone.</li>
+          <li><strong>Member rates</strong> on out-of-pocket repairs not covered by a protection plan.</li>
+          <li><strong>One place</strong> for every covered piece in your home.</li>
+        </ul>
+      </div>
+      <div class="panel-foot">
+        <a href="#" id="mem-manage">Manage membership</a>
+        <span style="color:var(--ink-45)">Billed at <strong id="mem-price">$12.99</strong>/month</span>
+      </div>
+    </section>
+
+    <!-- ===================== BILLING ===================== -->
+    <section class="panel">
+      <div class="panel-head">
+        <div>
+          <h2>Billing</h2>
+          <div class="ph-sub" id="bill-sub">—</div>
+        </div>
+        <button class="btn btn-quiet btn-sm" data-portal>Manage billing</button>
+      </div>
+      <div class="panel-body">
+        <div class="bill-method">
+          <div class="pm">
+            <span class="card-ic"><svg viewBox="0 0 24 24"><rect x="2" y="5" width="20" height="14" rx="2"/><line x1="2" y1="10" x2="22" y2="10"/></svg></span>
+            <div class="pm-text">
+              <div class="l" id="pm-card">Visa ending 4242</div>
+              <div class="s" id="pm-next">Next charge —</div>
+            </div>
+          </div>
+          <button class="chip" data-portal>Update</button>
+        </div>
+        <div class="bill-method">
+          <div class="pm">
+            <span class="card-ic"><svg viewBox="0 0 24 24"><path d="M12 21s-7-5.2-7-11a7 7 0 0 1 14 0c0 5.8-7 11-7 11z"/><circle cx="12" cy="10" r="2.4"/></svg></span>
+            <div class="pm-text">
+              <div class="l" id="pm-addr">—</div>
+              <div class="s">Billing address &amp; contact</div>
+            </div>
+          </div>
+          <button class="chip" data-portal>Update</button>
+        </div>
+        <table class="bill-table">
+          <thead><tr><th>Date</th><th>Description</th><th>Amount</th><th>Status</th></tr></thead>
+          <tbody id="bill-rows"><!-- rendered --></tbody>
+        </table>
+      </div>
+      <div class="panel-foot">
+        <a href="#" data-portal>Open Stripe billing portal</a>
+        <span style="color:var(--ink-45)">Payments handled securely by Stripe — we never store your card</span>
+      </div>
+    </section>
+
+    <!-- ===================== ACCOUNT DETAILS ===================== -->
+    <section class="panel">
+      <div class="panel-head">
+        <div>
+          <h2>Account details</h2>
+          <div class="ph-sub">Name, contact info &amp; mailing address</div>
+        </div>
+        <button class="btn btn-quiet btn-sm" id="btn-edit-acct">Edit details</button>
+      </div>
+      <div class="panel-body">
+        <div class="detail-row"><span class="dk">Name</span><span class="dv" id="d-name">—</span></div>
+        <div class="detail-row"><span class="dk">Email</span><span class="dv" id="d-email">—</span></div>
+        <div class="detail-row"><span class="dk">Phone</span><span class="dv" id="d-phone">—</span></div>
+        <div class="detail-row"><span class="dk">Mailing address</span><span class="dv" id="d-address">—</span></div>
+      </div>
+      <div class="panel-foot">
+        <span style="color:var(--ink-45)">Your <strong>billing</strong> address &amp; card live in the <a href="#" data-portal>Stripe portal</a></span>
+      </div>
+    </section>
+
+    <!-- ===================== ACTIVITY ===================== -->
+    <section class="panel">
+      <div class="panel-head"><div><h2>Recent activity</h2></div></div>
+      <div class="panel-body"><div class="feed" id="feed"><!-- rendered --></div></div>
+    </section>
+
+    <!-- ===================== REFERRAL ===================== -->
+    <section style="margin-top:8px">
+      <div class="refer-inner">
+        <div class="refer-copy">
+          <span class="eyebrow">Refer a friend</span>
+          <h2>Give a month, <em>get a month</em>.</h2>
+          <p>Share your code. When a friend protects their first piece, you both get a month on us.</p>
+        </div>
+        <div class="refer-cta">
+          <span class="refer-code">JAMIE-RX24 <button id="copy-code">Copy</button></span>
+        </div>
+      </div>
+    </section>
+
+  </div>
+</main>
+
+<footer class="site-foot">
+  <div class="container site-foot-inner">
+    <div class="links">
+      <a href="/">Back to site</a>
+      <a href="/terms/">Terms</a>
+      <a href="mailto:claims@raptns.com">claims@raptns.com</a>
+      <a href="tel:18333957824">1-833-395-7824</a>
+    </div>
+    <div class="legal">Furniture&#8209;Rx is administered by Risk Assurance Partners, LLC. Demo page — sample data only.</div>
+  </div>
+</footer>
+
+<!-- toast + modal hosts -->
+<div class="toast-wrap" id="toast-wrap" aria-live="polite"></div>
+<div class="modal-backdrop" id="modal-backdrop" role="dialog" aria-modal="true">
+  <div class="modal" id="modal"></div>
+</div>
+
+<script>
+'use strict';
+(function(){
+  /* ============================================================
+     DEMO STATE — sample data, no backend.
+
+     MODEL: a member holds one or more SUBSCRIPTIONS. Each
+     subscription is one $19.99/month plan covering MULTIPLE items
+     registered from the sales receipt uploaded at purchase, up to
+     a $5,000 retail limit. Pause / Cancel / Claim act on the plan.
+     Repair Membership is a SEPARATE subscription (different price).
+     ============================================================ */
+  var PLAN = { monthly:19.99, limit:5000 };
+
+  var STEPS = [
+    { key:'submitted', label:'Submitted' },
+    { key:'review',    label:'In review' },
+    { key:'scheduled', label:'Scheduled' },
+    { key:'resolved',  label:'Resolved' }
+  ];
+
+  var ICONS = {
+    sofa:'<path d="M4 11V8a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2v3"/><path d="M2 13a2 2 0 0 1 2-2 2 2 0 0 1 2 2v3h12v-3a2 2 0 0 1 4 0v5H2z"/><line x1="6" y1="18" x2="6" y2="20"/><line x1="18" y1="18" x2="18" y2="20"/>',
+    table:'<path d="M3 9h18"/><path d="M5 9V7a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2v2"/><line x1="6" y1="9" x2="6" y2="19"/><line x1="18" y1="9" x2="18" y2="19"/>',
+    chair:'<path d="M6 4v8h12V4"/><path d="M5 12h14l-1 8M6 20l-1-8"/><line x1="8" y1="20" x2="8" y2="22"/><line x1="16" y1="20" x2="16" y2="22"/>',
+    rug:'<rect x="3" y="5" width="18" height="14" rx="1"/><rect x="6" y="8" width="12" height="8" rx="1"/><path d="M3 5l-1-2M21 5l1-2M3 19l-1 2M21 19l1 2"/>',
+    bed:'<path d="M3 18v-6a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2v6"/><path d="M3 14h18"/><path d="M7 10V8h5v2"/><line x1="3" y1="18" x2="3" y2="20"/><line x1="21" y1="18" x2="21" y2="20"/>'
+  };
+
+  var STATE = {
+    member:{ name:'Jamie Rivera', first:'Jamie', email:'jamie@example.com', phone:'(512) 555-0142', address:'1240 Oak St, Austin, TX 78704', since:'April 2026' },
+    membership:{ active:true, monthly:19.99, since:'Apr 2026' },
+    subscriptions:[
+      { id:'sub1', planNo:'RX-48213', status:'active', monthly:PLAN.monthly, limit:PLAN.limit, started:'Apr 2026',
+        receipt:'Ashley HomeStore · Apr 3, 2026',
+        items:[
+          { name:'Mid-century sofa',   icon:'sofa',  retail:1899 },
+          { name:'Walnut dining table',icon:'table', retail:1200 },
+          { name:'Leather recliner',   icon:'chair', retail:749  }
+        ] },
+      { id:'sub2', planNo:'RX-51990', status:'active', monthly:PLAN.monthly, limit:PLAN.limit, started:'May 2026',
+        receipt:'The RoomPlace · May 2, 2026',
+        items:[
+          { name:'Area rug (8×10)', icon:'rug',   retail:480 },
+          { name:'Accent armchair', icon:'chair', retail:560 }
+        ] }
+    ],
+    billing:{ card:'Visa ending 4242', address:'1240 Oak St, Austin, TX 78704', charges:[
+      { date:'Jun 1', desc:'Coverage — 2 plans + membership', amount:59.97 },
+      { date:'May 1', desc:'Coverage — 1 plan + membership',  amount:39.98 },
+      { date:'Apr 1', desc:'Coverage — 1 plan + membership',  amount:39.98 }
+    ]},
+    claims:[
+      { no:'2451', subId:'sub1', itemName:'Mid-century sofa', title:'Accidental stain — red wine', sub:'Mid-century sofa · Plan RX-48213 · filed 2 days ago', step:'scheduled', note:'Technician scheduled · Tue 10:00 AM' },
+      { no:'2390', subId:'sub1', itemName:'Walnut dining table', title:'Heat mark from serving dish', sub:'Walnut dining table · Plan RX-48213 · filed Jun 10', step:'resolved', note:'Replacement credit issued' }
+    ],
+    activity:[
+      { kind:'claim', text:'Claim #2451 · Technician scheduled <strong>Tue 10:00 AM</strong>', when:'2 days ago' },
+      { kind:'plan',  text:'New plan <strong>RX-51990</strong> activated · 2 items', when:'May 2' },
+      { kind:'pay',   text:'Payment received · $59.97', when:'Jun 1' },
+      { kind:'plan',  text:'New plan <strong>RX-48213</strong> activated · 3 items', when:'Apr 3' }
+    ]
+  };
+
+  /* ---------- helpers ---------- */
+  var $ = function(s,r){ return (r||document).querySelector(s); };
+  function money(n){ return '$' + n.toFixed(2); }
+  function money0(n){ return '$' + n.toLocaleString('en-US'); }
+  function el(tag, cls, html){ var e=document.createElement(tag); if(cls) e.className=cls; if(html!=null) e.innerHTML=html; return e; }
+  function esc(s){ return String(s==null?'':s).replace(/&/g,'&amp;').replace(/"/g,'&quot;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+  function subById(id){ return STATE.subscriptions.filter(function(s){return s.id===id;})[0]; }
+
+  function activeSubs(){ return STATE.subscriptions.filter(function(s){return s.status==='active';}); }
+  function enrolledSubs(){ return STATE.subscriptions.filter(function(s){return s.status!=='canceled';}); }
+  function subUsed(s){ return s.items.reduce(function(a,i){return a+i.retail;},0); }
+  function totalItems(){ return activeSubs().reduce(function(a,s){return a+s.items.length;},0); }
+  function monthlyTotal(){
+    var t = activeSubs().reduce(function(a,s){return a+s.monthly;},0);
+    if(STATE.membership.active) t += STATE.membership.monthly;
+    return t;
+  }
+
+  /* shared SVGs */
+  var SVG = {
+    pause:'<svg viewBox="0 0 24 24"><line x1="9" y1="5" x2="9" y2="19"/><line x1="15" y1="5" x2="15" y2="19"/></svg>',
+    play:'<svg viewBox="0 0 24 24"><polygon points="6 4 20 12 6 20 6 4"/></svg>',
+    claim:'<svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>',
+    cancel:'<svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><line x1="8" y1="8" x2="16" y2="16"/></svg>',
+    restart:'<svg viewBox="0 0 24 24"><polyline points="23 4 23 10 17 10"/><path d="M20.5 15a9 9 0 1 1-2.6-9.4L23 10"/></svg>',
+    receipt:'<svg viewBox="0 0 24 24"><path d="M6 2h9l3 3v17l-3-2-3 2-3-2-3 2V2z"/><line x1="9" y1="8" x2="15" y2="8"/><line x1="9" y1="12" x2="15" y2="12"/></svg>',
+    plus:'<svg viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>'
+  };
+
+  /* ============================================================
+     RENDER
+     ============================================================ */
+  function renderHead(){
+    $('#who-name').textContent = STATE.member.name;
+    $('#who-email').textContent = STATE.member.email;
+    $('#who-avatar').textContent = STATE.member.name.split(/\s+/).map(function(p){return p[0];}).join('').slice(0,2).toUpperCase();
+    var first = STATE.member.name.trim().split(/\s+/)[0] || STATE.member.first;
+    $('#greet').textContent = 'Your coverage, ' + first + '.';
+    $('#head-sub').innerHTML = 'Member since <strong>'+STATE.member.since+'</strong> · renews every 30 days';
+    $('#mem-price').textContent = money(STATE.membership.monthly);
+    $('#d-name').textContent = STATE.member.name;
+    $('#d-email').textContent = STATE.member.email;
+    $('#d-phone').textContent = STATE.member.phone;
+    $('#d-address').textContent = STATE.member.address;
+  }
+
+  function renderStats(){
+    var as = activeSubs().length, es = enrolledSubs().length;
+    var paused = STATE.subscriptions.filter(function(s){return s.status==='paused';}).length;
+    var canceled = STATE.subscriptions.filter(function(s){return s.status==='canceled';}).length;
+    var bits = []; if(paused) bits.push(paused+' paused'); if(canceled) bits.push(canceled+' canceled');
+    var stats = [
+      { lead:true, k:'Monthly total', v:money(monthlyTotal()), sm:'/mo', meta:as+' active plan'+(as===1?'':'s')+(STATE.membership.active?' + membership':'') },
+      { k:'Active plans', v:as+'<small> of '+es+'</small>', meta:bits.length?bits.join(' · '):'all active' },
+      { k:'Items covered', v:String(totalItems()), meta:'across '+as+' plan'+(as===1?'':'s')+' · $5,000 limit each' },
+      { k:'Next payment', v:'Jul 1', meta:money(monthlyTotal())+' · '+STATE.billing.card.replace('ending','••••') }
+    ];
+    var row = $('#stat-row'); row.innerHTML='';
+    stats.forEach(function(s){
+      var c = el('div','stat-card'+(s.lead?' lead':''));
+      c.appendChild(el('div','k',s.k));
+      c.appendChild(el('div','v', s.v + (s.sm?'<small>'+s.sm+'</small>':'')));
+      if(s.meta) c.appendChild(el('div','meta',s.meta));
+      row.appendChild(c);
+    });
+  }
+
+  function renderSubs(){
+    $('#subs-sub').textContent = activeSubs().length+' active · '+enrolledSubs().length+' enrolled · '+totalItems()+' items covered';
+    var list = $('#subs-list'); list.innerHTML='';
+
+    STATE.subscriptions.forEach(function(s){
+      var card = el('div','plan-card'+(s.status==='paused'?' paused':'')+(s.status==='canceled'?' canceled':''));
+
+      /* top: name + plan no + status, and price */
+      var sPill = s.status==='active'?'pill-active':(s.status==='paused'?'pill-paused':'pill-canceled');
+      var sLabel = s.status==='active'?'Active':(s.status==='paused'?'Paused':'Canceled');
+      var top = el('div','plan-top');
+      var l = el('div');
+      l.innerHTML = '<div class="plan-name">Protection Plan</div>'
+        + '<div class="plan-meta"><span class="pill '+sPill+'">'+sLabel+'</span>'
+        + '<span class="sep">·</span>'+s.planNo
+        + '<span class="sep">·</span>since '+s.started+'</div>';
+      var r = el('div','plan-right','<div class="plan-price">'+(s.status==='canceled'?money(0):money(s.monthly))+'<small>/mo</small></div>');
+      top.appendChild(l); top.appendChild(r);
+      card.appendChild(top);
+
+      /* coverage line + bar */
+      var used = subUsed(s), pct = Math.min(100, Math.round(used/s.limit*100));
+      var cov = el('div','plan-cov');
+      cov.innerHTML = '<div class="cov-line"><span>'+s.items.length+' items · <b>'+money0(used)+'</b> of '+money0(s.limit)+' covered</span><span>'+pct+'%</span></div>'
+        + '<div class="usebar"><span style="width:'+pct+'%"></span></div>';
+      card.appendChild(cov);
+
+      /* item list (from the uploaded receipt) */
+      var items = el('div','plan-items');
+      s.items.forEach(function(it){
+        items.appendChild(el('div','plan-item-row',
+          '<span class="pi-ic"><svg viewBox="0 0 24 24">'+(ICONS[it.icon]||ICONS.sofa)+'</svg></span>'
+          + '<span class="pi-name">'+esc(it.name)+'</span>'
+          + '<span class="pi-retail">'+money0(it.retail)+' retail</span>'));
+      });
+      card.appendChild(items);
+
+      /* actions (plan-level) */
+      var actions = el('div','plan-actions');
+      if(s.status==='canceled'){
+        var restart = el('button','chip primary', SVG.restart+'Restart plan');
+        restart.onclick = function(){ restartSub(s.id); };
+        actions.appendChild(restart);
+      } else {
+        if(s.status==='active'){
+          var claim = el('button','chip primary', SVG.claim+'File a claim');
+          claim.onclick = function(){ openClaim(s.id, 0); };
+          actions.appendChild(claim);
+        }
+        var pause = el('button','chip', s.status==='active' ? SVG.pause+'Pause plan' : SVG.play+'Resume plan');
+        pause.onclick = function(){ toggleSubPause(s.id); };
+        actions.appendChild(pause);
+        var cancel = el('button','chip danger', SVG.cancel+'Cancel plan');
+        cancel.onclick = function(){ openCancel(s.id); };
+        actions.appendChild(cancel);
+      }
+      var receipt = el('button','chip', SVG.receipt+'View receipt');
+      receipt.onclick = function(){ openReceipt(s.id); };
+      actions.appendChild(receipt);
+      card.appendChild(actions);
+
+      list.appendChild(card);
+    });
+
+    /* add-a-plan tile → routes to the site configurator (buy another $19.99 plan) */
+    var add = document.createElement('a');
+    add.className='cov-add'; add.href='/#configurator';
+    add.innerHTML = SVG.plus+'Protect another receipt — start a new plan';
+    list.appendChild(add);
+  }
+
+  function renderClaims(){
+    var open = STATE.claims.filter(function(c){return c.step!=='resolved';}).length;
+    $('#claims-sub').textContent = STATE.claims.length+' total · '+open+' open';
+    var body = $('#claims-body'); body.innerHTML='';
+    if(!STATE.claims.length){ body.appendChild(el('p','footnote','No claims yet. File one any time — no phone calls, no paperwork.')); return; }
+    STATE.claims.forEach(function(c){
+      var wrap = el('div','claim');
+      var top = el('div','claim-top');
+      var l = el('div');
+      l.appendChild(el('div','claim-no','Claim #'+c.no));
+      l.appendChild(el('div','claim-h',c.title));
+      l.appendChild(el('div','claim-sub',c.sub+' · '+c.note));
+      var curIdx = STEPS.map(function(s){return s.key;}).indexOf(c.step);
+      top.appendChild(l);
+      top.appendChild(el('span','pill '+(c.step==='resolved'?'pill-active':'pill-paused'), STEPS[curIdx].label));
+      wrap.appendChild(top);
+      var stepper = el('div','stepper');
+      STEPS.forEach(function(s,i){
+        var st = el('div','step'+(i<curIdx?' done':'')+(i===curIdx?' current':''));
+        st.appendChild(el('span','node'));
+        st.appendChild(document.createTextNode(s.label));
+        stepper.appendChild(st);
+      });
+      wrap.appendChild(stepper);
+      body.appendChild(wrap);
+    });
+  }
+
+  function renderBilling(){
+    $('#bill-sub').textContent = 'Next charge Jul 1 · '+money(monthlyTotal());
+    $('#pm-card').textContent = STATE.billing.card;
+    $('#pm-addr').textContent = STATE.billing.address;
+    $('#pm-next').textContent = 'Next charge Jul 1 · '+money(monthlyTotal());
+    var tb = $('#bill-rows'); tb.innerHTML='';
+    STATE.billing.charges.forEach(function(c){
+      var tr = el('tr');
+      tr.appendChild(el('td',null,c.date));
+      tr.appendChild(el('td',null,c.desc));
+      tr.appendChild(el('td',null,money(c.amount)));
+      tr.appendChild(el('td','paid','Paid'));
+      tb.appendChild(tr);
+    });
+  }
+
+  function renderFeed(){
+    var feed = $('#feed'); feed.innerHTML='';
+    STATE.activity.forEach(function(a){
+      var row = el('div','feed-row');
+      row.appendChild(el('span','dot'+(a.kind==='pay'?' muted':'')));
+      row.appendChild(el('span',null,a.text + '<span class="meta">'+a.when+'</span>'));
+      feed.appendChild(row);
+    });
+  }
+
+  function renderAll(){ renderHead(); renderStats(); renderSubs(); renderClaims(); renderBilling(); renderFeed(); }
+
+  /* ============================================================
+     ACTIONS (plan-level)
+     ============================================================ */
+  function logActivity(kind, text){ STATE.activity.unshift({ kind:kind, text:text, when:'Just now' }); }
+
+  function toggleSubPause(id){
+    var s = subById(id); if(!s) return;
+    if(s.status==='active'){
+      s.status='paused';
+      logActivity('plan','Plan '+s.planNo+' paused');
+      renderAll();
+      toast('Plan '+s.planNo+' paused. No charge while paused.', { undo:function(){ s.status='active'; logActivity('plan','Plan '+s.planNo+' resumed'); renderAll(); toast('Resumed — plan '+s.planNo+' is active.', {success:true}); }, label:'Undo' });
+    } else if(s.status==='paused'){
+      s.status='active';
+      logActivity('plan','Plan '+s.planNo+' resumed');
+      renderAll();
+      toast('Plan '+s.planNo+' is active again.', { success:true });
+    }
+  }
+
+  function restartSub(id){
+    var s = subById(id); if(!s) return;
+    s.status='active';
+    logActivity('plan','Plan '+s.planNo+' restarted');
+    renderAll();
+    toast('Plan '+s.planNo+' is protected again. Welcome back.', { success:true });
+  }
+
+  /* ---------- cancel a plan ---------- */
+  function openCancel(id){
+    var s = subById(id);
+    openModal(modalShell(
+      'Cancel this plan?',
+      'Plan '+s.planNo+' · '+s.items.length+' items · '+money(s.monthly)+'/mo',
+      '<p style="font-size:.9rem;color:var(--ink-65);margin-bottom:14px">This cancels the whole plan and all '+s.items.length+' items on it. Coverage stops at the end of your current 30-day period — no further charges. Any open claim runs to completion.</p>'
+        + '<p style="font-size:.9rem;color:var(--ink-80);margin:0"><strong>Cancel today. Restart tomorrow.</strong> Turn this plan back on any time — no questions asked.</p>',
+      '<button class="btn btn-quiet" data-close>Keep my plan</button><button class="btn btn-ink" id="cn-confirm">Cancel plan</button>'
+    ));
+    wireClose();
+    $('#cn-confirm').onclick = function(){
+      s.status='canceled';
+      logActivity('plan','Plan '+s.planNo+' canceled');
+      renderAll();
+      closeModal();
+      toast('Plan '+s.planNo+' canceled. Restart any time.', { undo:function(){ restartSub(id); }, label:'Undo' });
+    };
+  }
+
+  /* ---------- view plan & receipt ---------- */
+  function openReceipt(id){
+    var s = subById(id);
+    var rows = s.items.map(function(it){
+      return '<div class="plan-item-row"><span class="pi-ic"><svg viewBox="0 0 24 24">'+(ICONS[it.icon]||ICONS.sofa)+'</svg></span><span class="pi-name">'+esc(it.name)+'</span><span class="pi-retail">'+money0(it.retail)+'</span></div>';
+    }).join('');
+    openModal(modalShell(
+      'Plan &amp; receipt',
+      'Plan '+s.planNo+' · since '+s.started,
+      '<p style="font-size:.85rem;color:var(--ink-65);margin-bottom:14px">All items below are covered under this one plan, registered from the sales receipt uploaded when the plan was purchased.</p>'
+        + '<div class="detail-row"><span class="dk">Sold by</span><span class="dv">'+esc(s.receipt)+'</span></div>'
+        + '<div class="detail-row"><span class="dk">Plan number</span><span class="dv">'+s.planNo+'</span></div>'
+        + '<div class="detail-row"><span class="dk">Monthly</span><span class="dv">'+money(s.monthly)+'/mo</span></div>'
+        + '<div class="detail-row"><span class="dk">Coverage limit</span><span class="dv">'+money0(subUsed(s))+' of '+money0(s.limit)+' retail</span></div>'
+        + '<div style="margin-top:14px" class="plan-items">'+rows+'</div>'
+        + '<p class="footnote">Demo page — in the live dashboard this links to the uploaded receipt file.</p>',
+      '<button class="btn btn-quiet btn-block" data-close>Close</button>'
+    ));
+    wireClose();
+  }
+
+  /* ---------- edit account details (name / email / phone / address) ---------- */
+  function openEditAccount(){
+    var m = STATE.member;
+    openModal(modalShell(
+      'Edit account details',
+      'Update your contact info &amp; mailing address',
+      '<div class="field"><label>Full name</label><input id="ed-name" value="'+esc(m.name)+'"></div>'
+        + '<div class="field"><label>Email</label><input id="ed-email" type="email" value="'+esc(m.email)+'"></div>'
+        + '<div class="field"><label>Phone</label><input id="ed-phone" type="tel" value="'+esc(m.phone)+'"></div>'
+        + '<div class="field"><label>Mailing address</label><input id="ed-address" value="'+esc(m.address)+'"></div>'
+        + '<p class="footnote">This updates your contact info. Your <strong>billing</strong> address &amp; card are managed in the Stripe portal.</p>',
+      '<button class="btn btn-quiet" data-close>Cancel</button><button class="btn btn-accent" id="ed-save">Save changes</button>'
+    ));
+    wireClose();
+    $('#ed-save').onclick = function(){
+      STATE.member.name = $('#ed-name').value.trim() || STATE.member.name;
+      STATE.member.email = $('#ed-email').value.trim() || STATE.member.email;
+      STATE.member.phone = $('#ed-phone').value.trim() || STATE.member.phone;
+      STATE.member.address = $('#ed-address').value.trim() || STATE.member.address;
+      STATE.member.first = STATE.member.name.split(/\s+/)[0];
+      logActivity('plan','Account details updated');
+      renderAll();
+      closeModal();
+      toast('Account details saved.', { success:true });
+    };
+  }
+
+  /* ---------- billing portal (Stripe) ---------- */
+  /* We never collect or store card data. Payment method, billing address and
+     invoices all live in the Stripe customer portal — this just routes there. */
+  function openBillingPortal(){
+    openModal(modalShell(
+      'Billing &amp; payment',
+      'Managed securely in Stripe',
+      '<p style="font-size:.9rem;color:var(--ink-65);margin-bottom:16px">Furniture&#8209;Rx never stores your card. Your secure Stripe portal is where you can:</p>'
+        + '<ul class="mem-benefits" style="margin:0 0 6px">'
+        + '<li>Update your <strong>payment method</strong></li>'
+        + '<li>Update your <strong>billing address</strong> &amp; contact email</li>'
+        + '<li>View &amp; download <strong>invoices and receipts</strong></li>'
+        + '</ul>'
+        + '<p class="footnote">Demo page — in the live dashboard this opens your Stripe customer portal in a new tab.</p>',
+      '<button class="btn btn-quiet" data-close>Close</button><button class="btn btn-accent" id="pay-portal">Open billing portal</button>'
+    ));
+    wireClose();
+    $('#pay-portal').onclick = function(){ closeModal(); toast('Stripe billing portal opens here in the live dashboard.'); };
+  }
+
+  /* ---------- file a claim (pick a plan's item) ---------- */
+  function openClaim(presetSubId, presetItemIdx){
+    var subs = activeSubs();
+    if(!subs.length){
+      openModal(modalShell('File a claim','No active plans',
+        '<p style="font-size:.9rem;color:var(--ink-65)">You don\'t have an active plan to claim against right now. Resume or restart a plan, then file your claim.</p>',
+        '<button class="btn btn-accent btn-block" data-close>Got it</button>'));
+      wireClose(); return;
+    }
+    var opts = '';
+    subs.forEach(function(s){
+      s.items.forEach(function(it, idx){
+        var val = s.id+'|'+idx;
+        var sel = (s.id===presetSubId && idx===(presetItemIdx||0)) ? ' selected' : '';
+        opts += '<option value="'+val+'"'+sel+'>'+esc(it.name)+' — Plan '+s.planNo+'</option>';
+      });
+    });
+    openModal(modalShell(
+      'File a claim',
+      'Tell us what happened — we\'ll take it from there.',
+      '<div class="field"><label>Which item?</label><select id="cl-item">'+opts+'</select></div>'
+        + '<div class="field"><label>What happened?</label><select id="cl-type">'
+        + '<option>Accidental stain</option><option>Rip, tear or puncture</option><option>Burn or heat mark</option>'
+        + '<option>Broken frame / structural</option><option>Mechanism / recliner motor</option><option>Other accidental damage</option>'
+        + '</select></div>'
+        + '<div class="field"><label>Add a few details</label><textarea id="cl-note" placeholder="e.g. Red wine spilled on the left cushion last night."></textarea></div>'
+        + '<p class="footnote">Report damage within 60 days of the incident. No phone calls, no paperwork.</p>',
+      '<button class="btn btn-quiet" data-close>Cancel</button><button class="btn btn-accent" id="cl-submit">Submit claim</button>'
+    ));
+    wireClose();
+    $('#cl-submit').onclick = function(){
+      var parts = $('#cl-item').value.split('|');
+      var s = subById(parts[0]); var it = s.items[parseInt(parts[1],10)];
+      var type = $('#cl-type').value;
+      var no = String(2451 + STATE.claims.length + 1);
+      STATE.claims.unshift({ no:no, subId:s.id, itemName:it.name, title:type, sub:it.name+' · Plan '+s.planNo+' · filed just now', step:'submitted', note:'We\'ve received your claim' });
+      logActivity('claim', 'Claim #'+no+' filed · '+it.name+' (Plan '+s.planNo+')');
+      renderAll();
+      closeModal();
+      toast('Claim #'+no+' submitted. We\'ll email next steps.', { success:true });
+    };
+  }
+
+  /* ============================================================
+     MODAL PLUMBING
+     ============================================================ */
+  var backdrop = $('#modal-backdrop'), modal = $('#modal');
+  function openModal(html){ modal.innerHTML = html; backdrop.classList.add('open'); document.body.style.overflow='hidden'; }
+  function closeModal(){ backdrop.classList.remove('open'); document.body.style.overflow=''; }
+  backdrop.addEventListener('click', function(e){ if(e.target===backdrop) closeModal(); });
+  document.addEventListener('keydown', function(e){ if(e.key==='Escape') closeModal(); });
+  function modalShell(title, sub, bodyHtml, footHtml){
+    return '<div class="modal-head"><div><h3>'+title+'</h3>'+(sub?'<div class="sub">'+sub+'</div>':'')+'</div>'
+      + '<button class="modal-close" data-close aria-label="Close">×</button></div>'
+      + '<div class="modal-body">'+bodyHtml+'</div>'
+      + (footHtml?'<div class="modal-foot">'+footHtml+'</div>':'');
+  }
+  function wireClose(){ Array.prototype.forEach.call(modal.querySelectorAll('[data-close]'), function(b){ b.onclick=closeModal; }); }
+
+  /* ============================================================
+     TOAST
+     ============================================================ */
+  function toast(msg, opts){
+    opts = opts || {};
+    var wrap = $('#toast-wrap');
+    var t = el('div','toast'+(opts.success?' success':''));
+    t.appendChild(el('span',null,msg));
+    if(opts.undo){
+      var u = el('button','undo', opts.label||'Undo');
+      u.onclick = function(){ opts.undo(); dismiss(); };
+      t.appendChild(u);
+    }
+    wrap.appendChild(t);
+    requestAnimationFrame(function(){ t.classList.add('show'); });
+    var timer = setTimeout(dismiss, opts.undo ? 6000 : 3800);
+    function dismiss(){ clearTimeout(timer); t.classList.remove('show'); setTimeout(function(){ if(t.parentNode) t.parentNode.removeChild(t); }, 320); }
+  }
+
+  /* ============================================================
+     WIRE TOP-LEVEL CONTROLS
+     ============================================================ */
+  function firstClaimTarget(){ var s=activeSubs()[0]; return s?s.id:null; }
+  $('#btn-claim').onclick = function(){ openClaim(firstClaimTarget(), 0); };
+  $('#foot-claim').onclick = function(e){ e.preventDefault(); openClaim(firstClaimTarget(), 0); };
+  $('#btn-edit-acct').onclick = openEditAccount;
+  $('#mem-manage').onclick = function(e){ e.preventDefault(); toast('Membership management is wired up in the live dashboard.'); };
+  Array.prototype.forEach.call(document.querySelectorAll('[data-portal]'), function(b){
+    b.onclick = function(e){ e.preventDefault(); openBillingPortal(); };
+  });
+  $('#copy-code').onclick = function(){
+    var code='JAMIE-RX24';
+    if(navigator.clipboard){ navigator.clipboard.writeText(code).then(function(){ toast('Code '+code+' copied.', {success:true}); }, function(){ toast('Code: '+code); }); }
+    else toast('Code: '+code);
+  };
+
+  renderAll();
+})();
+</script>
+</body>
+</html>

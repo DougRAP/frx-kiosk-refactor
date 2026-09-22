@@ -1,0 +1,1338 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex, nofollow">
+<meta name="referrer" content="no-referrer"><!-- C4: el token ?t= no se filtra por Referer al navegar fuera -->
+<title>Your coverage · FurnitureRx</title>
+<meta name="description" content="Your FurnitureRx account — plans, coverage and care kits.">
+<!-- favicon inline (09-jul): sin él, cada visita loguea un 404 de /favicon.ico -->
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%23d4541e'/%3E%3Ctext x='32' y='45' font-family='Georgia,serif' font-size='36' font-style='italic' font-weight='600' fill='%23fff' text-anchor='middle'%3ERx%3C/text%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,500;0,9..144,600;1,9..144,500&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+/* Tokens + componentes tomados de dashboard-demo.html (casa Furniture-Rx). */
+:root{
+  --paper:#fff; --paper-cool:#f3f5f8; --paper-cool2:#eaeef3;
+  --ink:#0e1418; --ink-80:rgba(14,20,24,.82); --ink-65:rgba(14,20,24,.65); --ink-45:rgba(14,20,24,.45);
+  --navy-deep:#081729; --navy-wash:#eef2f7; --orange:#d4541e; --orange-hover:#b33e0f; --orange-soft:rgba(212,84,30,.12);
+  --gold:#c89446; --scarlet:#c0392b; --success:#2f6b3a; --rule:#e6e8eb; --rule-strong:#c8ccd1;
+  --display:"Fraunces",Georgia,serif; --body:"Inter",system-ui,-apple-system,sans-serif;
+  --sp-section:clamp(64px,8vw,112px); --sp-block:clamp(32px,4vw,56px); --container:1080px; --gutter:clamp(20px,4vw,40px);
+  --ease:cubic-bezier(.2,.6,.2,1); --t-fast:160ms; --t-med:280ms; --t-slow:520ms;
+  --rim:4px; --shadow-card:0 1px 2px rgba(14,20,24,.04),0 12px 32px rgba(14,20,24,.06);
+  --shadow-lift:0 4px 12px rgba(14,20,24,.06),0 24px 56px rgba(14,20,24,.10);
+}
+*,*::before,*::after{box-sizing:border-box}
+body{margin:0;font-family:var(--body);font-size:16px;line-height:1.55;color:var(--ink);background:var(--navy-wash);-webkit-font-smoothing:antialiased}
+h1,h2,h3{font-family:var(--display);font-weight:500;letter-spacing:-.022em;line-height:1.05;margin:0;color:var(--ink);font-variation-settings:"opsz" 96}
+p{margin:0 0 1em}p:last-child{margin-bottom:0}
+button{font:inherit;cursor:pointer}
+svg{display:block}
+/* sistema de botones + chips (portado del dashboard-demo; el login conserva .auth-btn) */
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;padding:13px 22px;font-family:var(--body);font-weight:600;font-size:.9375rem;line-height:1;text-decoration:none;border-radius:3px;border:1.5px solid transparent;cursor:pointer;white-space:nowrap;transition:background-color var(--t-med) var(--ease),color var(--t-med) var(--ease),border-color var(--t-med) var(--ease)}
+.btn-accent{background:var(--orange);color:#fff;border-color:var(--orange)}
+.btn-accent:hover{background:var(--orange-hover);border-color:var(--orange-hover)}
+.btn-quiet{background:transparent;color:var(--ink-65);border-color:var(--rule-strong)}
+.btn-quiet:hover{border-color:var(--ink);color:var(--ink);background:rgba(14,20,24,.03)}
+.btn-sm{padding:10px 16px;font-size:.825rem}
+.btn[disabled]{opacity:.6;cursor:default}
+.chip{background:var(--paper);border:1px solid var(--rule);border-radius:99px;padding:9px 15px;font-size:.8125rem;font-weight:500;color:var(--ink);cursor:pointer;display:inline-flex;align-items:center;gap:6px;font-family:var(--body);text-decoration:none;transition:background-color var(--t-fast) var(--ease),border-color var(--t-fast) var(--ease)}
+.chip:hover{border-color:var(--ink);background:var(--paper-cool)}
+.chip.primary{background:var(--orange);color:#fff;border-color:var(--orange)}
+.chip.primary:hover{background:var(--orange-hover);border-color:var(--orange-hover)}
+.chip.danger{color:var(--scarlet);border-color:var(--rule)}
+.chip.danger:hover{background:rgba(192,57,43,.08);border-color:var(--scarlet);color:var(--scarlet)}
+/* PAUSE-1: placeholder "coming soon" DISIMULADO (tooltip nativo, sin acción) — la pausa real
+   espera las 4 decisiones de Doug; el portal de Stripe no la ofrece */
+.chip.soon{color:var(--ink-45);border-style:dashed;cursor:help}
+.chip.soon:hover{border-color:var(--rule-strong);background:var(--paper)}
+.chip svg{width:15px;height:15px;stroke:currentColor;stroke-width:1.8;fill:none}
+.btn:focus-visible,.chip:focus-visible,.linklike:focus-visible,.signout:focus-visible,.auth-btn:focus-visible{outline:2px solid var(--orange);outline-offset:3px}
+.container{width:100%;max-width:var(--container);margin:0 auto;padding-left:var(--gutter);padding-right:var(--gutter)}
+.eyebrow{font-family:var(--body);font-weight:600;font-size:11px;letter-spacing:.18em;text-transform:uppercase;color:var(--ink-45);margin:0 0 6px;display:inline-block}
+
+/* app bar */
+.appbar{position:sticky;top:0;z-index:40;background:rgba(255,255,255,.94);backdrop-filter:blur(10px);border-bottom:1px solid var(--rule)}
+.appbar-inner{display:flex;align-items:center;justify-content:space-between;gap:20px;height:64px}
+.brand{display:flex;align-items:baseline;gap:10px;text-decoration:none}
+.brand .mark{font-family:var(--display);font-weight:600;font-size:1.3rem;color:var(--ink);letter-spacing:-.02em;font-variation-settings:"opsz" 24}
+.brand .mark em{font-style:italic;color:var(--orange);font-weight:500}
+.brand .tag{font-size:.625rem;color:var(--ink-45);letter-spacing:.16em;text-transform:uppercase;font-weight:600}
+.appbar-right{display:flex;align-items:center;gap:14px}
+.who{display:none;flex-direction:column;align-items:flex-end;line-height:1.2}
+.who .n{font-size:.8125rem;font-weight:600;color:var(--ink)}
+.who .e{font-size:.6875rem;color:var(--ink-45)}
+.avatar{width:38px;height:38px;border-radius:50%;background:var(--navy-deep);color:#fff;display:flex;align-items:center;justify-content:center;font-family:var(--display);font-weight:500;font-size:.95rem;flex:none}
+/* item 5: Sign out como píldora (del demo), no como link legal */
+.signout{background:transparent;font-size:.8125rem;color:var(--ink-65);border:1px solid var(--rule);border-radius:99px;padding:8px 14px;cursor:pointer;transition:border-color var(--t-fast) var(--ease),color var(--t-fast) var(--ease)}
+.signout:hover{border-color:var(--ink);color:var(--ink)}
+@media(min-width:560px){.who{display:flex}}
+
+/* page + header */
+.page{padding:clamp(28px,4vw,48px) 0 var(--sp-section)}
+.dash-head{margin-bottom:26px}
+.dash-head .eyebrow{color:var(--gold)}
+.dash-head h1{font-size:clamp(1.9rem,3.6vw,2.75rem);line-height:1.04;letter-spacing:-.025em}
+.dash-head .sub{margin-top:8px;color:var(--ink-65);font-size:.95rem}
+.dash-head .sub strong{color:var(--ink);font-weight:600}
+
+/* stat row */
+.stat-row{display:grid;grid-template-columns:1fr;gap:14px;margin-bottom:var(--sp-block)}
+@media(min-width:560px){.stat-row{grid-template-columns:repeat(2,1fr)}}
+@media(min-width:880px){.stat-row{grid-template-columns:repeat(4,1fr)}}
+.stat-card{background:var(--paper);border:1px solid var(--rule);border-radius:6px;padding:18px 20px;box-shadow:var(--shadow-card);position:relative;overflow:hidden}
+.stat-card.lead::before{content:"";position:absolute;left:0;top:0;bottom:0;width:var(--rim);background:var(--orange)}
+.stat-card .k{font-size:.6875rem;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--ink-45)}
+.stat-card .v{font-family:var(--display);font-weight:500;font-size:1.9rem;line-height:1.05;letter-spacing:-.02em;margin-top:8px;font-variation-settings:"opsz" 40}
+.stat-card .v small{font-size:.8125rem;color:var(--ink-65);font-weight:400;font-family:var(--body)}
+.stat-card .meta{font-size:.78rem;color:var(--ink-65);margin-top:4px}
+
+/* panels */
+.panel{background:var(--paper);border:1px solid var(--rule);border-radius:6px;box-shadow:var(--shadow-card);margin-bottom:20px;position:relative;overflow:hidden}
+.panel.rimmed::before{content:"";position:absolute;left:0;top:0;bottom:0;width:var(--rim);background:var(--orange);z-index:1}
+.panel-head{display:flex;align-items:center;justify-content:space-between;gap:14px;padding:20px 24px;border-bottom:1px solid var(--rule)}
+.panel-head h2{font-size:1.25rem;font-weight:500;letter-spacing:-.018em;font-variation-settings:"opsz" 24}
+.panel-head .ph-sub{font-size:.8rem;color:var(--ink-45);margin-top:2px}
+.panel-head .ph-actions{display:flex;gap:16px;align-items:center;white-space:nowrap;flex-wrap:wrap;justify-content:flex-end}
+/* item 4: pie de panel con links (patrón del dashboard-demo de Doug) */
+.panel-foot{padding:14px 24px;border-top:1px solid var(--rule);display:flex;gap:16px;flex-wrap:wrap;font-size:.8rem;background:var(--paper-cool)}
+.panel-foot a{color:var(--ink-65);text-decoration:none;border-bottom:1px solid transparent}
+.panel-foot a:hover{color:var(--ink);border-bottom-color:var(--ink-45)}
+.panel-body{padding:22px 24px}
+
+/* pills */
+.pill{font-size:.625rem;font-weight:700;letter-spacing:.12em;text-transform:uppercase;padding:4px 10px;border-radius:99px;white-space:nowrap}
+.pill-active{background:rgba(47,107,58,.12);color:var(--success)}
+.pill-paused{background:rgba(14,20,24,.08);color:var(--ink-65)}
+.pill-canceled{background:rgba(192,57,43,.1);color:var(--scarlet)}
+.pill-past_due{background:rgba(212,84,30,.12);color:var(--orange)}   /* SUB-2: impago (dunning de Stripe) */
+.pill-pending{background:rgba(14,20,24,.08);color:var(--ink-65)}
+
+/* plan cards */
+.plan-card{border:1px solid var(--rule);border-radius:6px;padding:20px;margin-bottom:16px;transition:opacity var(--t-med) var(--ease),border-color var(--t-med) var(--ease),background-color var(--t-med) var(--ease)}
+.plan-card:last-of-type{margin-bottom:0}
+.plan-card.paused,.plan-card.canceled,.plan-card.past_due{opacity:.7;border-style:dashed;background:var(--paper-cool)}
+.plan-top{display:flex;align-items:flex-start;justify-content:space-between;gap:16px;flex-wrap:wrap}
+.plan-name{font-family:var(--display);font-weight:500;font-size:1.25rem;letter-spacing:-.015em;font-variation-settings:"opsz" 24}
+.plan-meta{font-size:.8125rem;color:var(--ink-65);margin-top:5px;display:flex;align-items:center;flex-wrap:wrap}   /* item 3: la pill vive AQUÍ */
+.plan-meta .sep{color:var(--rule-strong);margin:0 7px}
+.plan-right{text-align:right}
+.plan-price{font-family:var(--display);font-weight:500;font-size:1.4rem;letter-spacing:-.018em;font-variation-settings:"opsz" 28}
+/* item 3: fila de acciones de la card (chips) */
+.plan-actions{display:flex;flex-wrap:wrap;gap:8px;padding-top:14px;margin-top:16px;border-top:1px solid var(--rule)}
+/* item 2: icono por tipo de pieza */
+.pi-ic{width:30px;height:30px;border-radius:6px;background:var(--navy-wash);color:var(--navy-deep);display:flex;align-items:center;justify-content:center;flex:none}
+.pi-ic svg{width:17px;height:17px;stroke:currentColor;stroke-width:1.6;fill:none}
+.plan-price small{font-size:.72rem;color:var(--ink-65);font-weight:400;font-family:var(--body)}
+.plan-cov{margin:16px 0}
+.plan-cov .cov-line{display:flex;justify-content:space-between;gap:10px;font-size:.78rem;color:var(--ink-65);margin-bottom:6px}
+.plan-cov .cov-line b{color:var(--ink);font-weight:600}
+.plan-items{border:1px solid var(--rule);border-radius:5px;background:var(--paper);overflow:hidden}
+.plan-item-row{display:flex;align-items:center;gap:12px;padding:11px 14px;border-bottom:1px solid var(--rule);font-size:.875rem}
+.plan-item-row:last-child{border-bottom:none}
+.plan-item-row .pi-name{font-weight:500;flex:1;text-transform:capitalize}
+.plan-item-row .pi-retail{color:var(--ink-65);font-size:.8rem;white-space:nowrap}
+/* barra de % usado (solo cuando el Coverage Assistant dejó sales_order_total); width animada */
+.usebar{height:6px;border-radius:99px;background:var(--paper-cool2);margin-top:6px;overflow:hidden}
+.usebar>span{display:block;height:100%;background:var(--orange);border-radius:99px;transition:width var(--t-slow) var(--ease)}
+/* tile de recompra "protege otro recibo" */
+.cov-add{display:flex;align-items:center;justify-content:center;gap:8px;border:1px dashed var(--rule-strong);border-radius:6px;padding:16px;margin-top:16px;font-size:.875rem;font-weight:600;color:var(--ink-65);text-decoration:none;background:var(--paper-cool);transition:border-color var(--t-fast) var(--ease),color var(--t-fast) var(--ease),background-color var(--t-fast) var(--ease)}
+.cov-add:hover{border-color:var(--orange);color:var(--orange);background:var(--orange-soft)}
+/* item 3: beneficios de la Repair Safety Net */
+.mem-benefits{list-style:none;padding:0;margin:16px 0 0;display:flex;flex-direction:column;gap:12px}
+.mem-benefits li{padding-left:28px;position:relative;font-size:.9rem;line-height:1.5}
+.mem-benefits li::before{content:"";position:absolute;left:0;top:5px;width:15px;height:9px;border-left:2.5px solid var(--orange);border-bottom:2.5px solid var(--orange);transform:rotate(-45deg)}
+/* panel Billing (lectura; la gestión vive en el portal de Stripe) */
+.bill-method{display:flex;align-items:center;justify-content:space-between;gap:14px;padding:14px 16px;border:1px solid var(--rule);border-radius:5px;margin-bottom:14px;background:var(--paper-cool)}
+.bill-method .pm{display:flex;align-items:center;gap:12px;min-width:0}
+.bill-method .card-ic{width:42px;height:30px;border-radius:4px;background:var(--navy-deep);display:flex;align-items:center;justify-content:center;flex:none}
+.bill-method .card-ic svg{width:22px;height:22px;stroke:#fff;stroke-width:1.6;fill:none}
+.bill-method .k{font-size:.6563rem;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--ink-45);margin-bottom:2px}
+.bill-method .l{font-size:.875rem;font-weight:600}
+.bill-method .s{font-size:.75rem;color:var(--ink-65)}
+.bill-table{width:100%;border-collapse:collapse;font-size:.85rem}
+.bill-table th,.bill-table td{padding:10px 0;text-align:right;border-bottom:1px solid var(--rule)}
+.bill-table th:first-child,.bill-table td:first-child{text-align:left}
+.bill-table td:nth-child(2),.bill-table th:nth-child(2){text-align:left;color:var(--ink-65)}
+.bill-table th{font-size:.6875rem;letter-spacing:.1em;text-transform:uppercase;color:var(--ink-45)}
+.bill-table tr:last-child td{border-bottom:none}
+.bill-table .paid{color:var(--success);font-weight:600}
+/* item 12/17: MODAL (sheet mobile-first del demo, con gestión de foco que el demo no tenía) */
+.modal-backdrop{position:fixed;inset:0;background:rgba(8,23,41,.5);z-index:150;opacity:0;pointer-events:none;transition:opacity var(--t-med) var(--ease);display:flex;align-items:flex-end;justify-content:center;padding:0}
+.modal-backdrop.open{opacity:1;pointer-events:auto}
+.modal{width:100%;max-width:520px;max-height:92vh;overflow-y:auto;background:var(--paper);border-radius:12px 12px 0 0;box-shadow:var(--shadow-lift);transform:translateY(24px);transition:transform var(--t-med) var(--ease);position:relative}
+.modal::before{content:"";position:absolute;left:0;top:0;right:0;height:var(--rim);background:var(--orange);border-radius:12px 12px 0 0}
+.modal-backdrop.open .modal{transform:translateY(0)}
+.modal-head{display:flex;align-items:flex-start;justify-content:space-between;gap:14px;padding:24px 24px 12px}
+.modal-head h3{font-size:1.4rem;font-weight:500;letter-spacing:-.018em;font-variation-settings:"opsz" 28}
+.modal-head .sub{font-size:.85rem;color:var(--ink-65);margin-top:4px}
+.modal-close{background:transparent;border:0;padding:8px;margin:-8px;font-size:22px;line-height:1;color:var(--ink-45);cursor:pointer}
+.modal-close:hover{color:var(--ink)}
+.modal-body{padding:8px 24px 24px}
+.modal-foot{padding:16px 24px 24px;display:flex;gap:10px}
+.modal-foot .btn{flex:1}
+@media(min-width:560px){
+  .modal-backdrop{align-items:center;padding:20px}
+  .modal{border-radius:12px}
+  .modal::before{border-radius:12px 12px 0 0}
+}
+.field{margin-bottom:16px}
+.field>label{display:block;font-size:.7rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--ink-45);margin-bottom:8px}
+.field input,.field select{width:100%;padding:12px 14px;border:1px solid var(--rule);border-radius:5px;font-family:var(--body);font-size:.95rem;color:var(--ink);background:var(--paper)}
+.field input:focus,.field select:focus{outline:2px solid var(--orange);outline-offset:1px;border-color:var(--orange)}
+.footnote{margin-top:8px;font-size:.75rem;color:var(--ink-45);line-height:1.5}
+.receipt-img{display:block;width:100%;border:1px solid var(--rule);border-radius:6px;background:var(--paper-cool)}
+/* item 1: TOAST (aviso flotante; resultado de acciones) */
+.toast-wrap{position:fixed;left:50%;bottom:24px;transform:translateX(-50%);z-index:200;display:flex;flex-direction:column;gap:10px;align-items:center;width:calc(100% - 32px);max-width:460px;pointer-events:none}
+.toast{pointer-events:auto;width:100%;background:var(--navy-deep);color:#fff;border-radius:6px;padding:13px 16px;font-size:.875rem;display:flex;align-items:center;justify-content:space-between;gap:14px;box-shadow:var(--shadow-lift);border-left:var(--rim) solid var(--orange);opacity:0;transform:translateY(12px);transition:opacity var(--t-med) var(--ease),transform var(--t-med) var(--ease)}
+.toast.show{opacity:1;transform:translateY(0)}
+.toast.success{border-left-color:var(--success)}
+/* item 6: footer del site */
+footer.site-foot{border-top:1px solid var(--rule);background:var(--paper);padding:28px 0;margin-top:8px}
+.site-foot-inner{display:flex;flex-direction:column;gap:10px;align-items:flex-start;justify-content:space-between}
+.site-foot .links{display:flex;gap:18px;flex-wrap:wrap;font-size:.8rem}
+.site-foot .links a{color:var(--ink-65);text-decoration:none;transition:color var(--t-fast) var(--ease)}
+.site-foot .links a:hover{color:var(--ink)}
+.site-foot .legal{font-size:.75rem;color:var(--ink-45)}
+@media(min-width:660px){.site-foot-inner{flex-direction:row;align-items:center}}
+@media (prefers-reduced-motion:reduce){*{animation-duration:.01ms!important;transition-duration:.01ms!important}}
+
+/* detail rows */
+.detail-row{display:flex;align-items:center;justify-content:space-between;gap:14px;padding:14px 0;border-bottom:1px solid var(--rule)}
+.detail-row:last-child{border-bottom:none}
+.detail-row .dk{font-size:.7rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--ink-45);flex:0 0 38%}
+.detail-row .dv{font-size:.92rem;color:var(--ink);text-align:right;flex:1}
+
+/* states */
+.state{max-width:520px;margin:18vh auto 0;text-align:center;padding:0 var(--gutter)}
+.state h1{font-size:1.6rem;margin-bottom:10px}
+.state p{color:var(--ink-65)}
+.empty{color:var(--ink-45);font-style:italic;font-size:.9rem}
+.badge-receipt{display:inline-flex;align-items:center;gap:5px;font-size:.74rem;color:var(--success);font-weight:600;margin-top:10px}
+.badge-receipt-link{text-decoration:none;border-bottom:1px solid currentColor;cursor:pointer;transition:opacity .15s}
+.badge-receipt-link:hover{opacity:.7}
+.cov-summary{font-size:.86rem;line-height:1.5;color:var(--ink-65);margin:0 0 10px;padding:10px 12px;background:var(--paper-cool);border-left:3px solid var(--orange);border-radius:0 6px 6px 0}
+/* loading: SKELETON del dashboard (silueta real con shimmer), no un spinner perdido.
+   Con prefers-reduced-motion el shimmer muere y quedan bloques grises: sigue intencional. */
+.sk{position:relative;overflow:hidden;background:var(--paper-cool2);border-radius:4px}
+.sk::after{content:"";position:absolute;inset:0;transform:translateX(-100%);background:linear-gradient(90deg,transparent,rgba(255,255,255,.55),transparent);animation:skshine 1.4s ease infinite}
+@keyframes skshine{to{transform:translateX(100%)}}
+.sk-eyebrow{width:90px;height:10px;margin-bottom:12px}
+.sk-title{width:min(340px,70%);height:34px;margin-bottom:12px;border-radius:6px}
+.sk-sub{width:220px;height:12px}
+.sk-k{width:80px;height:10px;margin-bottom:12px}
+.sk-v{width:120px;height:26px}
+.sk-h2{width:140px;height:18px}
+.sk-card{height:96px;border:1px solid var(--rule);border-radius:6px;margin-bottom:16px}
+.sk-card:last-child{margin-bottom:0}
+
+/* DASH-11 (Doug 08-jul): claim tracker + referral anunciados como coming soon */
+.soon-flag{display:inline-flex;align-items:center;gap:6px;font-size:.6875rem;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--gold);border:1px solid var(--gold);border-radius:99px;padding:4px 10px;white-space:nowrap}
+.claim-preview{border:1px dashed var(--rule-strong);border-radius:5px;padding:18px 20px 14px;background:var(--paper-cool);opacity:.75}
+.stepper{display:flex;align-items:flex-start;margin-top:6px}
+.step{flex:1;text-align:center;position:relative;font-size:.7rem;color:var(--ink-45);font-weight:600}
+.step .node{width:18px;height:18px;border-radius:50%;background:var(--paper);border:2px solid var(--rule-strong);margin:0 auto 7px;position:relative;z-index:1;display:block}
+.step::before{content:"";position:absolute;top:8px;left:-50%;width:100%;height:2px;background:var(--rule-strong)}
+.step:first-child::before{display:none}
+.step.done .node{background:var(--success);border-color:var(--success)}
+.step.done::before{background:var(--success)}
+.step.done{color:var(--ink-65)}
+.step.current .node{background:var(--orange);border-color:var(--orange);box-shadow:0 0 0 4px var(--orange-soft)}
+.step.current{color:var(--orange)}
+.claims-note{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-top:14px}
+/* tarjetas gift + referral (patrón del strip del dashboard-demo de Doug):
+   gift = VIVO → rim naranja de la casa; referral = coming soon → rim dorado */
+.refer-grid{display:grid;grid-template-columns:1fr;gap:14px;margin-bottom:20px}
+@media(min-width:880px){.refer-grid{grid-template-columns:1fr 1fr}}
+.refer-grid .refer-inner{margin-bottom:0}
+.refer-inner{display:flex;flex-direction:column;gap:18px;align-items:flex-start;padding:26px clamp(20px,3vw,32px);background:var(--paper);border:1px solid var(--rule);border-radius:6px;position:relative;overflow:hidden;box-shadow:var(--shadow-card);margin-bottom:20px}
+.refer-inner.live::before{background:var(--orange)}
+.refer-inner.live::after{background:radial-gradient(ellipse 50% 50% at center,rgba(212,84,30,.14),transparent 65%)}
+.refer-inner.live .eyebrow{color:var(--orange)}
+.refer-inner.live h2 em{color:var(--orange)}
+.refer-inner::before{content:"";position:absolute;left:0;top:0;bottom:0;width:var(--rim);background:var(--gold)}
+.refer-inner::after{content:"";position:absolute;top:-40%;right:-10%;width:50%;height:180%;background:radial-gradient(ellipse 50% 50% at center,rgba(200,148,70,.18),transparent 65%);pointer-events:none}
+.refer-copy{position:relative;z-index:1;max-width:560px}
+.refer-copy .eyebrow{color:var(--gold);margin-right:8px}
+.refer-copy h2{font-size:clamp(1.4rem,2.6vw,1.9rem);letter-spacing:-.02em;line-height:1.1;margin:0 0 8px}
+.refer-copy h2 em{font-style:italic;color:var(--gold);font-weight:500}
+.refer-copy p{font-size:.9rem;color:var(--ink-65);line-height:1.55;margin:0}
+.refer-cta{position:relative;z-index:1;display:flex;align-items:center;gap:12px;flex-wrap:wrap}
+
+/* AUTH-1: login (password + código de un solo uso) */
+[hidden]{display:none!important}
+.auth-wrap{max-width:420px;margin:10vh auto 0;padding:0 var(--gutter)}
+.auth-card{background:var(--paper);border:1px solid var(--rule);border-radius:6px;box-shadow:var(--shadow-card);padding:26px 24px;position:relative;overflow:hidden}
+.auth-card::before{content:"";position:absolute;left:0;top:0;bottom:0;width:var(--rim);background:var(--orange)}
+.auth-card h1{font-size:1.45rem;margin-bottom:4px}
+.auth-card .sub{color:var(--ink-65);font-size:.9rem;margin-bottom:18px}
+.auth-field{margin-bottom:14px}
+.auth-field label{display:block;font-size:.7rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--ink-45);margin-bottom:6px}
+.auth-field input{width:100%;padding:12px 14px;border:1px solid var(--rule-strong);border-radius:4px;font:inherit;font-size:.95rem;box-sizing:border-box;background:var(--paper)}
+.auth-field input:focus{outline:2px solid var(--orange);outline-offset:1px}
+.auth-btn{width:100%;padding:13px 18px;border:0;border-radius:4px;background:var(--orange);color:#fff;font:inherit;font-weight:600;font-size:.95rem;cursor:pointer;transition:background var(--t-fast) var(--ease)}
+.auth-btn:hover{background:var(--orange-hover)}
+.auth-btn[disabled]{opacity:.6;cursor:default}
+.auth-alt{display:block;margin-top:12px;text-align:center}
+.linklike{background:none;border:0;padding:0;color:var(--orange);font:inherit;font-size:.85rem;cursor:pointer;text-decoration:underline}
+.auth-msg{font-size:.85rem;color:var(--scarlet);margin:12px 0 0;min-height:1.2em}
+.auth-msg.ok{color:var(--success)}
+.appbar .linklike{font-size:.75rem;color:var(--ink-45)}
+</style>
+</head>
+<body>
+
+<header class="appbar">
+  <div class="container appbar-inner">
+    <a class="brand" href="/"><span class="mark">Furniture&middot;<em>Rx</em></span><span class="tag">Second Chance</span></a>
+    <div class="appbar-right">
+      <div class="who"><span class="n" id="who-name">—</span><span class="e" id="who-email">—</span></div>
+      <span class="avatar" id="who-avatar" aria-hidden="true">—</span>
+      <button class="signout" id="logout" type="button" hidden>Sign out</button>
+    </div>
+  </div>
+</header>
+
+<!-- estados: el loading es la SILUETA del dashboard (mismas clases reales → reemplazo 1:1) -->
+<div id="loading" class="page container" role="status" aria-label="Loading your coverage" aria-busy="true">
+  <div class="dash-head">
+    <div class="sk sk-eyebrow"></div>
+    <div class="sk sk-title"></div>
+    <div class="sk sk-sub"></div>
+  </div>
+  <div class="stat-row">
+    <div class="stat-card lead"><div class="sk sk-k"></div><div class="sk sk-v"></div></div>
+    <div class="stat-card"><div class="sk sk-k"></div><div class="sk sk-v"></div></div>
+    <div class="stat-card"><div class="sk sk-k"></div><div class="sk sk-v"></div></div>
+    <div class="stat-card"><div class="sk sk-k"></div><div class="sk sk-v"></div></div>
+  </div>
+  <section class="panel rimmed">
+    <div class="panel-head"><div class="sk sk-h2"></div></div>
+    <div class="panel-body"><div class="sk sk-card"></div><div class="sk sk-card"></div></div>
+  </section>
+  <section class="panel">
+    <div class="panel-head"><div class="sk sk-h2"></div></div>
+    <div class="panel-body"><div class="sk sk-card"></div></div>
+  </section>
+</div>
+<div id="error" class="state" hidden>
+  <h1 id="error-h">This link isn’t valid.</h1>
+  <p id="error-p">Your sign-in link may have expired. Check your latest FurnitureRx email, or contact support.</p>
+</div>
+
+<!-- AUTH-1: login híbrido (password + código de un solo uso). El browser nunca toca GoTrue:
+     todo va a /api/auth-* server-side. -->
+<div id="auth" class="auth-wrap" hidden>
+  <div class="auth-card">
+    <span class="eyebrow">Your account</span>
+    <h1 id="auth-title">Sign in</h1>
+    <p class="sub" id="auth-sub">Use the email from your purchase.</p>
+
+    <div id="auth-view-login">
+      <div class="auth-field"><label for="li-email">Email</label><input id="li-email" type="email" autocomplete="email" placeholder="you@email.com"></div>
+      <div class="auth-field"><label for="li-pw">Password</label><input id="li-pw" type="password" autocomplete="current-password"></div>
+      <button class="auth-btn" id="li-submit" type="button">Sign in</button>
+      <span class="auth-alt"><button class="linklike" id="li-otp" type="button">Email me a one-time code instead</button></span>
+      <span class="auth-alt"><button class="linklike" id="li-forgot" type="button">Forgot your password?</button></span>
+    </div>
+
+    <div id="auth-view-code" hidden>
+      <div class="auth-field"><label for="oc-code">Code from the email</label><input id="oc-code" inputmode="numeric" autocomplete="one-time-code" maxlength="10" placeholder="123456"></div>
+      <button class="auth-btn" id="oc-submit" type="button">Verify code</button>
+      <span class="auth-alt"><button class="linklike" id="oc-back" type="button">Use password instead</button></span>
+    </div>
+
+    <div id="auth-view-setpw" hidden>
+      <div class="auth-field"><label for="sp-pw">New password (8+ characters)</label><input id="sp-pw" type="password" autocomplete="new-password"></div>
+      <button class="auth-btn" id="sp-submit" type="button">Save password</button>
+      <span class="auth-alt"><button class="linklike" id="sp-skip" type="button" hidden>Skip for now</button></span>
+    </div>
+
+    <p class="auth-msg" id="auth-msg" aria-live="polite"></p>
+  </div>
+</div>
+
+<!-- dashboard -->
+<main class="page container" id="dash" hidden>
+  <div class="dash-head">
+    <span class="eyebrow">Your account</span>
+    <h1 id="greet">Your coverage.</h1>
+    <p class="sub" id="head-sub">—</p>
+  </div>
+
+  <div class="stat-row" id="stat-row"></div>
+
+  <section class="panel rimmed">
+    <!-- DASH-2: claims van a Five Star (el sistema existente), no hay subsistema propio -->
+    <div class="panel-head"><div><h2>Your plans</h2><div class="ph-sub" id="subs-sub">—</div></div><div class="ph-actions"><a class="btn btn-quiet btn-sm" id="new-plan" href="/#compare">+ New plan</a></div></div>
+    <div class="panel-body" id="subs-list"></div>
+    <div class="panel-foot"><a href="/terms/" target="_blank" rel="noopener">Read plan terms &amp; conditions</a><a href="https://5starservice.net/" target="_blank" rel="noopener noreferrer">File a claim</a></div>
+  </section>
+
+  <!-- DASH-11 (Doug 08-jul): los claims van a Five Star HOY (DASH-2); el tracker en vivo se
+       ANUNCIA ya ("push it now… at least that way you get credit for it") y el stepper de
+       preview enseña la forma que tendrá. El botón File a claim se MUDÓ aquí desde Your plans
+       (composición del demo: cada panel es dueño de su acción). -->
+  <section class="panel" id="claims-panel">
+    <div class="panel-head">
+      <div><h2>Claims</h2><div class="ph-sub">Handled by Five Star, our claims service</div></div>
+      <a class="btn btn-accent btn-sm" id="file-claim" href="https://5starservice.net/" target="_blank" rel="noopener noreferrer">File a claim</a>
+    </div>
+    <div class="panel-body">
+      <div class="claim-preview" aria-hidden="true">
+        <div class="stepper">
+          <div class="step done"><span class="node"></span>Submitted</div>
+          <div class="step done"><span class="node"></span>In review</div>
+          <div class="step current"><span class="node"></span>Scheduled</div>
+          <div class="step"><span class="node"></span>Resolved</div>
+        </div>
+      </div>
+      <p class="claims-note"><span class="soon-flag">Live claim tracker &middot; coming soon</span><span class="footnote" style="margin:0">Soon you&rsquo;ll follow every claim step by step, right here in your dashboard.</span></p>
+    </div>
+  </section>
+
+  <!-- Repair Safety Net (membership) — antes era invisible aunque el cliente la pagara -->
+  <!-- item 4: composición del demo — pill en el head, beneficios en el body, precio en el foot -->
+  <section class="panel" id="mem-panel" hidden>
+    <div class="panel-head"><div><h2>Repair Safety Net</h2><div class="ph-sub" id="mem-sub">—</div></div><span class="pill pill-active" id="mem-pill">—</span></div>
+    <div class="panel-body">
+      <ul class="mem-benefits" style="margin-top:0">
+        <li><strong>Priority repair coordination</strong>: we line up the technician, you don't chase anyone.</li>
+        <li><strong>Member rates</strong> on out-of-pocket repairs not covered by a protection plan.</li>
+        <li><strong>One place</strong> for every covered piece in your home.</li>
+      </ul>
+    </div>
+    <div class="panel-foot" id="mem-foot"></div>
+  </section>
+
+  <section class="panel" id="kits-panel" hidden>
+    <div class="panel-head"><div><h2>Care kits</h2><div class="ph-sub" id="kits-sub">—</div></div></div>
+    <div class="panel-body" id="kits-list"></div>
+  </section>
+
+  <!-- item 5: Billing (solo lectura, solo con sesión; la gestión vive en el portal de Stripe) -->
+  <section class="panel" id="bill-panel" hidden>
+    <!-- item 7: Manage billing vive AQUÍ (antes en Account details, mal sitio) -->
+    <div class="panel-head"><div><h2>Billing</h2><div class="ph-sub" id="bill-sub">—</div></div><button class="btn btn-quiet btn-sm" id="billing" type="button">Manage billing</button></div>
+    <div class="panel-body" id="bill-body"></div>
+    <div class="panel-foot"><a href="#" id="bill-portal">Open Stripe billing portal</a><span class="footnote" style="margin:0">Payments handled securely by Stripe; the card never touches our servers</span></div>
+  </section>
+
+  <section class="panel">
+    <div class="panel-head"><div><h2>Account details</h2></div><div class="ph-actions"><button class="btn btn-quiet btn-sm" id="edit-acct" type="button" hidden>Edit details</button><button class="btn btn-quiet btn-sm" id="chpw" type="button" hidden>Change password</button></div></div>
+    <div class="panel-body" id="acct-body"></div>
+    <div class="panel-foot" id="acct-foot"><span class="footnote" style="margin:0">Your <strong>billing</strong> address &amp; card live in the </span><a href="#" id="acct-portal">Stripe portal</a></div>
+  </section>
+
+  <!-- DASH-11 (Doug 08-jul): "the gift card issue, the referral… put those on there as coming
+       soon". Dos tarjetas hermanas con encabezado propio: los GIFT COUPONS ya existen (GIFT-1,
+       una COMPRA) → tarjeta viva con CTA a /#gift; el referral (gratis, bilateral) sigue en
+       diseño (regla de recompensa pendiente, CTA-3) → coming soon. -->
+  <section>
+    <div class="refer-grid">
+      <div class="refer-inner live" id="gift-card">
+        <div class="refer-copy">
+          <span class="eyebrow">Gift coupons</span>
+          <h2>Give 3 months, <em>make their day</em>.</h2>
+          <p>Buy a gift coupon for any plan or the Repair Concierge: we email you a code, you pass it on, and they redeem it at checkout. Perfect when you sell or hand down furniture.</p>
+        </div>
+        <div class="refer-cta">
+          <a class="btn btn-accent btn-sm" id="gift-link" href="/#gift">Buy a gift coupon <span aria-hidden="true">&rarr;</span></a>
+        </div>
+      </div>
+      <div class="refer-inner" id="refer-card">
+        <div class="refer-copy">
+          <span class="eyebrow">Refer a friend</span><span class="soon-flag">Coming soon</span>
+          <h2>Give a month, <em>get a month</em>.</h2>
+          <p>Share FurnitureRx with a friend: when they protect their first piece, you both get a month on us.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+</main>
+
+<!-- item 6: footer del site (contacto + legal; visible también en el login) -->
+<footer class="site-foot">
+  <div class="container site-foot-inner">
+    <div class="links">
+      <a href="/">Back to site</a>
+      <a href="/terms/" target="_blank" rel="noopener">Terms</a>
+      <a href="https://5starservice.net/" target="_blank" rel="noopener noreferrer">File a claim</a>
+      <a href="mailto:claims@raptns.com">claims@raptns.com</a>
+      <a href="tel:18333957824">1-833-395-7824</a>
+    </div>
+    <div class="legal">FurnitureRx is administered by Risk Assurance Partners, LLC.</div>
+  </div>
+</footer>
+
+<!-- hosts: toast (resultado de acciones) + modal (item 17; contenido se construye por DOM y se LIMPIA al cerrar) -->
+<div class="toast-wrap" id="toast-wrap" aria-live="polite"></div>
+<div class="modal-backdrop" id="modal-backdrop"><div class="modal" id="modal" role="dialog" aria-modal="true"></div></div>
+
+<script>
+'use strict';
+(function(){
+  var $ = function(id){ return document.getElementById(id); };
+  function show(id){ var e=$(id); if(e) e.hidden=false; }
+  function hide(id){ var e=$(id); if(e) e.hidden=true; }
+
+  /* helpers de DOM (textContent → sin XSS) */
+  function el(tag, cls, text){ var n=document.createElement(tag); if(cls) n.className=cls; if(text!=null) n.textContent=text; return n; }
+  function money(cents){ return '$' + ((Number(cents)||0)/100).toFixed(2); }
+  function dollars(n){ return '$' + (Number(n)||0).toLocaleString('en-US'); }
+  var TIER={ 'stain':'Stain protection', 'stain_mech':'Stain + Structure', 'stain-mech':'Stain + Structure' };
+  function tierLabel(t){ return TIER[t] || (t||'Protection plan'); }
+  function monthYear(iso){ if(!iso) return '—'; try{ return new Date(iso).toLocaleDateString('en-US',{month:'long',year:'numeric'}); }catch(e){ return '—'; } }
+  function initials(name, email){ var s=(name||email||'?').trim(); var p=s.split(/\s+/); return ((p[0]||'')[0]||'') + ((p[1]||'')[0]||'') || s[0] || '?'; }
+
+  /* ── iconos (item 2): paths CONSTANTES de desarrollador → SVG por DOM (nunca innerHTML) ── */
+  var SVG_NS = 'http://www.w3.org/2000/svg';
+  var ICON_PATHS = {
+    sofa:   ['M4 11V8a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2v3','M2 13a2 2 0 0 1 2-2 2 2 0 0 1 2 2v3h12v-3a2 2 0 0 1 4 0v5H2z','M6 18v2','M18 18v2'],
+    table:  ['M3 9h18','M5 9V7a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2v2','M6 9v10','M18 9v10'],
+    chair:  ['M6 4v8h12V4','M5 12h14l-1 8M6 20l-1-8','M8 20v2','M16 20v2'],
+    rug:    ['M3 5h18v14H3z','M6 8h12v8H6z','M3 5l-1-2M21 5l1-2M3 19l-1 2M21 19l1 2'],
+    bed:    ['M3 18v-6a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2v6','M3 14h18','M7 10V8h5v2','M3 18v2','M21 18v2'],
+    lamp:   ['M9 3h6l3 7H6z','M12 10v8','M8 21h8'],
+    receipt:['M6 2h9l3 3v17l-3-2-3 2-3-2-3 2V2z','M9 8h6','M9 12h6'],
+    claim:  ['M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z','M14 2v6h6'],
+    cancel: ['M12 3a9 9 0 1 0 0 18 9 9 0 0 0 0-18z','M8 8l8 8'],
+    pause:  ['M9 5v14','M15 5v14'],
+    card:   ['M3 5h18a1 1 0 0 1 1 1v12a1 1 0 0 1-1 1H3a1 1 0 0 1-1-1V6a1 1 0 0 1 1-1z','M2 10h20'],
+    pin:    ['M12 21s-7-5.2-7-11a7 7 0 0 1 14 0c0 5.8-7 11-7 11z','M12 7.6a2.4 2.4 0 1 0 0 4.8 2.4 2.4 0 0 0 0-4.8z']
+  };
+  /* piece_type real del checkout (furniture/outdoor/adjbed/mattress/rugs/lighting) → icono */
+  var PIECE_ICON = { furniture:'sofa', sofa:'sofa', sectional:'sofa', recliner:'chair', chair:'chair',
+    outdoor:'chair', dining:'table', table:'table', adjbed:'bed', bed:'bed', mattress:'bed',
+    rugs:'rug', rug:'rug', lighting:'lamp', lamp:'lamp' };
+  function svgIcon(name){
+    var svg = document.createElementNS(SVG_NS,'svg');
+    svg.setAttribute('viewBox','0 0 24 24');
+    (ICON_PATHS[name] || ICON_PATHS.sofa).forEach(function(d){
+      var p = document.createElementNS(SVG_NS,'path'); p.setAttribute('d', d); svg.appendChild(p);
+    });
+    return svg;
+  }
+  function pieceIcon(type){
+    var box = el('span','pi-ic');
+    box.appendChild(svgIcon(PIECE_ICON[String(type||'').toLowerCase()] || 'sofa'));
+    return box;
+  }
+
+  /* ── toast (item 1): el RESULTADO de una acción; el progreso sigue en el texto del botón ── */
+  function toast(message, opts){
+    var wrap = $('toast-wrap'); if(!wrap) return;
+    var tst = el('div','toast' + (opts && opts.success ? ' success' : ''));
+    tst.appendChild(el('span', null, message));
+    wrap.appendChild(tst);
+    requestAnimationFrame(function(){ requestAnimationFrame(function(){ tst.className += ' show'; }); });
+    setTimeout(function(){
+      tst.className = tst.className.replace(' show','');
+      setTimeout(function(){ if(tst.parentNode) tst.parentNode.removeChild(tst); }, 300);
+    }, 3800);
+  }
+
+  /* ── modal (items 12/17): la sheet del demo MÁS lo que el demo no tenía: gestión de foco y
+        contenido construido por DOM y limpiado al cerrar (sin ids zombis, sin innerHTML) ── */
+  var modalPrevFocus = null;
+  function openModal(build){
+    var bd = $('modal-backdrop'), mo = $('modal');
+    if(!bd || !mo) return;
+    mo.textContent = '';
+    build(mo);
+    modalPrevFocus = document.activeElement;
+    bd.className = 'modal-backdrop open';
+    document.body.style.overflow = 'hidden';
+    var first = mo.querySelector('input, button:not(.modal-close)');
+    if(first) first.focus();
+  }
+  function closeModal(){
+    var bd = $('modal-backdrop'), mo = $('modal');
+    if(!bd || !mo) return;
+    bd.className = 'modal-backdrop';
+    document.body.style.overflow = '';
+    mo.textContent = '';   /* limpiar YA: determinista para tests y sin ids duplicados */
+    if(modalPrevFocus && modalPrevFocus.focus){ try{ modalPrevFocus.focus(); }catch(_){} }
+    modalPrevFocus = null;
+  }
+  function modalShell(mo, title, sub){
+    var head = el('div','modal-head');
+    var hl = el('div');
+    hl.appendChild(el('h3', null, title));
+    if(sub) hl.appendChild(el('div','sub', sub));
+    head.appendChild(hl);
+    var x = el('button','modal-close','×'); x.type = 'button'; x.setAttribute('aria-label','Close');
+    x.addEventListener('click', closeModal);
+    head.appendChild(x);
+    var body = el('div','modal-body');
+    var foot = el('div','modal-foot');
+    mo.appendChild(head); mo.appendChild(body); mo.appendChild(foot);
+    return { body: body, foot: foot };
+  }
+
+  function fail(h, p){
+    hide('loading');
+    if(h) $('error-h').textContent=h;
+    if(p) $('error-p').textContent=p;
+    show('error');
+  }
+
+  function render(d){
+    lastView = d;
+    var prof = d.profile || {};
+    var name = prof.full_name || '';
+    var first = name ? name.split(/\s+/)[0] : '';
+
+    // app bar
+    $('who-name').textContent = name || d.email;
+    $('who-email').textContent = d.email;
+    $('who-avatar').textContent = (initials(name, d.email)||'?').toUpperCase();
+
+    // header
+    $('greet').textContent = first ? ('Your coverage, ' + first + '.') : 'Your coverage.';
+    var sub = $('head-sub');
+    sub.textContent = '';
+    if(d.summary.member_since){
+      sub.appendChild(document.createTextNode('Member since '));
+      sub.appendChild(el('strong', null, monthYear(d.summary.member_since)));
+      sub.appendChild(document.createTextNode(' · renews every 30 days'));
+    } else {
+      sub.textContent = d.email;
+    }
+
+    // stat row
+    var sr = $('stat-row'); sr.textContent='';
+    function stat(k, v, vsmall, meta, lead){
+      var c = el('div', 'stat-card' + (lead?' lead':''));
+      c.appendChild(el('div','k',k));
+      var vv = el('div','v', v);
+      if(vsmall){ vv.appendChild(document.createTextNode(' ')); vv.appendChild(el('small',null,vsmall)); }
+      c.appendChild(vv);
+      if(meta) c.appendChild(el('div','meta',meta));
+      return c;
+    }
+    var s = d.summary;
+    /* item 11: Monthly total LIDERA (como el demo); Next payment se rellena async desde get-billing
+       (member_since salió del stat row: ya vive en el subtítulo del header) */
+    sr.appendChild(stat('Monthly total', money(s.monthly_cents_total), '/mo',
+      s.plans_active + ' active plan' + (s.plans_active===1?'':'s') + (d.membership && d.membership.status==='active' ? ' + membership' : ''), true));
+    var pausedN = d.plans.filter(function(p){ return p.status==='paused'; }).length;
+    var canceledN = d.plans.filter(function(p){ return p.status==='canceled'; }).length;
+    var bits = []; if(pausedN) bits.push(pausedN+' paused'); if(canceledN) bits.push(canceledN+' canceled');
+    sr.appendChild(stat('Active plans', String(s.plans_active), s.plans_total>s.plans_active ? ('of '+s.plans_total) : '', bits.length ? bits.join(' · ') : 'all active'));
+    sr.appendChild(stat('Coverage', dollars(s.coverage_cents_total/100), '', 'total protected'));
+    var np = stat('Next payment', '—', '', 'from your billing');
+    np.id = 'stat-nextpay';
+    sr.appendChild(np);
+
+    // plans
+    var list = $('subs-list'); list.textContent='';
+    var itemsN = d.plans.reduce(function(a,p){ return a + ((p.pieces && p.pieces.length) || 0); }, 0);
+    $('subs-sub').textContent = d.plans.length
+      ? (s.plans_active + ' active · ' + d.plans.length + ' enrolled' + (itemsN ? (' · ' + itemsN + ' item' + (itemsN===1?'':'s') + ' covered') : ''))
+      : 'No plans yet';
+    if(!d.plans.length){ list.appendChild(el('div','empty','No protection plans on this account yet.')); }
+    d.plans.forEach(function(p){
+      var card = el('div','plan-card' + (p.status!=='active' ? (' '+p.status) : ''));
+      var top = el('div','plan-top');
+      var left = el('div');
+      left.appendChild(el('div','plan-name', tierLabel(p.tier)));
+      var meta = el('div','plan-meta');
+      /* item 3: la pill vive en la línea meta (como el demo); plan-right queda solo con el precio */
+      meta.appendChild(el('span','pill pill-'+(p.status||'active'), (p.status||'active').replace('_',' ')));
+      meta.appendChild(el('span','sep','·'));
+      if(p.master_no){                                       // serialización (opción B): nº de plan del cliente
+        meta.appendChild(document.createTextNode('Plan ' + p.master_no));
+        meta.appendChild(el('span','sep','·'));
+      }
+      meta.appendChild(document.createTextNode('Order #' + (p.sales_order_number||'—')));
+      meta.appendChild(el('span','sep','·'));
+      meta.appendChild(document.createTextNode('Started ' + monthYear(p.started_at)));
+      left.appendChild(meta);
+      top.appendChild(left);
+      var right = el('div','plan-right');
+      var pr = el('div','plan-price', money(p.monthly_cents));
+      pr.appendChild(el('small',null,'/mo'));
+      right.appendChild(pr);
+      top.appendChild(right);
+      card.appendChild(top);
+
+      // coverage summary — item 13: narrativa + UNA línea compacta + barra (fuera las 4 filas)
+      if(p.coverage){
+        var cov = el('div','plan-cov');
+        if(p.coverage.summary){ cov.appendChild(el('p','cov-summary', p.coverage.summary)); }   // narrativa legible (B)
+        var capBase = (p.coverage.covered_up_to!=null && p.coverage.covered_up_to > 0) ? p.coverage.covered_up_to : 5000;
+        var lineRow = el('div','cov-line');
+        if(p.coverage.sales_order_total!=null){
+          var pct = Math.min(100, Math.round(p.coverage.sales_order_total / capBase * 100));
+          var leftTxt = el('span');
+          if(p.coverage.item_count!=null) leftTxt.appendChild(document.createTextNode(p.coverage.item_count + ' item' + (p.coverage.item_count===1?'':'s') + ' · '));
+          leftTxt.appendChild(el('b', null, dollars(p.coverage.sales_order_total)));
+          leftTxt.appendChild(document.createTextNode(' of ' + dollars(capBase) + ' covered'));
+          lineRow.appendChild(leftTxt);
+          lineRow.appendChild(el('span', null, pct + '%'));
+          cov.appendChild(lineRow);
+          var bar = el('div','usebar'); var fill = el('span');
+          bar.appendChild(fill); cov.appendChild(bar);
+          /* la transición anima 0 → pct al pintar (doble rAF: el 0 alcanza a renderizarse) */
+          requestAnimationFrame(function(){ requestAnimationFrame(function(){ fill.style.width = pct + '%'; }); });
+        } else {
+          lineRow.appendChild(el('span', null, 'Covered up to'));
+          lineRow.appendChild(el('b', null, dollars(capBase)));
+          cov.appendChild(lineRow);
+        }
+        card.appendChild(cov);
+      }
+
+      // covered pieces (item 2: con icono por tipo)
+      if(p.pieces && p.pieces.length){
+        var box = el('div','plan-items');
+        p.pieces.forEach(function(pt){
+          var row = el('div','plan-item-row');
+          row.appendChild(pieceIcon(pt));
+          row.appendChild(el('span','pi-name', pt));
+          row.appendChild(el('span','pi-retail','covered'));
+          box.appendChild(row);
+        });
+        card.appendChild(box);
+      }
+
+      /* item 3: fila de acciones (chips). Pause/Cancel viven en el portal de Stripe, no aquí. */
+      var actions = el('div','plan-actions');
+      if(p.status === 'active'){
+        var claimChip = el('a','chip primary');
+        claimChip.appendChild(svgIcon('claim'));
+        claimChip.appendChild(document.createTextNode('File a claim'));
+        claimChip.href = 'https://5starservice.net/'; claimChip.target = '_blank'; claimChip.rel = 'noopener noreferrer';
+        actions.appendChild(claimChip);
+      }
+      if(p.receipt_url){
+        /* la foto abre en MODAL dentro de la página (pedido 08-jul); full-size queda de respaldo */
+        var rc = el('button','chip'); rc.type = 'button';
+        rc.appendChild(svgIcon('receipt'));
+        rc.appendChild(document.createTextNode('View receipt'));
+        rc.addEventListener('click', function(){ openReceiptModal(p); });
+        actions.appendChild(rc);
+      } else if(p.receipt){
+        var rb = el('span','chip'); rb.style.cursor = 'default';
+        rb.appendChild(svgIcon('receipt'));
+        rb.appendChild(document.createTextNode('Receipt on file'));
+        actions.appendChild(rb);
+      }
+      /* PAUSE-1 (B3, 09-jul): "Pause plan" existe pero DISIMULADO — tooltip "Coming soon",
+         SPAN sin acción. La pausa real es fase 2 (decisiones de Doug pendientes). */
+      if(p.status === 'active'){
+        var pauseChip = el('span','chip soon');
+        pauseChip.appendChild(svgIcon('pause'));
+        pauseChip.appendChild(document.createTextNode('Pause plan'));
+        pauseChip.title = 'Coming soon';
+        pauseChip.setAttribute('aria-disabled','true');
+        actions.appendChild(pauseChip);
+      }
+      /* DASH-1b: Cancel plan → flow dirigido del Customer Portal (Stripe confirma allá,
+         fecha de fin de período incluida). Solo con sesión (la vía ?t= no tiene Bearer).
+         La cancelación de Stripe opera sobre la COMPRA completa: si esta card comparte
+         sub id con más líneas, startCancelPlan lo avisa antes de salir. */
+      if(session && p.status !== 'canceled' && p.stripe_subscription_id){
+        var cancelChip = el('button','chip danger'); cancelChip.type = 'button';
+        cancelChip.appendChild(svgIcon('cancel'));
+        cancelChip.appendChild(document.createTextNode('Cancel plan'));
+        cancelChip.addEventListener('click', function(){ startCancelPlan(p); });
+        actions.appendChild(cancelChip);
+      }
+      if(actions.childNodes.length) card.appendChild(actions);
+      list.appendChild(card);
+    });
+
+    /* item 1: tile de recompra → la sección de planes del site (máquina de re-venta) */
+    var addTile = document.createElement('a');
+    addTile.className = 'cov-add'; addTile.href = '/#compare';
+    addTile.textContent = '+ Protect another receipt, start a new plan';
+    list.appendChild(addTile);
+
+    // membership (Repair Safety Net) — item 4: composición del demo (pill en el head, precio en el foot)
+    if(d.membership){
+      show('mem-panel');
+      var m = d.membership;
+      $('mem-sub').textContent = m.monthly_cents === 0 ? 'Included with your protection plan' : 'Repair experts for everything else in your home';
+      var mp = $('mem-pill');
+      mp.className = 'pill pill-' + (m.status || 'active');
+      mp.textContent = (m.status || 'active').replace('_',' ');
+      var mf = $('mem-foot'); mf.textContent = '';
+      var mm = el('a', null, 'Manage membership'); mm.href = '#'; mm.id = 'mem-manage';
+      mm.addEventListener('click', function(ev){ ev.preventDefault(); openPortal(null); });
+      mf.appendChild(mm);
+      var priceSpan = el('span','footnote'); priceSpan.style.margin = '0';
+      if(m.monthly_cents === 0){
+        priceSpan.appendChild(document.createTextNode('Included with your plan'));
+      } else {
+        priceSpan.appendChild(document.createTextNode('Billed at '));
+        priceSpan.appendChild(el('strong', null, money(m.monthly_cents)));
+        priceSpan.appendChild(document.createTextNode('/month'));
+      }
+      priceSpan.appendChild(document.createTextNode(' · since ' + monthYear(m.started_at)));
+      mf.appendChild(priceSpan);
+    } else if(d.repair_safety_net === 'included'){
+      /* MEM-7 (14-ago): sin membership propia pero con plan activo, la Repair Safety Net viene
+         INCLUIDA (entitlement computado en el server, sin fila ni cobro). */
+      show('mem-panel');
+      $('mem-sub').textContent = 'Included with your protection plan';
+      var ip = $('mem-pill'); ip.className = 'pill pill-active'; ip.textContent = 'included';
+      var imf = $('mem-foot'); imf.textContent = '';
+      var inote = el('span','footnote'); inote.style.margin = '0';
+      inote.appendChild(document.createTextNode('Included with your plan at no extra cost — if damage isn’t covered, we still coordinate the repair; you pay only parts and tech fees.'));
+      imf.appendChild(inote);
+    } else hide('mem-panel');
+
+    // kits
+    if(d.kits && d.kits.length){
+      show('kits-panel');
+      $('kits-sub').textContent = d.kits.length + ' order' + (d.kits.length>1?'s':'');
+      var kl = $('kits-list'); kl.textContent='';
+      d.kits.forEach(function(o){
+        var card = el('div','plan-card');
+        var top = el('div','plan-top');
+        var left = el('div');
+        left.appendChild(el('div','plan-name','Care kit order'));
+        left.appendChild(el('div','plan-meta', monthYear(o.created_at)));
+        top.appendChild(left);
+        var right = el('div','plan-right');
+        right.appendChild(el('div','plan-price', money(o.total_cents)));
+        right.appendChild(el('span','pill pill-active', o.status||'paid'));
+        top.appendChild(right);
+        card.appendChild(top);
+        if(o.items && o.items.length){
+          var box = el('div','plan-items'); box.style.marginTop='16px';
+          o.items.forEach(function(it){
+            var row = el('div','plan-item-row');
+            row.appendChild(el('span','pi-name', it.name + (it.quantity>1 ? (' ×'+it.quantity) : '')));
+            row.appendChild(el('span','pi-retail', money(it.unit_price_cents)));
+            box.appendChild(row);
+          });
+          card.appendChild(box);
+        }
+        kl.appendChild(card);
+      });
+    }
+
+    // account details (los editables llevan id; email NO se edita: es la identidad)
+    lastProfile = { full_name: name || '', phone: prof.phone || '', address: prof.address || '' };
+    var ab = $('acct-body'); ab.textContent='';
+    function drow(k,v,id){ var r=el('div','detail-row'); r.appendChild(el('span','dk',k)); var dv=el('span','dv', v||'—'); if(id) dv.id=id; r.appendChild(dv); ab.appendChild(r); }
+    drow('Name', name, 'd-name');
+    drow('Email', d.email);
+    drow('Phone', prof.phone, 'd-phone');
+    drow('Mailing address', prof.address, 'd-address');
+
+    hide('loading'); show('dash');
+  }
+
+  /* ══ AUTH-1: sesión + login híbrido (password / código) + aterrizaje del invite ══
+     Sin llave de Supabase en el browser: todo GoTrue pasa por /api/auth-*. La sesión vive en
+     localStorage (sin auto-refresh: si expira, se vuelve al login con aviso). */
+  var SESSION_KEY = 'furnfx_session';
+  function saveSession(s){ try{ localStorage.setItem(SESSION_KEY, JSON.stringify(s)); }catch(_){} }
+  function clearSession(){ try{ localStorage.removeItem(SESSION_KEY); }catch(_){} }
+  function getSession(){
+    try{
+      var s = JSON.parse(localStorage.getItem(SESSION_KEY) || 'null');
+      if(s && s.access_token && (!s.expires_at || s.expires_at > Math.floor(Date.now()/1000) + 30)) return s;
+    }catch(_){}
+    return null;
+  }
+
+  var session = null;          /* sesión viva (validada por account-me) */
+  var pendingSession = null;   /* la del hash del invite/recovery, antes de guardarla */
+  var afterSetPw = null;       /* qué hacer tras guardar (o saltar) la contraseña */
+  var lastProfile = { full_name:'', phone:'', address:'' };   /* valores base del modal de edición */
+  var lastView = null;         /* la vista completa del último render (DASH-1b: contar líneas por compra) */
+
+  function postJSON(url, body){
+    return fetch(url, { method:'POST', headers:{ 'Content-Type':'application/json' }, body: JSON.stringify(body) })
+      .then(function(res){ return res.json().then(function(d){ return { ok: res.ok, d: d }; }, function(){ return { ok:false, d:{} }; }); });
+  }
+  function msg(text, ok){
+    var m = $('auth-msg'); if(!m) return;
+    m.textContent = text || '';
+    m.className = 'auth-msg' + (ok ? ' ok' : '');
+  }
+  function authView(which, subText){
+    hide('loading'); hide('error'); hide('dash'); show('auth');
+    ['auth-view-login','auth-view-code','auth-view-setpw'].forEach(function(id){
+      var e = $(id); if(e) e.hidden = (id !== 'auth-view-' + which);
+    });
+    $('auth-title').textContent = which === 'setpw' ? 'Set your password' : 'Sign in';
+    if(subText != null) $('auth-sub').textContent = subText;
+    msg('');
+  }
+  function showLogin(note, ok){ authView('login', 'Use the email from your purchase.'); if(note) msg(note, ok); }
+  /* Vista set-password con el botón skip gobernado en UN solo lugar.
+     AUTH-2: el flujo de contraseña temporal lo llama con allowSkip=false (cambio OBLIGATORIO). */
+  function setpwView(subText, allowSkip, skipLabel){
+    authView('setpw', subText);
+    var sk = $('sp-skip');
+    if(sk){ sk.hidden = !allowSkip; sk.textContent = skipLabel || 'Skip for now'; }
+  }
+
+  /* Entra al dashboard con una sesión: account-me valida el Bearer y trae la vista rica. */
+  function enter(s){
+    hide('auth'); hide('error'); hide('dash'); show('loading');
+    fetch('/api/account-me', { headers: { Authorization: 'Bearer ' + s.access_token } })
+      .then(function(res){
+        if(res.status === 401){ clearSession(); session = null; showLogin('Your session expired — please sign in again.'); return null; }
+        if(!res.ok) throw new Error('http ' + res.status);
+        return res.json();
+      })
+      .then(function(d){
+        if(!d) return;
+        session = s; saveSession(s);
+        render(d);
+        var lo = $('logout'); if(lo) lo.hidden = false;
+        var cp = $('chpw'); if(cp) cp.hidden = false;
+        var ea = $('edit-acct'); if(ea) ea.hidden = false; /* editar solo con sesión */
+        loadBilling(s);                                     /* panel Billing (no bloquea el render) */
+      })
+      .catch(function(){ fail('Something went wrong.', 'Please try again in a moment.'); });
+  }
+
+  /* ── handlers ── */
+  function busy(id, on){ var b = $(id); if(b) b.disabled = !!on; }
+  $('li-submit').addEventListener('click', function(){
+    var email = ($('li-email').value || '').trim();
+    var pw = $('li-pw').value || '';
+    if(!email || !pw){ msg('Add your email and password.'); return; }
+    busy('li-submit', true); msg('Signing in…', true);
+    postJSON('/api/auth-login', { email: email, password: pw }).then(function(r){
+      busy('li-submit', false);
+      if(r.ok && r.d && r.d.access_token){
+        if(r.d.must_change_password){
+          /* AUTH-2: entró con la contraseña TEMPORAL del welcome → cambio obligatorio, sin skip */
+          pendingSession = r.d;
+          setpwView('For security, replace your temporary password with one of your own.', false);
+        } else enter(r.d);
+      }
+      else msg('That email and password don’t match — try again, or use a one-time code.');
+    });
+  });
+  function requestCode(){
+    var email = ($('li-email').value || '').trim();
+    if(!email){ msg('Add your email first.'); return; }
+    busy('li-otp', true); busy('li-forgot', true);
+    postJSON('/api/auth-otp', { email: email }).then(function(){
+      busy('li-otp', false); busy('li-forgot', false);
+      authView('code', 'We emailed a sign-in code to ' + email + '.');
+      $('oc-code').focus();
+    });
+  }
+  $('li-otp').addEventListener('click', function(){ afterSetPw = null; requestCode(); });
+  /* Forgot password = código + set-password al entrar (una pantalla reusada; sin flujo aparte) */
+  $('li-forgot').addEventListener('click', function(){ afterSetPw = 'offer'; requestCode(); });
+  $('oc-back').addEventListener('click', function(){ showLogin(); });
+  $('oc-submit').addEventListener('click', function(){
+    var email = ($('li-email').value || '').trim();
+    var code = ($('oc-code').value || '').trim();
+    if(!/^\d{6,10}$/.test(code)){ msg('Enter the code from the email.'); return; }
+    busy('oc-submit', true); msg('Checking…', true);
+    postJSON('/api/auth-otp', { email: email, code: code }).then(function(r){
+      busy('oc-submit', false);
+      if(r.ok && r.d && r.d.access_token){
+        if(r.d.must_change_password){
+          /* AUTH-2: aunque entre por código, la temporal sigue viva → cambio obligatorio */
+          pendingSession = r.d;
+          setpwView('For security, replace your temporary password with one of your own.', false);
+        } else if(afterSetPw === 'offer'){
+          pendingSession = r.d;
+          setpwView('You’re in — set your new password now.', true);
+        } else enter(r.d);
+      }
+      else msg('That code didn’t work — check it or request a new one.');
+    });
+  });
+  $('sp-submit').addEventListener('click', function(){
+    var pw = $('sp-pw').value || '';
+    if(pw.length < 8){ msg('Use at least 8 characters.'); return; }
+    var tok = (pendingSession && pendingSession.access_token) || (session && session.access_token);
+    if(!tok){ showLogin('Your link expired — sign in or request a one-time code.'); return; }
+    busy('sp-submit', true); msg('Saving…', true);
+    postJSON('/api/auth-set-password', { access_token: tok, password: pw }).then(function(r){
+      busy('sp-submit', false);
+      if(r.ok && r.d && r.d.ok){
+        var s = pendingSession || session; pendingSession = null;
+        enter(s);
+      }
+      else msg('We couldn’t save that password — your link may have expired. Sign in with a one-time code and try again.');
+    });
+  });
+  $('sp-skip').addEventListener('click', function(){
+    var s = pendingSession || session; pendingSession = null;
+    if(s) enter(s); else showLogin();
+  });
+  $('logout').addEventListener('click', function(){
+    clearSession(); session = null;
+    $('logout').hidden = true; var cp = $('chpw'); if(cp) cp.hidden = true;
+    var ea = $('edit-acct'); if(ea) ea.hidden = true;
+    hide('bill-panel');
+    closeModal();
+    showLogin('Signed out.', true);
+  });
+  /* DASH-1: Customer Portal de Stripe (pause/cancel/tarjeta se gestionan allá). UN solo flujo
+     reutilizado por: botón Manage billing, chips Update, Manage membership y los links de pie. */
+  /* DASH-1b: `subscription` opcional → el server arma el flow dirigido de cancelación
+     (subscription_cancel) y el portal abre YA en la confirmación de ESA suscripción. */
+  function openPortal(btn, subscription){
+    if(!session || !session.access_token) return;
+    var idle = btn ? btn.textContent : '';
+    if(btn){ btn.disabled = true; btn.textContent = 'Opening…'; }
+    /* PESTAÑA NUEVA (pedido 08-jul): se abre YA, dentro del gesto del click (un window.open
+       async caería en el popup blocker) y la URL del portal se inyecta cuando el server responde.
+       opener=null corta el vínculo (equivalente a noopener; pasar 'noopener' devolvería null y no
+       podríamos navegarla). Si el blocker igual la mata → fallback a la misma pestaña. */
+    var win = null;
+    try{ win = window.open('about:blank', '_blank'); if(win) win.opener = null; }catch(_){ win = null; }
+    function restore(){ if(btn){ btn.disabled = false; btn.textContent = idle; } }
+    fetch('/api/create-portal-session', {
+      method: 'POST',
+      headers: subscription
+        ? { Authorization: 'Bearer ' + session.access_token, 'Content-Type': 'application/json' }
+        : { Authorization: 'Bearer ' + session.access_token },
+      body: subscription ? JSON.stringify({ subscription: subscription }) : undefined
+    })
+      .then(function(res){ return res.json().catch(function(){ return {}; }); })
+      .then(function(d){
+        restore();   /* ya no navegamos esta página → el botón NUNCA se queda en "Opening…" */
+        if(d && d.url){
+          if(win){ win.location = d.url; }
+          else { location.assign(d.url); }
+          return;
+        }
+        if(win) win.close();
+        toast('Couldn’t open the billing portal, try again.');
+      })
+      .catch(function(){
+        restore();
+        if(win) win.close();
+        toast('Couldn’t open the billing portal, try again.');
+      });
+  }
+  $('billing').addEventListener('click', function(){ openPortal($('billing')); });
+  var bp = $('bill-portal');
+  if(bp) bp.addEventListener('click', function(ev){ ev.preventDefault(); openPortal(null); });
+  var ap = $('acct-portal');
+  if(ap) ap.addEventListener('click', function(ev){ ev.preventDefault(); openPortal(null); });
+  /* modal: cierre por backdrop y por Escape */
+  $('modal-backdrop').addEventListener('click', function(ev){ if(ev.target === $('modal-backdrop')) closeModal(); });
+  document.addEventListener('keydown', function(ev){
+    if(ev.key === 'Escape' && $('modal-backdrop').className.indexOf('open') >= 0) closeModal();
+  });
+
+  /* ── panel Billing (lectura vía get-billing v2; fail-soft, es cortesía) ── */
+  function shortDate(iso){ if(!iso) return '—'; try{ return new Date(iso).toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'}); }catch(e){ return '—'; } }
+  function cardLabel(card){ return card.brand.charAt(0).toUpperCase() + card.brand.slice(1) + ' •••• ' + card.last4; }
+  /* item 11: rellena el stat "Next payment" cuando llega el billing (fail-soft: queda el guion) */
+  function nextPayStat(b){
+    var c = $('stat-nextpay'); if(!c) return;
+    var v = c.querySelector('.v'), meta = c.querySelector('.meta');
+    if(b && b.next_charge){
+      if(v) v.textContent = shortDate(b.next_charge.date);
+      if(meta) meta.textContent = money(b.next_charge.amount_cents) + (b.card ? ' · ' + cardLabel(b.card) : '');
+    } else if(b){
+      if(v) v.textContent = '—';
+      if(meta) meta.textContent = 'no upcoming charge';
+    }
+  }
+  /* fila tarjeta/dirección: LABEL explícito (el icono solo no se entiende) + chip Update → portal */
+  function methodRow(iconName, label, l, s){
+    var row = el('div','bill-method');
+    var left = el('div','pm');
+    var ic = el('span','card-ic'); ic.appendChild(svgIcon(iconName));
+    left.appendChild(ic);
+    var txt = el('div');
+    txt.appendChild(el('div','k', label));
+    txt.appendChild(el('div','l', l));
+    txt.appendChild(el('div','s', s));
+    left.appendChild(txt);
+    row.appendChild(left);
+    var up = el('button','chip','Update'); up.type = 'button';
+    up.addEventListener('click', function(){ openPortal(up); });
+    row.appendChild(up);
+    return row;
+  }
+  function renderBilling(b){
+    if(!b){ hide('bill-panel'); nextPayStat(null); return; }
+    show('bill-panel');
+    $('bill-sub').textContent = b.next_charge
+      ? ('Next charge ' + shortDate(b.next_charge.date) + ' · ' + money(b.next_charge.amount_cents))
+      : 'No upcoming charge';
+    var body = $('bill-body'); body.textContent = '';
+    body.appendChild(methodRow('card', 'Payment method',
+      b.card ? cardLabel(b.card) : 'Card on file with Stripe',
+      b.card ? ('Expires ' + b.card.exp_month + '/' + b.card.exp_year) : 'Manage it in the Stripe portal'));
+    body.appendChild(methodRow('pin', 'Billing address',
+      b.billing_address || 'On file with Stripe',
+      'Managed in the Stripe portal'));
+    if(b.invoices && b.invoices.length){
+      var tbl = el('table','bill-table');
+      var thead = el('thead'); var hr = el('tr');
+      ['Date','Description','Amount','Status'].forEach(function(h){ hr.appendChild(el('th',null,h)); });
+      thead.appendChild(hr); tbl.appendChild(thead);
+      var tb = el('tbody');
+      b.invoices.forEach(function(inv){
+        var tr = el('tr');
+        tr.appendChild(el('td',null, shortDate(inv.date)));
+        tr.appendChild(el('td',null, inv.description || '—'));
+        tr.appendChild(el('td',null, money(inv.amount_cents)));
+        tr.appendChild(el('td', inv.status === 'paid' ? 'paid' : null, inv.status || '—'));
+        tb.appendChild(tr);
+      });
+      tbl.appendChild(tb); body.appendChild(tbl);
+    }
+    nextPayStat(b);
+  }
+  function loadBilling(s){
+    fetch('/api/get-billing', { headers: { Authorization: 'Bearer ' + s.access_token } })
+      .then(function(res){ if(!res.ok) throw 0; return res.json(); })
+      .then(function(d){ renderBilling(d && d.ok ? d.billing : null); })
+      .catch(function(){ hide('bill-panel'); });
+  }
+
+  /* ── DASH-1b: Cancel plan. La confirmación en página abre SIEMPRE (pedido Adrian 09-jul:
+        el chip es por fila → la confirmación también). El copy varía por alcance: compra de
+        UNA línea → "Cancel this plan?"; compra con MÁS líneas (otros planes / membership del
+        mismo checkout) → aviso honesto: Stripe cancela el paquete entero. El resumen de la
+        compra viene del SERVER (p.purchase), que ve TODAS las filas. ── */
+  function startCancelPlan(p){
+    if(!session || !session.access_token) return;
+    var pur = p.purchase || { plans: 1, membership: false };
+    var multi = pur.plans + (pur.membership ? 1 : 0) > 1;
+    openModal(function(mo){
+      var sh = modalShell(mo, multi ? 'Cancel this purchase?' : 'Cancel this plan?',
+        tierLabel(p.tier) + (p.master_no ? ' · Plan ' + p.master_no : ''));
+      var what = pur.plans + ' plan' + (pur.plans === 1 ? '' : 's') + (pur.membership ? ' + membership' : '');
+      var msg = el('p', null, multi
+        ? 'This plan was bought together with other coverage, and Stripe cancels the whole purchase: '
+          + what + '. You’ll review the details and confirm on the next screen.'
+        : 'Coverage stops at the end of your current billing period. You’ll review the date and confirm on the next screen — nothing is canceled yet.');
+      msg.style.cssText = 'font-size:.9rem;color:var(--ink-65);margin-bottom:6px';
+      sh.body.appendChild(msg);
+      var keep = el('button','btn btn-quiet','Keep my coverage'); keep.type = 'button';
+      keep.addEventListener('click', closeModal);
+      var go = el('button','btn btn-accent','Continue to Stripe'); go.type = 'button'; go.id = 'cancel-continue';
+      go.addEventListener('click', function(){ closeModal(); openPortal(null, p.stripe_subscription_id); });
+      sh.foot.appendChild(keep); sh.foot.appendChild(go);
+    });
+  }
+
+  /* ── Gift EN CONTEXTO (09-jul, feedback Adrian): el CTA del strip compraba navegando a /#gift
+        y cerrar el overlay te dejaba VARADO en el site. Ahora el gift se compra en un modal DE
+        AQUÍ (el email del comprador es el de la sesión: cero tipeo) y Stripe devuelve a
+        /account.html?gift=… (source:'account'). El precio real lo calcula el server (meses ×
+        lista); este mapa es solo display, espejo del D2C. ── */
+  var GIFT_MONTHS = 3;
+  var GIFT_CENTS = { 'stain': 999, 'stain-mech': 1999, 'membership': 1999 };
+  function giftFmt(c){ return '$' + (c / 100).toFixed(2); }
+  function openGiftModal(){
+    var email = (lastView && lastView.email) || $('who-email').textContent || '';
+    openModal(function(mo){
+      var sh = modalShell(mo, 'Gift coupon codes', 'Give ' + GIFT_MONTHS + ' months to a friend or furniture buyer');
+      var f = el('div','field');
+      var lb = el('label', null, 'What to gift'); lb.setAttribute('for','gift-tier');
+      var sel = document.createElement('select'); sel.id = 'gift-tier';
+      [['stain','Stain protection · $9.99/mo'],
+       ['stain-mech','Stain + Structure · $19.99/mo'],
+       ['membership','Repair Concierge · $19.99/mo']].forEach(function(o){
+        var op = document.createElement('option'); op.value = o[0]; op.textContent = o[1]; sel.appendChild(op);
+      });
+      f.appendChild(lb); f.appendChild(sel);
+      sh.body.appendChild(f);
+      var total = el('p', null, ''); total.id = 'gift-total';
+      total.style.cssText = 'font-weight:600;color:var(--ink);margin:0 0 10px';
+      function refresh(){ total.textContent = GIFT_MONTHS + ' months · total ' + giftFmt((GIFT_CENTS[sel.value] || 0) * GIFT_MONTHS); }
+      sel.addEventListener('change', refresh); refresh();
+      sh.body.appendChild(total);
+      sh.body.appendChild(el('p','footnote','We’ll email the coupon code to ' + email + '. Forward it to the person you’re gifting; they redeem it at checkout. Codes expire in 90 days.'));
+      var msg = el('p','footnote',''); msg.style.color = 'var(--scarlet)'; msg.setAttribute('aria-live','polite');
+      sh.body.appendChild(msg);
+      var cancel = el('button','btn btn-quiet','Cancel'); cancel.type = 'button';
+      cancel.addEventListener('click', closeModal);
+      var go = el('button','btn btn-accent','Continue to payment'); go.type = 'button'; go.id = 'gift-continue';
+      go.addEventListener('click', function(){
+        go.disabled = true; go.textContent = 'Opening payment…'; msg.textContent = '';
+        fetch('/api/create-gift-checkout', {
+          method: 'POST', headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ email: email, tier: sel.value, source: 'account' })
+        })
+          .then(function(res){ return res.json().then(function(d){ return { s: res.status, d: d }; }, function(){ return { s: 0, d: {} }; }); })
+          .then(function(r){
+            if(r.d && r.d.url){ location.assign(r.d.url); return; }
+            go.disabled = false; go.textContent = 'Continue to payment';
+            msg.textContent = r.s === 503 ? 'Gifts aren’t available just yet.'
+              : (r.s === 409 ? 'You already have 5 unredeemed gift codes.' : 'Something went wrong, try again.');
+          })
+          .catch(function(){
+            go.disabled = false; go.textContent = 'Continue to payment';
+            msg.textContent = 'Something went wrong, try again.';
+          });
+      });
+      sh.foot.appendChild(cancel); sh.foot.appendChild(go);
+    });
+  }
+  var giftLink = $('gift-link');
+  if(giftLink) giftLink.addEventListener('click', function(ev){ ev.preventDefault(); openGiftModal(); });
+
+  /* ── View receipt en MODAL (08-jul): la foto del recibo sin salir de la página ── */
+  function openReceiptModal(p){
+    openModal(function(mo){
+      var bits = [];
+      if(p.master_no) bits.push('Plan ' + p.master_no);
+      if(p.sales_order_number) bits.push('Order #' + p.sales_order_number);
+      var sh = modalShell(mo, 'Sales receipt', bits.join(' · ') || null);
+      var img = document.createElement('img');
+      img.className = 'receipt-img'; img.alt = 'Sales receipt photo';
+      img.addEventListener('error', function(){
+        if(img.parentNode) img.parentNode.removeChild(img);
+        sh.body.appendChild(el('p','footnote','The receipt image couldn’t load; the secure link may have expired. Reload the page and try again.'));
+      });
+      img.src = p.receipt_url;   /* URL firmada (1h) de Supabase Storage; img-src la permite en la CSP */
+      sh.body.appendChild(img);
+      var close = el('button','btn btn-quiet','Close'); close.type = 'button';
+      close.addEventListener('click', closeModal);
+      var full = el('a','btn btn-accent','Open full size');
+      full.href = p.receipt_url; full.target = '_blank'; full.rel = 'noopener noreferrer';
+      sh.foot.appendChild(close); sh.foot.appendChild(full);
+    });
+  }
+
+  /* ── item 12: Edit details en MODAL (Doug lo quiere). Email NO se edita: es la identidad. ── */
+  function fieldRow(labelText, id, value){
+    var f = el('div','field');
+    var lb = el('label', null, labelText); lb.setAttribute('for', id);
+    var inp = document.createElement('input');
+    inp.type = 'text'; inp.id = id; inp.value = value || '';
+    f.appendChild(lb); f.appendChild(inp);
+    return f;
+  }
+  $('edit-acct').addEventListener('click', function(){
+    if(!session || !session.access_token) return;
+    openModal(function(mo){
+      var sh = modalShell(mo, 'Edit account details', 'Signed in as ' + ($('who-email').textContent || ''));
+      sh.body.appendChild(fieldRow('Full name', 'd-name-in', lastProfile.full_name));
+      sh.body.appendChild(fieldRow('Phone', 'd-phone-in', lastProfile.phone));
+      sh.body.appendChild(fieldRow('Mailing address', 'd-address-in', lastProfile.address));
+      sh.body.appendChild(el('p','footnote','Your billing address and card are managed in the Stripe portal. Email can’t be changed: it’s how we know it’s you.'));
+      var cancel = el('button','btn btn-quiet','Cancel'); cancel.type = 'button'; cancel.id = 'acct-cancel';
+      cancel.addEventListener('click', closeModal);
+      var save = el('button','btn btn-accent','Save changes'); save.type = 'button'; save.id = 'acct-save';
+      save.addEventListener('click', function(){
+        var vals = {
+          full_name: ($('d-name-in').value || '').trim(),
+          phone: ($('d-phone-in').value || '').trim(),
+          address: ($('d-address-in').value || '').trim()
+        };
+        if(!vals.full_name){ $('d-name-in').focus(); return; }   /* el nombre no se deja vacío */
+        save.disabled = true; save.textContent = 'Saving…';
+        fetch('/api/update-profile', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json', Authorization: 'Bearer ' + session.access_token },
+          body: JSON.stringify(vals)
+        })
+          .then(function(res){ return res.json().then(function(j){ return res.ok && j && j.ok; }, function(){ return false; }); })
+          .then(function(ok){
+            save.disabled = false; save.textContent = 'Save changes';
+            if(ok){
+              lastProfile = vals;
+              $('d-name').textContent = vals.full_name || '—';
+              $('d-phone').textContent = vals.phone || '—';
+              $('d-address').textContent = vals.address || '—';
+              $('who-name').textContent = vals.full_name;
+              closeModal();
+              toast('Details saved.', { success: true });
+            } else {
+              toast('Couldn’t save your details, try again.');
+            }
+          })
+          .catch(function(){
+            save.disabled = false; save.textContent = 'Save changes';
+            toast('Couldn’t save your details, try again.');
+          });
+      });
+      sh.foot.appendChild(cancel); sh.foot.appendChild(save);
+    });
+  });
+  $('chpw').addEventListener('click', function(){
+    afterSetPw = null; pendingSession = null;
+    setpwView('Choose a new password for your account.', true, 'Back to my account');
+  });
+
+  /* Retorno de la compra de gift (Stripe → /account.html?gift=sent|canceled): toast + URL
+     limpia ANTES del arranque normal (el ?t= u otros params se preservan). */
+  var giftBack = new URLSearchParams(location.search).get('gift');
+  if(giftBack === 'sent' || giftBack === 'canceled'){
+    var giftSp = new URLSearchParams(location.search); giftSp.delete('gift');
+    history.replaceState(null, '', location.pathname + (giftSp.toString() ? '?' + giftSp.toString() : '') + location.hash);
+    setTimeout(function(){
+      toast(giftBack === 'sent'
+        ? 'Gift purchased. The coupon code is on its way to your email.'
+        : 'Gift checkout canceled. No charge was made.', { success: giftBack === 'sent' });
+    }, 350);
+  }
+
+  /* ── arranque ──
+     1) Hash de GoTrue (invite/recovery/magiclink): capturar tokens y LIMPIAR la URL.
+     2) ?t= legacy (HMAC): la vía account-view queda intacta.
+     3) Sesión guardada → dashboard. 4) Nada → login. */
+  var hp = new URLSearchParams((location.hash || '').replace(/^#/, ''));
+  var legacyToken = new URLSearchParams(location.search).get('t');
+
+  if(hp.get('access_token')){
+    var pend = {
+      access_token: hp.get('access_token'),
+      refresh_token: hp.get('refresh_token') || null,
+      expires_at: Math.floor(Date.now()/1000) + (parseInt(hp.get('expires_in'), 10) || 3600)
+    };
+    var htype = hp.get('type');
+    history.replaceState(null, '', location.pathname + location.search);   /* token fuera de la URL y del historial */
+    if(htype === 'invite' || htype === 'recovery'){
+      pendingSession = pend;
+      setpwView('Welcome! Set a password to finish your account.', true);
+    } else {
+      enter(pend);
+    }
+  } else if(legacyToken){
+    /* BUG prod 06-jul: el email de cuenta trae el link de GoTrue (UN solo uso — los escáneres de
+       email suelen consumirlo antes que el cliente) Y el ?t= HMAC de respaldo. Si GoTrue llega con
+       #error, el ?t= debe GANAR igualmente: el cliente aterriza en su dashboard, no en el login. */
+    if(hp.get('error')) history.replaceState(null, '', location.pathname + location.search);
+    fetch('/api/account-view?t=' + encodeURIComponent(legacyToken))
+      .then(function(res){
+        if(res.status===401){ fail('This link isn’t valid or has expired.', 'Please use the most recent link from your FurnitureRx email, or contact support.'); return null; }
+        if(!res.ok) throw new Error('http '+res.status);
+        return res.json();
+      })
+      .then(function(d){ if(d && d.ok) render(d); else if(d) fail(); })
+      .catch(function(){ fail('Something went wrong.', 'Please try again in a moment.'); });
+  } else if(hp.get('error')){
+    history.replaceState(null, '', location.pathname + location.search);
+    showLogin('That link has expired — sign in, or get a one-time code by email.');
+  } else if(hp.get('welcome') !== null){
+    /* MAIL-1b (Adrian 09-jul): aterrizaje del botón "View my dashboard" del welcome email.
+       NUNCA auto-entrar con la sesión guardada (puede ser de OTRA persona en este browser):
+       login con el email del comprador prefilled, foco en la password y la guía de la
+       temporal. La sesión ajena queda intacta en storage; se reemplaza sola cuando el
+       nuevo dueño inicia sesión. */
+    var wEmail = hp.get('welcome') || '';
+    history.replaceState(null, '', location.pathname + location.search);
+    authView('login', 'Welcome! Sign in with the temporary password from your email.');
+    var wIn = $('li-email'); if(wIn && wEmail) wIn.value = wEmail;
+    var wPw = $('li-pw'); if(wPw) wPw.focus();
+  } else {
+    var stored = getSession();
+    if(stored) enter(stored);
+    else showLogin();
+  }
+})();
+</script>
+</body>
+</html>

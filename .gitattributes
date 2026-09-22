@@ -1,0 +1,18 @@
+# Line-endings: LF en el árbol para los fuentes de texto → mata los warnings "LF will be replaced by
+# CRLF" y estabiliza diffs cross-platform. El harness (tools/gate) IGUAL normaliza en memoria antes de
+# hashear, así que esto es defensa en profundidad (no el mecanismo único).
+*.html   text eol=lf
+*.css    text eol=lf
+*.mjs    text eol=lf
+*.js     text eol=lf
+*.json   text eol=lf
+*.toml   text eol=lf
+*.md     text eol=lf
+*.sha256 text eol=lf
+
+# Binarios — no tocar
+*.png    binary
+*.jpg    binary
+*.jpeg   binary
+*.webp   binary
+*.ico    binary

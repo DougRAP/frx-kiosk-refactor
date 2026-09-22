@@ -1,0 +1,3238 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Furniture-Rx Protection Plan — Terms & Conditions</title>
+
+
+
+<style>
+    /* ========================================
+       CSS CUSTOM PROPERTIES
+       ======================================== */
+    :root {
+      --primary-color: #2563eb;
+      --primary-dark: #1e40af;
+      --secondary-color: #34495e;
+      --text-color: #333;
+      --background-light: #f9f9f9;
+      --border-color: #ddd;
+      --success-color: #16a34a;
+      --warning-color: #f59e0b;
+      --error-color: #dc2626;
+      --focus-color: #1e40af;
+      --focus-outline: 3px solid var(--focus-color);
+      --focus-offset: 2px;
+    }
+
+    /* ========================================
+       BASE STYLES
+       ======================================== */
+    
+     body {
+       font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+       line-height: 1.4;
+       color: var(--text-color);
+       max-width: 900px;
+       margin: 0 auto;
+       padding: 20px;
+       background-color: var(--background-light);
+
+       padding-bottom: 80px; /* prevent smart bar from covering last lines */
+     }
+
+    main {
+      outline: none;
+    }
+
+    /* ========================================
+       TYPOGRAPHY - GENERAL
+       ======================================== */
+    h1 {
+      color: var(--primary-dark);
+      text-align: center;
+      margin-bottom: 10px;
+      font-size: 2.3em;
+      border-bottom: 3px solid var(--primary-color);
+      padding-bottom: 10px;
+    }
+
+    h2 {
+      color: var(--secondary-color);
+      margin-top: 30px;
+      margin-bottom: 15px;
+      font-size: 1.5em;
+      background-color: #ecf0f1;
+      padding: 10px;
+      border-left: 4px solid var(--primary-color);
+    }
+
+    h3 {
+      color: var(--secondary-color);
+      margin-top: 20px;
+      margin-bottom: 10px;
+      font-size: 1.2em;
+    }
+
+    h4 {
+      margin-top: 15px;
+      margin-bottom: 8px;
+      font-size: 1.1em;
+    }
+
+    p {
+      margin-bottom: 10px;
+      text-align: justify;
+    }
+
+    ul, ol {
+      margin-bottom: 15px;
+      padding-left: 30px;
+    }
+
+    li {
+      margin-bottom: 8px;
+    }
+
+
+
+/* ========================================
+   TIER SECTIONS - SPECIAL SPACING
+   ======================================== */
+/* Tier 1 & 2 specific spacing overrides - VERY TIGHT */
+    #plan-coverage h3,
+    #tier2-coverage h3 {
+      margin-top: 6px !important;
+      margin-bottom: 2px !important;  /* Very tight to h4 */
+      line-height: 1.2;
+    }
+
+    #plan-coverage h4,
+    #tier2-coverage h4 {
+      margin-top: 2px !important;      /* Almost touching h3 above */
+      margin-bottom: 0px !important;   /* No gap to list below */
+      line-height: 1.2;
+    }
+
+    /* Direct sibling selectors for tighter spacing */
+    #plan-coverage h3 + h4,
+    #tier2-coverage h3 + h4 {
+      margin-top: 0px !important;      /* h4 right against h3 */
+    }
+
+    #plan-coverage h4 + ul,
+    #tier2-coverage h4 + ul {
+      margin-top: 0px !important;      /* List right against h4 */
+      margin-bottom: 6px !important;
+      padding-left: 30px;
+    }
+
+    #plan-coverage ul,
+    #tier2-coverage ul {
+      margin-top: 2px !important;      /* Minimal top margin */
+      margin-bottom: 6px !important;
+      padding-left: 30px;
+    }
+
+    #plan-coverage li,
+    #tier2-coverage li {
+      margin-bottom: 2px !important;   /* Very tight list items */
+      line-height: 1.3;
+    }
+
+    #plan-coverage p,
+    #tier2-coverage p {
+      line-height: 1.35;
+      margin-bottom: 6px !important;
+    }
+
+
+    /* Tight spacing for additional terms sections */
+    .tier-additional-terms {
+      margin-top: 10px;
+      margin-bottom: 50px !important;  /* Add space after this section */
+    }
+
+    .tier-additional-terms h3 {
+      margin-top: 0 !important;
+      margin-bottom: 4px !important;
+      line-height: 1.2 !important;
+    }
+
+    .tier-additional-terms h4 {
+      margin-top: 6px !important;
+      margin-bottom: 2px !important;
+      line-height: 1.1 !important;
+      font-size: 1.05em !important;
+    }
+
+    .tier-additional-terms ul {
+      margin-top: 0 !important;
+      margin-bottom: 0 !important;
+      padding-left: 28px !important;
+    }
+
+    .tier-additional-terms li {
+      margin-bottom: 3px !important;
+      line-height: 1.25 !important;
+    }
+
+    /* Even tighter for the second h4 */
+    .tier-additional-terms h4 + ul + h4 {
+      margin-top: 10px !important;
+    }
+
+    /* ========================================
+       PLAN-TYPE COVERAGE — VISUAL CONTAINMENT
+       Each program block reads as one unit, separated by spacing + a hairline
+       (no background fills, per house style)
+       ======================================== */
+    .plan-type-coverage {
+      margin-top: 30px;
+      padding-top: 20px;
+      border-top: 2px solid var(--border-color);
+    }
+
+    /* First program follows the "Coverage by Plan Type" intro — no leading rule */
+    #coverage-furniture {
+      margin-top: 0;
+      padding-top: 0;
+      border-top: none;
+    }
+
+
+    /* ========================================
+       LINKS & INTERACTIVE ELEMENTS
+       ======================================== */
+    a {
+      color: var(--primary-dark);
+      text-decoration: underline;
+    }
+
+    a:hover {
+      text-decoration: none;
+    }
+
+    a:focus {
+      background-color: #fef3c7;
+    }
+
+    /* Focus styles for interactive elements */
+    a:focus,
+    button:focus,
+    input:focus,
+    select:focus,
+    textarea:focus,
+    tr:focus,
+    tr:focus-within,
+    .scroll-container:focus {
+      outline: var(--focus-outline);
+      outline-offset: var(--focus-offset);
+    }
+
+    /* ========================================
+       TABLES
+       ======================================== */
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 20px 0;
+      background-color: white;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    }
+
+    th {
+      background-color: var(--primary-color);
+      color: white;
+      padding: 12px;
+      text-align: left;
+      font-weight: bold;
+    }
+
+    td {
+      padding: 10px;
+      border: 1px solid var(--border-color);
+    }
+
+    /* Table row styling */
+    tr:nth-child(even) {
+      background-color: #f9f9f9;
+    }
+
+    tr:hover {
+      background-color: #dbeafe;
+      cursor: default;
+    }
+
+    tr:focus-within {
+      outline: 2px solid var(--primary-color);
+      outline-offset: -2px;
+      background-color: #bfdbfe;
+    }
+
+    /* Tier table special styling */
+    #plan-coverage thead .table-title,
+    #tier2-coverage thead .table-title {
+      background: #fafafa;
+      color: var(--secondary-color);
+      border-left: 4px solid var(--primary-color);
+      font-weight: 700;
+      padding: 10px;
+    }
+
+    #plan-coverage thead th,
+    #tier2-coverage thead th {
+      background-color: #eef2ff;
+      color: var(--primary-dark);
+    }
+
+    #plan-coverage .row-divider,
+    #tier2-coverage .row-divider {
+      background: #eaeefb;
+      color: var(--primary-dark);
+      text-transform: uppercase;
+      letter-spacing: 0.3px;
+      font-weight: 700;
+    }
+
+    /* ========================================
+       EXCLUSIONS TABLE — CONSOLIDATED STYLES
+       ======================================== */
+    /* (new, scoped rules for the exclusions table only) */
+    #exclusions table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 20px 0;
+      background-color: #fff;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    }
+
+    #exclusions thead th {
+      background-color: var(--primary-color);
+      color: #fff; 
+      font-weight: 700;
+      text-align: center;
+      padding: 12px 10px;
+      font-size: 1.05em;
+    }
+
+    /* Category codes (A, B, C...) column */
+    #exclusions table th:first-child,
+    #exclusions table td:first-child {
+      width: 6%;
+      text-align: center;
+      background-color: #f3f4f6;
+      font-weight: 700;
+      font-size: 1.05em;
+      color: var(--secondary-color);
+      vertical-align: middle;
+    }
+
+
+/* Apply to body cells only; let the header stay white */
+#exclusions tbody td:nth-child(2) {
+  text-align: left;
+  font-size: 1em;
+  line-height: 1.45;
+  color: var(--text-color);
+}
+
+
+
+    #exclusions tbody tr:nth-child(even) {
+      background-color: #fafafa;
+    }
+
+    #exclusions tbody tr:hover {
+      background-color: #dbeafe;
+    }
+
+    #exclusions td {
+      border: 1px solid var(--border-color);
+      padding: 10px 12px;
+    }
+
+    /* ========================================
+       SPECIAL COMPONENTS
+       ======================================== */
+    /* Coverage header */
+    .coverage-header {
+      background-color: transparent;
+      border: none;
+      border-bottom: 2px solid var(--primary-color);
+      text-align: center;
+      padding: 0 0 8px;
+      margin-bottom: 12px;
+    }
+
+    .coverage-header h3 {
+      color: var(--primary-dark);
+      margin: 0;
+      font-size: 1.3em;
+    }
+
+    .coverage-subtitle {
+      color: var(--primary-dark);
+      text-align: center;
+      font-weight: bold;
+      margin: 10px 0;
+    }
+
+    /* Scrollable container */
+    .scroll-container {
+      max-height: 50vh;
+      overflow-y: auto;
+      position: relative;
+      border: 1px solid var(--border-color);
+      border-radius: 4px;
+      padding: 15px;
+      margin: 15px 0;
+      background-color: white;
+    }
+
+    .scroll-container::after {
+      content: "";
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      width: 100%;
+      height: 40px;
+      background: linear-gradient(to top, rgba(255,255,255,1), rgba(255,255,255,0));
+      pointer-events: none;
+      z-index: 1;
+    }
+
+    /* Plan holder info box */
+    .plan-holder-info {
+      background-color: #fffbf0;
+      border: 2px solid #f59e0b;
+      padding: 20px;
+      margin-top: 30px;
+      border-radius: 8px;
+    }
+
+    .plan-holder-info:focus-within {
+      box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.5);
+    }
+
+    .info-row {
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 10px;
+      padding: 8px 0;
+      border-bottom: 1px dotted #ccc;
+    }
+
+    .info-row:last-child {
+      border-bottom: none;
+    }
+
+    .info-label {
+      font-weight: bold;
+      color: #2c3e50;
+      flex: 0 0 40%;
+    }
+
+    .info-value {
+      color: var(--error-color);
+      font-weight: bold;
+      flex: 0 0 55%;
+      text-align: right;
+    }
+
+      /* Plan Holder Input Fields */
+    .info-input {
+      flex: 0 0 55%;
+      text-align: right;
+      font-weight: bold;
+      font-size: inherit;
+      font-family: inherit;
+      color: var(--primary-dark);
+      background-color: #fff;
+      border: 1px solid var(--border-color);
+      border-radius: 4px;
+      padding: 6px 10px;
+    }
+
+    .info-input:focus {
+      outline: none;
+      border-color: var(--primary-color);
+      box-shadow: 0 0 0 2px rgba(37, 99, 235, 0.2);
+    }
+
+    .info-input[readonly] {
+      background-color: #f3f4f6;
+      color: var(--secondary-color);
+      cursor: not-allowed;
+    }
+
+    .info-input::placeholder {
+      color: var(--error-color);
+      font-style: italic;
+    }
+
+
+    /* ========================================
+       DOCUMENT HEADER (title block)
+       ======================================== */
+    .doc-header {
+      text-align: center;
+      margin-bottom: 35px;
+      padding-bottom: 30px;
+      border-bottom: 1px solid var(--border-color);
+    }
+
+    /* Drop the global H1 underline inside the header; the block hairline below replaces it */
+    .doc-header h1 {
+      border-bottom: none;
+      padding-bottom: 0;
+      margin-bottom: 10px;
+    }
+
+    .doc-tagline {
+      text-align: center;
+      font-size: 1.15em;
+      font-weight: 600;
+      color: var(--primary-dark);
+      margin: 0 0 4px;
+    }
+
+    .doc-subtagline {
+      text-align: center;
+      font-size: 0.9em;
+      font-weight: 400;
+      color: #666;
+      margin: 0 0 18px;
+    }
+
+    .doc-label {
+      text-align: center;
+      font-size: 0.8em;
+      font-weight: 700;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      color: var(--secondary-color);
+      margin: 0 0 8px;
+    }
+
+    /* Header padding provides the gap down to the hairline, so zero the button row's own margin */
+    .doc-header .top-actions {
+      margin-bottom: 0;
+    }
+
+
+    /* ========================================
+       TOP ACTION BUTTONS (Dashboard / Claim / Offers)
+       ======================================== */
+    .top-actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+      justify-content: center;
+      max-width: 760px;
+      margin: 0 auto 35px;
+    }
+
+    .top-action-btn {
+      flex: 1 1 200px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.5rem;
+      line-height: 1.2;
+      text-align: center;
+      text-decoration: none;
+      background-color: var(--primary-color);
+      color: #fff;
+      font-weight: 600;
+      font-size: 1rem;
+      padding: 14px 18px;
+      border: 1px solid var(--primary-dark);
+      border-radius: 8px;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+      transition: background-color 0.2s ease, transform 0.2s ease, box-shadow 0.2s ease;
+    }
+
+    .top-action-btn:hover,
+    .top-action-btn:focus {
+      background-color: var(--primary-dark);
+      color: #fff;
+      text-decoration: none;
+      transform: translateY(-2px);
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15);
+    }
+
+    /* Secondary / ghost buttons (Dashboard, Dealer Offers) */
+    .top-action-btn.secondary {
+      background-color: #fff;
+      color: var(--primary-dark);
+      border-color: #c7d2fe;
+      box-shadow: none;
+    }
+
+    .top-action-btn.secondary:hover,
+    .top-action-btn.secondary:focus {
+      background-color: #eef2ff;
+      border-color: var(--primary-color);
+      color: var(--primary-dark);
+    }
+
+    .top-action-btn .btn-icon {
+      display: inline-flex;
+      width: 18px;
+      height: 18px;
+    }
+
+    .top-action-btn .btn-icon svg {
+      width: 100%;
+      height: 100%;
+      display: block;
+    }
+
+    @media (max-width: 768px) {
+      .top-action-btn {
+        flex: 1 1 100%;   /* stack full-width on small screens */
+      }
+    }
+
+
+    /* ========================================
+       UTILITY CLASSES
+       ======================================== */
+    .definition-term {
+      font-weight: bold;
+    }
+
+    .exclusion-category {
+      text-align: center;
+      font-weight: bold;
+      vertical-align: middle;
+      background-color: #f3f4f6;
+    }
+
+    /* ========================================
+       ACCESSIBILITY
+       ======================================== */
+    /* Skip link for screen readers */
+    .skip-link {
+      position: absolute;
+      top: -40px;
+      left: 0;
+      background: var(--primary-dark);
+      color: white;
+      padding: 8px;
+      text-decoration: none;
+      z-index: 100;
+      border-radius: 0 0 4px 0;
+    }
+
+    .skip-link:focus {
+      top: 0;
+    }
+
+    /* Visually hidden but accessible */
+    .visually-hidden {
+      position: absolute;
+      width: 1px;
+      height: 1px;
+      padding: 0;
+      margin: -1px;
+      overflow: hidden;
+      clip: rect(0, 0, 0, 0);
+      white-space: nowrap;
+      border: 0;
+    }
+
+    /* ========================================
+       FOOTER
+       ======================================== */
+    footer {
+      margin-top: 50px;
+      text-align: center;
+      font-size: 0.9em;
+      color: #666;
+      border-top: 2px solid var(--border-color);
+      padding-top: 20px;
+    }
+
+
+    /* ========================================
+       PRINT STYLES - NEW VERSION
+       ======================================== */
+
+    @media print {
+      /* Basic print setup */
+
+body {
+  background-color: white;
+  max-width: 100%;
+  orphans: 3;
+  widows: 3;
+}
+
+/* Hide non-print elements */
+.skip-link,
+.top-actions,
+.smart-bar,
+.bottom-sheet,
+.help-sheet,
+#sidebar,
+#sidebarToggle,
+#sidebarCloseArrow {
+  display: none !important;
+}
+
+
+
+
+
+      /* ====== STEP 1: ENHANCED PAGE BREAK CONTROL ====== */
+      
+      /* Main heading - always start new page */
+      h1 {
+        page-break-before: always;
+        page-break-after: avoid;
+      }
+      
+      /* Except for the first h1 */
+      body > main > h1:first-child {
+        page-break-before: auto;
+      }
+      
+      /* Section headings - avoid breaking after */
+      h2 {
+        page-break-before: auto;
+        page-break-after: avoid;
+        page-break-inside: avoid;
+        orphans: 4;
+        widows: 4;
+      }
+      
+      h3, h4 {
+        page-break-after: avoid;
+        page-break-inside: avoid;
+        orphans: 3;
+        widows: 3;
+      }
+      
+      /* Keep paragraphs together when possible */
+      p {
+        orphans: 2;
+        widows: 2;
+        page-break-inside: avoid;
+      }
+      
+      /* Lists - keep together when possible */
+      ul, ol {
+        page-break-inside: auto;
+        orphans: 3;
+        widows: 3;
+      }
+      
+      /* Keep list items together */
+      li {
+        page-break-inside: avoid;
+        orphans: 2;
+        widows: 2;
+      }
+      
+      /* Tables - critical for readability */
+      table {
+        page-break-inside: auto;
+      }
+      
+      thead {
+        display: table-header-group; /* Repeat header on each page */
+      }
+      
+      tbody {
+        display: table-row-group;
+      }
+      
+      tr {
+        page-break-inside: avoid;
+      }
+      
+      td, th {
+        page-break-inside: avoid;
+      }
+      
+      /* Keep coverage headers with their content */
+      .coverage-header {
+        page-break-after: avoid;
+        page-break-inside: avoid;
+        border: none;
+        border-bottom: 1px solid #000;
+        background: transparent;
+      }
+      
+      .coverage-header + * {
+        page-break-before: avoid;
+      }
+      
+      .coverage-subtitle {
+        page-break-after: avoid;
+        page-break-inside: avoid;
+      }
+      
+      /* Keep tier additional terms sections together */
+      .tier-additional-terms {
+        page-break-inside: auto;
+        page-break-before: auto;
+      }
+      
+      .tier-additional-terms h3,
+      .tier-additional-terms h4 {
+        page-break-after: avoid;
+      }
+      
+      /* Definition lists - keep terms with definitions */
+      .definition-term {
+        page-break-after: avoid;
+      }
+      
+      /* Plan holder info - critical to keep together */
+      .plan-holder-info {
+        page-break-inside: avoid;
+        page-break-before: auto;
+      }
+      
+      .info-row {
+        page-break-inside: avoid;
+      }
+      
+
+      /* Input fields print as plain text */
+      .info-input {
+        border: none;
+        background: transparent;
+        padding: 0;
+        box-shadow: none;
+        -webkit-appearance: none;
+        appearance: none;
+      }
+
+      .info-input[readonly] {
+        background: transparent;
+      }
+
+
+      /* Sections - try to keep entire sections together */
+      section {
+        page-break-inside: auto;
+        orphans: 3;
+        widows: 3;
+      }
+      
+      
+      
+      /* Small sections should stay together */
+      section:has(p:only-child) {
+        page-break-inside: avoid;
+      }
+
+      /* Footer - keep together */
+      footer {
+        page-break-inside: avoid;
+        page-break-before: auto;
+      }
+      
+      /* Special handling for exclusions table */
+      #exclusions table {
+        page-break-before: auto;
+      }
+      
+      #exclusions table tbody tr {
+        page-break-inside: avoid;
+      }
+      
+      /* Coverage sections - try to keep together */
+      #plan-coverage > div,
+      #tier2-coverage > div {
+        page-break-inside: auto;
+      }
+      
+      /* Links and other elements */
+      a {
+        text-decoration: none;
+        color: inherit;
+      }
+      
+      .coverage-header h3,
+      .coverage-subtitle {
+        color: black;
+      }
+      
+      .scroll-container {
+        max-height: none;
+        overflow: visible;
+        border: none;
+        page-break-inside: auto;
+      }
+      
+      .scroll-container::after {
+        display: none;
+      }
+      
+      /* Ensure proper spacing for orphans/widows */
+      *:not(h1):not(h2):not(h3):not(h4) {
+        orphans: 2;
+        widows: 2;
+      }
+    }
+
+    /* ========================================
+       MOBILE RESPONSIVE
+       ======================================== */
+    @media (max-width: 768px) {
+      body {
+        padding: 10px;
+      }
+      
+      h1 {
+        font-size: 1.5em;
+      }
+      
+      h2 {
+        font-size: 1.2em;
+      }
+      
+      .info-row {
+        flex-direction: column;
+      }
+      
+      
+      .info-value,
+      .info-input {
+        text-align: left;
+        margin-top: 5px;
+        width: 100%;
+      }
+      
+      a, button {
+        min-height: 44px;
+        min-width: 44px;
+        display: inline-block;
+        line-height: 44px;
+      }
+      
+      .scroll-container {
+        max-height: 50vh;
+        padding: 10px;
+        margin: 10px 0;
+      }
+      
+      .scroll-container table {
+        font-size: 0.9em;
+      }
+      
+
+.scroll-container td, .scroll-container th {
+        padding: 8px;
+      }
+      
+      /* Improve readability of exclusion category cells */
+      .exclusion-category {
+        min-width: 30px;
+        font-size: 1.1em;
+      }
+
+      /* --- NEW: mobile tuning for exclusions table --- */
+      #exclusions table th,
+      #exclusions table td {
+        font-size: 0.95em;
+        padding: 8px 10px;
+      }
+
+      #exclusions table th:first-child,
+      #exclusions table td:first-child {
+        width: 10%;
+        font-size: 1em;
+      }
+      /* --- END NEW --- */
+      
+      /* Better touch targets for any future buttons */
+      button {
+        min-height: 48px;
+        padding: 12px 24px;
+        font-size: 1em;
+      }
+      
+      /* Ensure coverage headers don't get too cramped */
+      .coverage-header h3 {
+        font-size: 1.15em;
+        line-height: 1.3;
+      }
+    }  /* This closing brace ends the mobile media query */
+
+
+    /* ========================================
+       ACCESSIBILITY PREFERENCES
+       ======================================== */
+    @media (prefers-contrast: high) {
+      .coverage-header {
+        border-width: 3px;
+      }
+      
+      th {
+        border: 1px solid white;
+      }
+      
+      .scroll-container {
+        border-width: 2px;
+      }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      * {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+        scroll-behavior: auto !important;
+      }
+    }
+  
+
+    /* ========================================
+       LANDSCAPE ORIENTATION FOR SMALL DEVICES
+       ======================================== */
+    @media (max-width: 768px) and (orientation: landscape) {
+      /* Reduce vertical spacing in landscape */
+      body {
+        padding: 10px 20px;
+      }
+      
+      h1 {
+        margin-bottom: 5px;
+        padding-bottom: 5px;
+      }
+      
+      h2 {
+        margin-top: 20px;
+        margin-bottom: 10px;
+        padding: 8px;
+      }
+      
+      .coverage-header {
+        padding: 8px;
+        margin-bottom: 10px;
+      }
+      
+      .plan-holder-info {
+        padding: 15px;
+        margin-top: 20px;
+      }
+      
+      /* Reduce spacing between sections */
+      section {
+        margin-bottom: 15px;
+      }
+    } 
+
+
+      /* Sidebar base (mobile-first) */
+      #sidebar {
+        box-sizing: border-box;  /* include padding in width so it hides fully off-screen */
+        position: fixed;
+        top: 0;
+        left: -80%;              /* hidden off-screen on mobile */
+        width: 80%;              /* sidebar covers 80% of viewport on mobile */
+        max-width: 300px;        /* but never wider than 300px */
+        height: 100%;            /* fill full viewport height */
+        background-color: #111;
+        color: white;
+        transition: left 0.3s ease;
+        z-index: 1000;
+        padding: 1rem;
+        display: flex;           /* stack children vertically */
+        flex-direction: column;
+      }
+
+      #sidebar.open {
+        left: 0;
+      }
+
+
+
+      #sidebar ul {
+        list-style: none;
+        padding: 0;
+        margin: 0;
+
+        flex-grow: 1;                 /* KEEP: allows list to fill sidebar */
+        overflow-y: auto;
+
+        /* ↓ Reduce scroll area so footer never overlaps */
+        max-height: 75vh;
+
+        /* Optional safety buffer */
+        padding-bottom: 1rem;
+      }
+
+
+
+      #sidebar li {
+        margin: 0.75rem 0;
+      }
+
+      #sidebar a {
+        color: white;
+        text-decoration: none;
+        font-size: 1rem;
+      }
+
+      #sidebar a:hover {
+        text-decoration: underline;
+      }
+
+      /* Nested coverage program / tier links under "Coverage by Plan Type" */
+      #sidebar li.nav-program {
+        margin-left: 0.85rem;
+      }
+      #sidebar li.nav-program a {
+        font-size: 0.95rem;
+      }
+      #sidebar li.nav-tier {
+        margin-left: 1.7rem;
+      }
+      #sidebar li.nav-tier a {
+        font-size: 0.85rem;
+        opacity: 0.85;
+      }
+
+      /* Toggle button */
+      #sidebarToggle {
+        position: fixed;
+        top: 1rem;
+        left: 1rem;
+        font-size: 1.5rem;
+        background: #2563eb;
+        color: white;
+        border: none;
+        border-radius: 4px;
+        padding: 0.5rem 0.75rem;
+        cursor: pointer;
+        z-index: 1100;
+      }
+
+      #closeSidebar {
+        font-size: 1.5rem;
+        background: none;
+        border: none;
+        color: white;
+        cursor: pointer;
+        margin-bottom: 1rem;
+      }
+
+      /* Floating close arrow button */
+      #sidebarCloseArrow {
+        position: fixed;
+        top: 50%;
+        left: 80%;  /* aligns with mobile sidebar width */
+        transform: translateY(-50%);
+        font-size: 2rem;
+        background: #2563eb;
+        color: white;
+        border: none;
+        border-radius: 50%;
+        padding: 0.6rem 0.9rem;
+        cursor: pointer;
+        z-index: 1100;
+        display: none; /* hidden by default */
+      }
+
+      #sidebar.open + #sidebarCloseArrow {
+        display: block;
+      }
+
+      /* Desktop override (768px and up) */
+      @media (min-width: 768px) {
+        #sidebar {
+          width: 250px;    /* fixed width sidebar on desktop */
+          left: -250px;    /* hidden off-screen */
+        }
+        #sidebar.open {
+          left: 0;
+        }
+        #sidebarCloseArrow {
+          left: 250px;     /* aligns with desktop sidebar */
+        }
+      }
+
+
+      /* ========================================
+        SECTION HIGHLIGHT ON NAVIGATION
+        ======================================== */
+      h2:target,
+      .coverage-header h3:target {
+        outline: 4px solid red;            /* use outline instead of border to avoid conflicts */
+        outline-offset: 4px;               /* space between original border and red outline */
+        scroll-margin-top: 80px;           /* offset so heading isn't flush at top */
+        animation: fadeOutline 10s ease forwards;
+      }
+
+      @keyframes fadeOutline {
+        from { outline-color: red; }
+        to { outline-color: transparent; } /* disappears after 10s */
+      }
+
+
+      .highlight-flash {
+        outline: 3px solid orange;
+        animation: flashFade 2s ease forwards;
+      }
+
+      @keyframes flashFade {
+        0%   { outline-color: orange; }
+        80%  { outline-color: orange; }
+        100% { outline-color: transparent; }
+      }
+
+
+
+      /* ========================================
+        SMART BAR BASE STYLES
+        ======================================== */
+      .smart-bar {
+        position: fixed;
+        bottom: 0;
+        left: 0;
+        width: 100%;
+        height: var(--smart-bar-height, 60px);
+        background: rgba(255, 255, 255, 0.85);
+        backdrop-filter: blur(10px);
+        -webkit-backdrop-filter: blur(10px);
+        border-top: 1px solid rgba(255, 255, 255, 0.3);
+        box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.1);
+        z-index: 1500;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+
+      .smart-bar-container {
+        display: flex;
+        justify-content: space-around;
+        width: 100%;
+        max-width: 900px;
+        padding: 0 1rem;
+      }
+
+      .smart-bar-action {
+        flex: 1;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 0.5rem;
+        background: transparent;
+        border: none;
+        font-size: 1rem;
+        font-weight: 500;
+        color: var(--secondary-color);
+        cursor: pointer;
+        transition: color 0.3s ease;
+      }
+
+      .smart-bar-action:hover,
+      .smart-bar-action:focus {
+        color: var(--primary-color);
+      }
+
+      /* Highlight Top button after scrolling */
+      .smart-bar-action.active-top {
+        color: var(--primary-dark);
+        background-color: rgba(37, 99, 235, 0.08);
+        border-radius: 6px;
+        transition: background 0.3s ease, color 0.3s ease;
+      }
+
+      .smart-bar-action .bar-icon {
+        font-size: 1.2rem;
+      }
+
+
+      /* === OPTIONAL POLISH FOR PRINT BUTTON === */
+      .smart-bar-action[data-action="print"],
+      .smart-bar-action[onclick*="printDocument"] {
+        transition: background 0.3s ease, color 0.3s ease;
+      }
+
+      .smart-bar-action[data-action="print"]:hover,
+      .smart-bar-action[onclick*="printDocument"]:hover {
+        color: var(--primary-dark);
+        background-color: rgba(37, 99, 235, 0.08);
+        border-radius: 6px;
+      }
+
+
+      /* ========================================
+        BOTTOM SHEET STYLES
+        ======================================== */
+
+      .bottom-sheet {
+        position: fixed;
+        bottom: 0;
+        left: 0;
+        width: 100%;
+        max-height: 85vh;
+        height: 0;
+        background: #fff;
+        border-top-left-radius: 1rem;
+        border-top-right-radius: 1rem;
+        box-shadow: 0 -4px 20px rgba(0,0,0,0.2);
+        overflow: hidden;
+        z-index: 1600;
+
+        /* Morph start state */
+        transform: translateY(100%) scale(0.95);
+        opacity: 0;
+
+        /* Spring-like easing for open/close */
+        transition: transform 0.45s cubic-bezier(0.22, 1, 0.36, 1),
+                    opacity 0.3s ease,
+                    height 0.3s ease;
+      }
+
+      .bottom-sheet[data-state="open"] {
+        transform: translateY(0) scale(1);
+        opacity: 1;
+        height: 60vh;
+      }
+
+      .bottom-sheet[data-state="peek"] {
+        transform: translateY(0) scale(0.98);
+        opacity: 1;
+        height: 25vh;
+      }
+
+
+      .sheet-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 0.75rem 1rem;
+        border-bottom: 1px solid #ddd;
+        background: rgba(255, 255, 255, 0.9);
+        backdrop-filter: blur(8px);
+      }
+
+      .sheet-header {
+        position: relative; /* allow absolute positioning of the close button */
+      }
+
+      .chat-close-btn {
+        position: absolute;
+        top: 0.5rem;
+        right: 1rem;
+        background-color: transparent;
+        border: none;
+        color: var(--secondary-color);
+        font-size: 0.95rem;
+        font-weight: 600;
+        cursor: pointer;
+        line-height: 1.5;
+        padding: 0.25rem 0.5rem;
+        transition: color 0.2s ease;
+      }
+
+      .chat-close-btn:hover,
+      .chat-close-btn:focus {
+        color: var(--primary-dark);
+        text-decoration: underline;
+        outline: var(--focus-outline);
+        outline-offset: var(--focus-offset);
+      }
+
+
+
+      .sheet-title {
+        font-size: 1.1rem;
+        font-weight: 600;
+        color: var(--secondary-color);
+        margin: 0;
+      }
+
+      .sheet-close,
+      .sheet-minimize {
+        background: none;
+        border: none;
+        font-size: 1.3rem;
+        cursor: pointer;
+        color: var(--secondary-color);
+        margin-left: 0.5rem;
+      }
+
+      .sheet-close:hover,
+      .sheet-minimize:hover {
+        color: var(--primary-color);
+      }
+
+      .sheet-content {
+        display: flex;
+        flex-direction: column;
+        height: calc(100% - 50px);
+        padding: 1rem;
+        overflow-y: hidden; /* prevent double scroll */
+      }
+
+
+      /* Chat message styles + animations */
+      .chat-messages {
+        flex: 1;
+        overflow-y: auto;
+        margin-bottom: 0.5rem; /* avoid clipping above input row */
+      }
+
+      .chat-message {
+        margin-bottom: 0.75rem;
+        line-height: 1.4;
+
+        /* Animation */
+        opacity: 0;
+        transform: translateY(10px);
+        animation: fadeInUp 0.4s ease forwards;
+      }
+
+      .bot-message {
+        background: #f1f5f9;
+        padding: 0.75rem 1rem;
+        border-radius: 8px;
+        max-width: 80%;
+        color: var(--secondary-color);
+        font-size: 0.95rem;
+      }
+
+      @keyframes fadeInUp {
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
+      }
+
+
+      /* Typing indicator (3 bouncing dots) */
+      .typing-indicator {
+        display: inline-flex;
+        gap: 4px;
+        align-items: center;
+        margin: 0.5rem 0;
+      }
+
+      .typing-indicator span {
+        width: 6px;
+        height: 6px;
+        background: var(--secondary-color);
+        border-radius: 50%;
+        display: inline-block;
+        animation: bounce 1s infinite;
+      }
+
+      .typing-indicator span:nth-child(2) {
+        animation-delay: 0.2s;
+      }
+
+      .typing-indicator span:nth-child(3) {
+        animation-delay: 0.4s;
+      }
+
+      @keyframes bounce {
+        0%, 80%, 100% { transform: scale(0.6); opacity: 0.5; }
+        40% { transform: scale(1); opacity: 1; }
+      }
+
+
+
+      /* Quick reply chips */
+      .quick-replies {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.5rem;
+        margin-bottom: 1rem;
+      }
+
+      .quick-reply-chip {
+        background: #eef2ff;
+        border: 1px solid #c7d2fe;
+        border-radius: 9999px;
+        padding: 0.4rem 0.9rem;
+        font-size: 0.9rem;
+        color: var(--primary-dark);
+        cursor: pointer;
+        transition: background 0.2s ease, transform 0.2s ease;
+      }
+
+      .quick-reply-chip:hover {
+        background: #dbeafe;
+        transform: translateY(-2px);
+      }
+
+      .chat-input-area {
+        border-top: 1px solid #ddd;
+        padding: 0.5rem;
+        background: #fff;
+        position: sticky;
+        bottom: 0;
+        z-index: 2;
+      }
+
+      .chat-form {
+        display: flex;
+        gap: 0.5rem;
+      }
+
+      .chat-input {
+        flex: 1;
+        padding: 0.6rem;
+        border: 1px solid #ccc;
+        border-radius: 6px;
+        font-size: 0.95rem;
+      }
+
+      .chat-send {
+        padding: 0.6rem 1.2rem;
+        background: var(--primary-color);
+        color: #fff;
+        border: none;
+        border-radius: 6px;
+        cursor: pointer;
+        font-size: 0.95rem;
+        transition: background 0.2s ease;
+      }
+
+      .chat-send:hover {
+        background: var(--primary-dark);
+      }
+
+      .chat-notice {
+        margin-top: 0.5rem;
+        font-size: 0.85rem;
+        color: var(--secondary-color);
+        text-align: center;
+      }
+
+
+      /* ========================================
+        CHAT MODAL — CLOSE BUTTON IMPROVEMENTS
+        ======================================== */
+
+      .chat-footer-actions {
+        display: flex;
+        justify-content: center;
+        padding: 0.75rem 0 1rem;
+        border-top: 1px solid #eee;
+        background: #fff;
+      }
+
+      .chat-close-btn {
+        background-color: var(--primary-color);
+        color: #fff;
+        border: none;
+        border-radius: 6px;
+        font-size: 1rem;
+        font-weight: 500;
+        padding: 0.6rem 1.2rem;
+        cursor: pointer;
+        transition: background 0.2s ease;
+      }
+
+      .chat-close-btn:hover,
+      .chat-close-btn:focus {
+        background-color: var(--primary-dark);
+        outline: var(--focus-outline);
+        outline-offset: var(--focus-offset);
+      }
+
+
+      /* ========================================
+        RESPONSIVE & SAFE-AREA POLISH
+        ======================================== */
+
+
+      /* Safe area padding for iOS devices */
+      .smart-bar,
+      .bottom-sheet,
+      .help-sheet {
+        padding-bottom: env(safe-area-inset-bottom, 0);
+      }
+
+
+
+      /* Landscape adjustments for bottom sheet */
+      @media (max-width: 768px) and (orientation: landscape) {
+        .bottom-sheet[data-state="open"] {
+          height: 50vh; /* reduce height in landscape */
+        }
+      }
+
+      /* Max width on large screens */
+      @media (min-width: 1024px) {
+        .smart-bar-container {
+          max-width: 1000px;
+        }
+        .bottom-sheet {
+          max-width: 1000px;
+          margin: 0 auto;
+          left: 0;
+          right: 0;
+        }
+      }
+
+
+
+      /* ========================================
+        HELP SHEET STYLES
+        ======================================== */
+      .help-sheet {
+        position: fixed;
+        bottom: 0;
+        left: 0;
+        width: 100%;
+        background: #fff;
+        border-top-left-radius: 1rem;
+        border-top-right-radius: 1rem;
+        box-shadow: 0 -4px 20px rgba(0,0,0,0.2);
+        z-index: 1600;
+        transform: translateY(100%);
+        transition: transform 0.3s ease;
+      }
+
+      .help-sheet[data-state="open"] {
+        transform: translateY(0);
+      }
+
+      .help-sheet .sheet-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 0.75rem 1rem;
+        border-bottom: 1px solid #ddd;
+        background: rgba(255, 255, 255, 0.9);
+        backdrop-filter: blur(8px);
+      }
+
+      .help-sheet .sheet-title {
+        font-size: 1.1rem;
+        font-weight: 600;
+        color: var(--secondary-color);
+        margin: 0;
+      }
+
+      .help-sheet .sheet-content {
+        padding: 1rem;
+        font-size: 0.95rem;
+        color: var(--secondary-color);
+      }
+
+      .help-sheet .sheet-content p {
+        margin: 0.5rem 0;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+      }
+
+      .help-sheet .sheet-content a {
+        color: var(--primary-dark);
+        text-decoration: underline;
+      }
+
+      .help-sheet .sheet-content a:hover {
+        text-decoration: none;
+      }
+
+
+
+      /* ========================================
+        ENHANCED ANIMATIONS & TRANSITIONS
+        ======================================== */
+      .smart-bar-action,
+      .quick-reply-chip,
+      .chat-send,
+      .bottom-sheet,
+      .help-sheet {
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      }
+
+      /* Desktop refinement for help sheet */
+      @media (min-width: 768px) {
+        .help-sheet {
+          max-width: 400px;
+          right: 1rem;
+          left: auto;
+        }
+      }
+
+</style>
+
+
+
+</head>
+<body>
+
+
+
+ <!-- Sidebar toggle button -->
+ <button id="sidebarToggle" aria-label="Open Menu">☰</button>
+
+ <!-- Slide-out sidebar -->
+ <nav id="sidebar">
+   <button id="closeSidebar" aria-label="Close Menu">×</button>
+   <ul id="sidebarLinks">
+     <!-- Links will be injected dynamically -->
+   </ul>
+ </nav>
+
+ 
+ <button id="sidebarCloseArrow" aria-label="Close Menu">←</button>
+
+ <!-- Skip to main content link for keyboard users -->
+ <a href="#main-content" class="skip-link">Skip to main content</a>
+  
+ 
+  
+  <main id="main-content" tabindex="-1">
+<header class="doc-header">
+  <p class="doc-label">Terms &amp; Conditions</p>
+  <h1>Furniture-Rx Protection Plan</h1>
+  <p class="doc-tagline">Up to $5,000 of Coverage — 30-Day Renewable Subscription (Up to 36 Months)</p>
+  <p class="doc-subtagline">(60 Days to Report Damage)</p>
+
+  <div class="top-actions" role="group" aria-label="Quick actions">
+    <a class="top-action-btn secondary" href="https://furniturerx.net/dashboard"
+       target="_blank" rel="noopener" aria-label="Log in to your Furniture-Rx dashboard">
+      <span class="btn-icon" aria-hidden="true"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"/><polyline points="10 17 15 12 10 7"/><line x1="15" y1="12" x2="3" y2="12"/></svg></span>
+      Login to Dashboard
+    </a>
+    <a class="top-action-btn" href="https://5starservice.net/"
+       target="_blank" rel="noopener" aria-label="File a claim online">
+      <span class="btn-icon" aria-hidden="true"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 3H6a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V9z"/><path d="M14 3v6h6"/><line x1="8" y1="13" x2="16" y2="13"/><line x1="8" y1="17" x2="16" y2="17"/></svg></span>
+      File a Claim
+    </a>
+    <!-- TODO: replace dummy dealer-offers URL with the live link when available -->
+    <a class="top-action-btn secondary" href="https://example.com/dealer-offers"
+       target="_blank" rel="noopener" aria-label="Check for dealer offers (placeholder link)">
+      <span class="btn-icon" aria-hidden="true"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z"/><line x1="7" y1="7" x2="7.01" y2="7"/></svg></span>
+      Check for Dealer Offers
+    </a>
+  </div>
+</header>
+
+<h2 id="introduction" data-index="Introduction">INTRODUCTION</h2>
+   <section aria-labelledby="introduction">
+      <p>This document details what is and is not covered under the Furniture-Rx Protection Plan (the &ldquo;Plan&rdquo;). It applies to all Furniture-Rx protection plan types &mdash; <strong>Furniture</strong>, <strong>Outdoor Furniture</strong>, <strong>Area Rug</strong>, and <strong>Adjustable Bed Base</strong>. The general terms in this document apply to every plan; the coverage specific to each plan type is described in the &ldquo;Coverage by Plan Type&rdquo; section below. Please read these Terms and Conditions carefully before purchasing. If you have any questions regarding coverage, service, or claims, you may call us at 1-833-395-7824 or email Us at claims@raptns.com. We appreciate having you as a customer and thank you for allowing us to serve you.</p>
+   </section>
+
+<h2 id="monthly-plan-terms" data-index="Monthly Plan Terms">MONTHLY PLAN TERMS</h2>
+    <section aria-labelledby="monthly-plan-terms">
+      <p>This Plan is a monthly subscription. The following terms govern the Term, payment, renewal, and Coverage limit of this Plan and apply together with all other Terms &amp; Conditions described in this Plan:</p>
+      <ul aria-label="Monthly subscription plan terms">
+        <li><strong>Coverage Start (30-Day Waiting Period).</strong> Coverage under this Plan starts thirty (30) days from the date of Our receipt of Your subscription payment. Any Damage occurring before Coverage starts is not covered.</li>
+        <li><strong>Each Payment Buys 30 Days.</strong> Each subscription payment buys thirty (30) days of Coverage. To keep Coverage active, You must make each subscription payment when due.</li>
+        <li><strong>30-Day Renewable Term, 36-Month Maximum.</strong> This Plan renews in recurring thirty (30) day periods for a maximum of thirty-six (36) months. After thirty-six (36) months, this Plan and its Coverage end and may not be renewed.</li>
+        <li><strong>Lapse and Non-Renewal.</strong> If the subscription lapses for more than ninety (90) days, You may not renew the subscription on the Item(s) covered under this Plan.</li>
+        <li><strong>Covered Retail Limit.</strong> This Plan covers up to five thousand dollars ($5,000.00) of retail of qualified Item(s) listed in this Plan.</li>
+        <li><strong>No Coverage During Lapse or Non-Payment.</strong> If Coverage lapses or You have not paid Your subscription payment, any Damage or Claim occurring or reported during or after such lapse or non-payment is not covered.</li>
+      </ul>
+    </section>
+
+
+<h2 id="customer-obligations" data-index="Your Obligations">CUSTOMER OBLIGATIONS</h2>
+    <section aria-labelledby="customer-obligations">
+      <p>This Plan provides Coverage for Qualifying Furniture, subject to these Terms & Conditions. As a Plan holder, it is crucial that You thoroughly read and understand these Terms & Conditions, including the Coverage, Exclusions, and Service sections BEFORE YOU PURCHASE THIS PLAN. This Plan incorporates specific limitations on Coverage that are designed to maintain its affordability. Some of Your responsibilities under this Plan include:</p>
+      <ul aria-label="Customer obligations list">
+        <li><strong>Reading and Understanding Manuals</strong>. Ensure You read all owner's manuals and accompanying information relevant to the Qualifying Items. This is crucial for understanding the full scope of Your coverage and the limitations that apply.</li>
+        <li><strong>Following Use and Care Instructions</strong>. Adhere strictly to all manufacturer and retailer instructions or guidelines regarding the use and care of the Qualifying Items. Proper handling according to those instructions is essential to maintain Coverage under this Plan.</li>
+        <li><strong>Retaining Important Documents</strong>. Keep a copy of this Plan, its Confirmation Number, and Your Sales Receipt, which are necessary and must be produced upon Our request to facilitate service under this Plan.</li>
+        <li><strong>No Coverage Without a Confirmation Number.</strong> You shall have NO coverage under this Plan unless and until We issue You a unique Plan number.</li>
+        <li><strong>Cooperating with the Claims Process</strong>. Your cooperation with Our requests is vital for a smooth and efficient resolution to any claim(s) or issue(s) that may arise under this Plan. Failure to fully cooperate with Us may be a basis for a claim being denied.</li>
+      </ul>
+    </section>
+    
+
+<h2 id="definitions" data-index="Definitions">DEFINITIONS</h2>
+    <section aria-labelledby="definitions">
+      <ul aria-label="Plan definitions">
+        <li><span class="definition-term">Plan: Means</span> this Protection Plan.</li>
+        <li><span class="definition-term">Reseller:</span> Means the retailer or interior designer who sold You this Plan and the Item(s). Only Resellers who, at the time of sale, held a valid Reseller Account ID (RAID) previously issued by Us are authorized to sell this Plan. To verify a RAID, You may call [1-800-637-8316] toll-free. Plans sold or distributed by resellers who did not hold a valid RAID prior to the time of sale or distribution are not valid and provide no coverage. In such cases, Your sole recourse is against the individual(s) or entity that sold or distributed the Plan to You.</li>
+        <li><span class="definition-term">Item(s):</span> Refers to the Item(s) You purchased from a Reseller, and include only the following: Upholstered furniture covered in fabric, microfiber, leather, or vinyl (grass, woven, and wicker items used indoors only); solid surface wood or laminate furniture—including bedroom, dining room, home office, entertainment, dinette, and accessory case goods; machine-made rugs (excluding one-of-a-kind rugs); and adjustable beds (excluding mattresses). All Items must be designed for indoor use and are subject to the coverage limits of this Plan.</li>
+        <li><span class="definition-term">We, Our, or Us: Means</span> Risk Assurance Partners, LLC.</li>
+        <li><span class="definition-term">Obligor: Means</span> Risk Assurance Partners, LLC, PO Box 912, Boynton Beach, FL 33425, 1-800-637-8316.</li>
+        <li><span class="definition-term">Administrator:</span> Means Risk Assurance Partners, LLC, PO Box 912, Boynton Beach, FL 33425, 1-800-637-8316.</li>
+        <li><span class="definition-term">You or Your: Means</span> the person(s) named on the last page of this Plan.</li>
+        <li><span class="definition-term">Term:</span> Means the period during which this Plan's Coverage is active. This Plan is a monthly subscription consisting of recurring thirty (30) day Coverage periods, renewable for a maximum of thirty-six (36) months, and is inclusive of any applicable reseller, retailer, manufacturer, or distributor warranties. Please see the Monthly Plan Terms section and the last page of this Plan for the Effective and End Date of this Plan's Term.</li>
+        <li><span class="definition-term">Effective Date:</span> Means the date listed on the last page of this Plan as the date this Plan's Coverage becomes effective. As described in the Monthly Plan Terms section, Coverage becomes effective thirty (30) days after We receive Your first subscription payment.</li>
+        <li><span class="definition-term">Coverage:</span> Means Damage(s) and Defect(s) covered by this Plan as described in the Coverage section of this Plan.</li>
+        <li><span class="definition-term">Exclusions:</span> Means any failure, loss, damage, or injury to Item(s) that is NOT covered by this Plan (see the Exclusions section).</li>
+        <li><span class="definition-term">Damage:</span> Means an unanticipated event that directly or indirectly causes damage to or failure of an Item (not all Damage is covered, exclusions apply).</li>
+        <li><span class="definition-term">Defect:</span> Means the failure to function as designed because of flaws in material or workmanship, during normal use of Item(s).</li>
+        <li><span class="definition-term">Co-Pay:</span> Means, if this Plan has Tier 2 coverage, a fee that You must pay to Us to activate and receive benefits under Tier 2 Coverage of this Plan.</li>
+        <li><span class="definition-term">Pet:</span> Means dogs, cats, birds, reptiles, arachnids, or other animals kept by You; provided that "Pet" does not include an animal owned or raised on a farm to generate a profit through the operation of a business or used as a food source.</li>
+        <li><span class="definition-term">Plan Confirmation Number:</span> Means a unique Plan Number issued by Us to activate Your coverage under this Plan.</li>
+        <li><span class="definition-term">Purchase Amount or Retail:</span> Means the amount that You paid for the Item(s) or this Plan, excluding taxes, fees, and delivery charges.</li>
+        <li><span class="definition-term">Sales Receipt:</span> Means the original sales receipt issued by the Reseller describing Your purchase of the Item(s) and this Plan.</li>
+        <li><span class="definition-term">Wear & Tear, General Soiling & Odor:</span> Means a gradual buildup of dirt, dust, body oils, scratches, chips, dents, stains, or similar damage that cannot be attributed to a single incident. For the avoidance of doubt, "Odor" means any smell emanating from covered Item(s).</li>
+        <li><span class="definition-term">Claim:</span> Means one (1) claim filed with Us for one (1) item, in the manner described in this Plan, for damage to one (1) Item, where You are seeking service, repair, replacement, or other benefits under this Plan.</li>
+      </ul>
+    </section>
+    
+
+
+<h2 id="plan-confirmation" data-index="Confirmation Number">A PLAN CONFIRMATION NUMBER IS REQUIRED TO ACTIVATE COVERAGE</h2>
+    <section aria-labelledby="plan-confirmation">
+      <p>This Plan becomes active only upon Our issuance of a unique Plan Confirmation to You, and You acquire no benefits under
+         this Plan until We, at Our sole and absolute discretion, issue a Plan Confirmation Number to You to activate coverage under
+          this Plan. Your sole and exclusive notice that We have issued a Plan Confirmation Number to You, and this Plan's coverage
+           is activated, is Your receipt of a Plan Confirmation Number issued directly to You by Us. This Plan does not provide
+            retroactive coverage prior to its Effective Date. We have not authorized any third parties or Retailers to issue Plan
+             Confirmation Numbers to You on Our behalf. Your purchase of this Plan from a Retailer or third party, even if documented
+              on sales receipts or by other means, shall not operate to bind Us to provide You coverage or benefits under this Plan,
+               and Your sole recourse if no coverage is bound shall be to the party that sold You this Plan.</p>
+    </section>
+    
+   
+<h2 id="claim-limits" data-index="Claim Limits">CLAIM LIMITS PER ITEM</h2>
+    <section aria-labelledby="claim-limits">
+      <p>To keep this Plan affordable, You are limited to filing no more than three (3) Claims per Item covered under this Plan.
+         If more than three (3) Claims are filed for any one Item, We may, at Our sole discretion, either cancel coverage for that
+          specific Item or cancel this Plan in its entirety. If coverage is canceled for a specific Item while coverage remains in
+           effect for other Items, You will not be entitled to any refund of amounts paid for this Plan. If We cancel all coverage
+            under this Plan, We will do so in accordance with the terms outlined in the Cancellation section of this Plan.</p>
+    </section>
+    
+
+
+<h2 id="coverage-by-plan-type" data-index="Coverage by Plan Type">COVERAGE BY PLAN TYPE</h2>
+   <section aria-labelledby="coverage-by-plan-type">
+      <p>Coverage depends on the plan type You purchased. Find the section below that matches Your plan. The Items Covered, covered damages, and additional coverage terms in that section apply to Your plan, together with all of the general terms, definitions, exclusions, and service provisions described elsewhere in this document.</p>
+   </section>
+
+<section class="plan-type-coverage" id="coverage-furniture" aria-label="Furniture coverage">
+  <h2 data-index="Furniture Plan" id="plan-furniture">FURNITURE PLAN</h2>
+<h3>Items Covered</h3>
+    <section aria-labelledby="items-covered">
+      <p>Item(s) covered by this Plan are limited to Item(s) that You purchased from a Reseller, and includes only the following:
+         Upholstered furniture covered in fabric, microfiber, leather, or vinyl (excluding grass, woven, and wicker items);
+         solid surface wood or laminate furniture—including bedroom, dining room, home office, entertainment, dinette,
+          and accessory case goods. All Items must be designed for indoor use and are subject to the coverage
+           limits of this Plan.</p>
+    </section>
+
+
+
+
+<section id="plan-coverage-furniture" aria-labelledby="tier1-coverage-furniture">
+
+  <div class="coverage-header">
+    <h3 id="tier1-coverage-furniture" data-index="Furniture: Coverage">
+      Tier 1: Full Coverage for These Common Damages
+    </h3>
+  </div>
+
+  <p class="coverage-subtitle">
+    No Co-Pay, 100% Replacement Credit, 60 Days to Report Damage
+  </p>
+
+  <p class="coverage-subtitle">
+    Coverage for Upholstery, Casegoods, and Accessory Furniture
+  </p>
+
+
+<div>
+  <p>Tier 1 provides coverage for the common household damages described in the table below that are caused by a single, isolated
+     accidental event.  Coverage excludes any damage resulting from leasing, renting, short-term rental, or showcasing of the
+      property or Item.  The terms below this table, together with the Exclusions described in the Exclusions section of this Plan,
+       also apply.</p>
+ 
+ 
+  <table role="table" aria-label="Tier 1 Coverage Details">
+    <tbody>
+
+      <tr>
+        <td><strong>Most Stains</strong>:
+        <em>Applies to Fabric, Microfiber, Vinyl, Leather, Top Grain Leather, and Wood/Solid Surface. Covers accidental single-incident stains from common household food, beverage, and ink sources. Excludes caustic, bleach, dye-type substances, and stains from continuous exposure.</em></td>
+      </tr>
+
+      <tr>
+        <td><strong>Dye Transfer</strong>:
+        <em>Covers isolated dye transfer from clothing, newspaper, or similar items. Excludes large-area discoloration from repeated exposure.</em></td>
+      </tr>
+
+      <tr>
+        <td><strong>Burn or Heat Marks</strong>:
+        <em>Covers accidental burn or heat marks from a single incident.</em></td>
+      </tr>
+
+      <tr>
+        <td><strong>Rips, Tears, or Punctures</strong>:
+        <em>Covers accidental single-incident rips, tears, and punctures. Excludes seam separation and zippers.</em></td>
+      </tr>
+
+      <tr>
+        <td><strong>Cracking and Peeling of Top Grain Leather</strong>:
+        <em>Covers cracking and peeling of Top Grain Leather only. Does not apply to non-top-grain upholstery, bi-cast, or bonded leather.</em></td>
+      </tr>
+
+      <tr>
+        <td><strong>Breakage of Frames, Springs & Structural Components</strong>:
+        <em>Covers breakage of frames, springs, and structural components on covered upholstered and wood/solid surface Items. Chair joint and chair rung breakage and loosening are EXCLUDED.</em></td>
+      </tr>
+
+      <tr>
+        <td><strong>Failure of Integral Electrical Components</strong>:
+        <em>Covers failure of factory-installed motors, switches, outlets, and control devices on upholstered and wood/solid surface Items. Excludes damage caused by electrical surges, Acts of God, batteries, bulbs, and lost remote controls.</em></td>
+      </tr>
+
+      <tr>
+        <td><strong>Scratches, Dents, Chips, or Gouges Penetrating the Finish</strong>:
+        <em>Applies to Wood and Solid Surface furniture. Damage must penetrate the finish.</em></td>
+      </tr>
+
+      <tr>
+        <td><strong>Checking, Cracking, Bubbling, Peeling, or Lifting of Veneers</strong>:
+        <em>Applies to Wood and Solid Surface furniture finishes.</em></td>
+      </tr>
+
+      <tr>
+        <td><strong>Warping</strong>:
+        <em>Applies to Wood and Solid Surface furniture.</em></td>
+      </tr>
+
+      <tr>
+        <td><strong>Mirror Chipping, Breakage, or Loss of Silvering</strong>:
+        <em>Applies to integral mirrors on covered furniture. Excludes hand-held or decorative mirrors not attached to covered Items.</em></td>
+      </tr>
+
+      
+    </tbody>
+  </table>
+</div>
+ 
+<div class="tier-additional-terms">
+  <h3>Tier 1: Additional Terms & Common Misunderstandings</h3>
+  <h4>Replacement Terms & Conditions:</h4>
+  <ul>
+    <li><strong>Matching items are not covered</strong>, even if part of a set. Sectionals and matching headboards/footboards are
+       considered a single Item when replaced.</li>
+    <li><strong>Replacement credits</strong> are based on the retail price paid (excluding taxes/fees) and must be used
+       within <strong>six (6) months</strong> of issuance or they will be void.</li>
+    <li>Credits are <strong>non-transferable</strong>, <strong>non-assignable</strong>, and <strong>not redeemable for
+       cash</strong>.</li>
+    <li>Credits may only be redeemed through the <strong>original Reseller</strong>. If Your replacement Item exceeds the credit 
+      value, You are responsible for the difference, including applicable taxes and fees.</li>
+  </ul>
+  
+  <h4>Important Clarification -- Not Considered Stains, Rips, Tears or Burns:</h4>
+  <ul>
+    <li>Cracking, peeling, or delamination of upholstery, including fabric,leather, vinyl, or coated fabrics.</li>
+    <li>Surface wear, including fading, discoloration from light exposure, or material aging.</li>
+    <li>Damage from misuse, neglect, lack of care, or manufacturer defects.</li>
+  </ul>
+
+  </div>
+    </section>
+
+
+</section>
+
+<section class="plan-type-coverage" id="coverage-outdoor" aria-label="Outdoor Furniture coverage">
+  <h2 data-index="Outdoor Furniture Plan" id="plan-outdoor">OUTDOOR FURNITURE PLAN</h2>
+<h3>Items Covered</h3>
+    <section aria-labelledby="items-covered">
+      <p>Item(s) covered by this Plan are limited to outdoor furniture Item(s) that You purchased from a Reseller and that are
+         <strong>designed and manufactured for outdoor use</strong>. Covered Items include outdoor seating, sofas, sectionals,
+          chairs, chaises, benches, dining sets, tables, bar stools, ottomans, and accessory case goods constructed of
+           outdoor-rated materials such as outdoor-grade upholstery, all-weather wicker, teak and other outdoor woods, aluminum,
+            steel, wrought iron, and resin, together with their associated outdoor cushions, glass tops, and frames. This Plan
+             does <strong>not</strong> cover furniture intended for indoor use. All Items must be <strong>designed and
+              manufactured for outdoor use</strong> and are subject to the coverage limits of this Plan.</p>
+    </section>
+
+
+
+
+<section id="plan-coverage-outdoor" aria-labelledby="tier1-coverage-outdoor">
+
+  <div class="coverage-header">
+    <h3 id="tier1-coverage-outdoor" data-index="Outdoor Furniture: Coverage">
+      Tier 1: Full Coverage for These Common Damages
+    </h3>
+  </div>
+
+  <p class="coverage-subtitle">
+    No Co-Pay, 100% Replacement Credit, 60 Days to Report Damage
+  </p>
+
+  <p class="coverage-subtitle">
+    Coverage for Outdoor Furniture
+  </p>
+
+
+<div>
+  <p>Tier 1 provides coverage for the common household damages described in the table below that are caused by a single, isolated
+     accidental event.  Coverage excludes any damage resulting from leasing, renting, short-term rental, or showcasing of the
+      property or Item.  The terms below this table, together with the Exclusions described in the Exclusions section of this Plan,
+       also apply.</p>
+ 
+ 
+  <table role="table" aria-label="Tier 1 Coverage Details">
+    <tbody>
+
+      <tr>
+        <td><strong>Breakage of Frames and Panels</strong>:
+        <em>Covers structural breakage of outdoor furniture frames and panels resulting from a single, isolated incident on Items
+           designed and manufactured for outdoor use. Other exclusions described in this Plan apply.</em></td>
+      </tr>
+
+      <tr>
+        <td><strong>Stains from a Single Incident</strong>:
+        <em>Covers accidental stains caused by a single, isolated incident on Items designed and manufactured for outdoor use.
+           <strong>Excludes stains from pests, wildlife, insects, or vermin.</strong></em></td>
+      </tr>
+
+      <tr>
+        <td><strong>Punctures, Rips, Burns, Tears, or Cuts from a Single Incident</strong>:
+        <em>Covers accidental punctures, rips, burns, tears, or cuts caused by a single, isolated incident on Items designed and
+           manufactured for outdoor use. <strong>Excludes wind and weather damage.</strong></em></td>
+      </tr>
+
+      <tr>
+        <td><strong>Liquid Marks from a Single Incident</strong>:
+        <em>Covers accidental liquid marks (such as water rings or similar liquid-caused marks) caused by a single, isolated
+           incident on Items designed and manufactured for outdoor use. <strong>Excludes flood and weather damage.</strong></em></td>
+      </tr>
+
+      <tr>
+        <td><strong>Glass Chipping or Breakage</strong>:
+        <em>Covers accidental chipping or breakage of glass components (such as glass tops on outdoor tables) caused by a single,
+           isolated incident. Other exclusions described in this Plan apply.</em></td>
+      </tr>
+
+      <tr>
+        <td><strong>Rust on Ferrous Metals/Alloys</strong>:
+        <em>Covers rust that compromises ferrous metals and ferrous metal alloys used in the structural construction of Items
+           designed and manufactured for outdoor use. <strong>Excludes rust stains.</strong></em></td>
+      </tr>
+
+
+    </tbody>
+  </table>
+</div>
+ 
+<div class="tier-additional-terms">
+  <h3>Tier 1: Additional Terms & Common Misunderstandings</h3>
+  <h4>Replacement Terms & Conditions:</h4>
+  <ul>
+    <li><strong>Matching items are not covered</strong>, even if part of a set. Sectionals and matching headboards/footboards are
+       considered a single Item when replaced.</li>
+    <li><strong>Replacement credits</strong> are based on the retail price paid (excluding taxes/fees) and must be used
+       within <strong>six (6) months</strong> of issuance or they will be void.</li>
+    <li>Credits are <strong>non-transferable</strong>, <strong>non-assignable</strong>, and <strong>not redeemable for
+       cash</strong>.</li>
+    <li>Credits may only be redeemed through the <strong>original Reseller</strong>. If Your replacement Item exceeds the credit 
+      value, You are responsible for the difference, including applicable taxes and fees.</li>
+  </ul>
+  
+  <h4>Important Clarification -- Not Considered Stains, Rips, Tears or Burns:</h4>
+  <ul>
+    <li>Cracking, peeling, or delamination of upholstery, including fabric,leather, vinyl, or coated fabrics.</li>
+    <li>Surface wear, including fading, discoloration from light exposure, or material aging.</li>
+    <li>Damage from misuse, neglect, lack of care, or manufacturer defects.</li>
+  </ul>
+
+  </div>
+    </section>
+
+
+</section>
+
+<section class="plan-type-coverage" id="coverage-rug" aria-label="Area Rug coverage">
+  <h2 data-index="Area Rug Plan" id="plan-rug">AREA RUG PLAN</h2>
+<h3>Items Covered</h3>
+    <section aria-labelledby="items-covered">
+      <p>Item(s) covered by this Plan are limited to <strong>machine-made area rugs designed for indoor residential use</strong>
+         that You purchased from a Reseller. All Items must be designed for indoor residential use and are subject
+          to the coverage limits of this Plan.</p>
+      <p><strong>The following are NOT eligible for coverage under this Plan:</strong></p>
+      <ul aria-label="Items not eligible for coverage">
+        <li>Handmade rugs</li>
+        <li>One-of-a-kind rugs</li>
+        <li>Silk rugs</li>
+        <li>Natural fiber rugs</li>
+        <li>Outdoor rugs</li>
+        <li>Commercial rugs</li>
+      </ul>
+    </section>
+
+
+
+
+<section id="plan-coverage-rug" aria-labelledby="tier1-coverage-rug">
+
+  <div class="coverage-header">
+    <h3 id="tier1-coverage-rug" data-index="Area Rug: Coverage">
+      $5,000 of Coverage
+    </h3>
+  </div>
+
+  <p class="coverage-subtitle">
+    60 Days to Report Damage
+  </p>
+
+  <p class="coverage-subtitle">
+    No Co-Pay, 100% Replacement Credit
+  </p>
+
+  <p class="coverage-subtitle">
+    Coverage for Qualifying Area Rugs
+  </p>
+
+
+<div>
+  <p>Tier 1 provides coverage for the common damages described in the table below that are caused by a single, isolated
+     accidental event. Coverage excludes any damage resulting from leasing, renting, short-term rental, or showcasing of the
+      property or Item. The terms below this table, together with the Exclusions described in the Exclusions section of this Plan,
+       also apply.</p>
+
+
+  <table role="table" aria-label="Tier 1 Coverage Details">
+    <tbody>
+
+      <tr>
+        <td><strong>Delamination Causing Buckling</strong>:
+        <em>Not caused by wear and tear.</em></td>
+      </tr>
+
+      <tr>
+        <td><strong>Unraveling, Loosening of Threads, or Splitting of Seams</strong>:
+        <em>Not caused by wear and tear; excludes damage from vacuums.</em></td>
+      </tr>
+
+      <tr>
+        <td><strong>Most Stains</strong>:
+        <em>Excludes caustic, bleach, and dye-type substances.</em></td>
+      </tr>
+
+      <tr>
+        <td><strong>Dye Transfer</strong>:
+        <em>Covers accidental dye transfer onto the area rug from another source.</em></td>
+      </tr>
+
+      <tr>
+        <td><strong>Burn/Singe Marks</strong>:
+        <em>Covers accidental single-incident burn or singe marks.</em></td>
+      </tr>
+
+      <tr>
+        <td><strong>Rips, Tears, or Punctures</strong>:
+        <em>Covers accidental single-incident rips, tears, and punctures.</em></td>
+      </tr>
+
+
+    </tbody>
+  </table>
+</div>
+
+<div class="tier-additional-terms">
+  <h3>Tier 1: Additional Terms & Common Misunderstandings</h3>
+  <h4>Replacement Terms & Conditions:</h4>
+  <ul>
+    <li><strong>Matching items are not covered</strong>, even if part of a set.</li>
+    <li><strong>Replacement credits</strong> are based on the retail price paid (excluding taxes/fees) and must be used
+       within <strong>six (6) months</strong> of issuance or they will be void.</li>
+    <li>Credits are <strong>non-transferable</strong>, <strong>non-assignable</strong>, and <strong>not redeemable for
+       cash</strong>.</li>
+    <li>Credits may only be redeemed through the <strong>original Reseller</strong>. If Your replacement Item exceeds the credit
+      value, You are responsible for the difference, including applicable taxes and fees.</li>
+  </ul>
+
+  <h4>Important Clarification -- Not Considered Stains, Rips, Tears or Burns:</h4>
+  <ul>
+    <li>Surface wear, including fading, discoloration from light exposure, or material aging.</li>
+    <li>Damage from misuse, neglect, lack of care, or manufacturer defects.</li>
+    <li>Gradual soiling or wear from foot traffic.</li>
+  </ul>
+
+  </div>
+    </section>
+
+
+</section>
+
+<section class="plan-type-coverage" id="coverage-adjbed" aria-label="Adjustable Bed Base coverage">
+  <h2 data-index="Adjustable Bed Base Plan" id="plan-adjbed">ADJUSTABLE BED BASE PLAN</h2>
+<h3>Items Covered</h3>
+    <section aria-labelledby="items-covered">
+      <p>Item(s) covered by this Plan are limited to Item(s) that You purchased from a Reseller, and includes only the following: Upholstered furniture covered in fabric, microfiber, or vinyl (excluding grass, woven, and wicker items); solid surface wood or laminate furniture—including bedroom, dining room, home office, entertainment, dinette, and accessory case goods; and table lamps. All Items must be designed for indoor use and are subject to the coverage limits of this Plan.</p>
+    </section>
+
+
+
+
+<section id="plan-coverage-adjbed" aria-labelledby="tier1-coverage-adjbed">
+
+  <div class="coverage-header">
+    <h3 id="tier1-coverage-adjbed" data-index="Adjustable Bed Base: Coverage">
+      Tier 1: Full Coverage for These Common Damages
+    </h3>
+  </div>
+
+  <p class="coverage-subtitle">
+    No Co-Pay, 100% Replacement Credit, 60 Days to Report Damage
+  </p>
+
+  <p class="coverage-subtitle">
+    Coverage for Adjustable Bed Bases Only
+  </p>
+
+
+<div>
+  <p>Tier 1 provides coverage for the common household damages described in the table below that are caused by a single, isolated accidental event.  Coverage excludes any damage resulting from leasing, renting, short-term rental, or showcasing of the property or Item.    The terms below this table, together with the Exclusions described in the Exclusions section of this Plan, also apply.</p>
+ 
+ 
+  <table role="table" aria-label="Tier 1 Coverage Details">
+    <tbody>
+
+      <tr>
+        <td><strong>Motors & Switches</strong>: 
+        <em>Excludes Damage from teeth, claws, beaks, batteries, electrical surge, electrical supply, and batteries</em></td>
+      </tr>
+
+      <tr>
+        <td><strong>Mechanisms</strong>: 
+        <em>Excludes damage from misuse or abuse or from loads exceeding the design limits of the Adjustable Base</em></td>
+      </tr>
+
+      <tr>
+        <td><strong>Remotes</strong>: 
+        <em>Excludes Damage from teeth, claws, beaks, batteries, electrical surge, electrical supply, and batteries</em></td>
+      </tr>
+
+      <tr>
+        <td><strong>Accidental Damage from a Single Incident</strong>: 
+        <em>Excludes damage or marks caused by weather, natural disaster, fire or acts of God</em></td>
+      </tr>
+
+      <tr>
+        <td><strong>Plan Limitations</strong>: 
+        <em>This Plan does not cover mattresses, bed linens, furniture or batteries; see Exclusions</em></td>
+      </tr>
+
+    </tbody>
+  </table>
+</div>
+ 
+<div class="tier-additional-terms">
+  <h3>Tier 1: Additional Terms & Common Misunderstandings</h3>
+  <h4>Replacement Terms & Conditions:</h4>
+  <ul>
+    <li><strong>Matching items are not covered</strong>, even if part of a set.</li>
+    <li><strong>Replacement credits</strong> are based on the retail price paid (excluding taxes/fees) and must be used within <strong>six (6) months</strong> of issuance or they will be void.</li>
+    <li>Credits are <strong>non-transferable</strong>, <strong>non-assignable</strong>, and <strong>not redeemable for cash</strong>.</li>
+    <li>Credits may only be redeemed through the <strong>original Reseller</strong>. If Your replacement Item exceeds the credit value, You are responsible for the difference, including applicable taxes and fees.</li>
+  </ul>
+  
+  <h4>Important Clarification Where Applicable -- Not Considered Stains, Rips, Tears or Burns:</h4>
+  <ul>
+    <li>Cracking, peeling, or delamination of leather, vinyl, or coated fabrics.</li>
+    <li>Surface wear, including fading, discoloration from light exposure, or material aging.</li>
+    <li>Damage from misuse, neglect, lack of care, or manufacturer defects.</li>
+  </ul>
+
+  </div>
+
+    </section>
+
+
+</section>
+
+
+<!-- ExclusionsTag -->
+<section id="exclusions" aria-labelledby="exclusions-heading">
+  <h2 id="exclusions-heading" data-index="What's Not Covered">EXCLUSIONS – WHAT'S NOT COVERED</h2>
+  <div id="exclusions-block">    
+
+  <p>In addition to any conditions, restrictions, or exclusions described elsewhere in this Plan, the exclusions listed below are 
+    not covered. If any exclusion applies, coverage will not be provided for that Claim. The determination of whether an exclusion 
+    applies shall be made solely and exclusively by Us, in Our absolute discretion.</p>
+
+  <table role="table" aria-label="Exclusions List">
+    <thead>
+      <tr>
+        <th style="width:10%;" scope="col">Category</th>
+        <th scope="col" style="text-align:center;">Excluded Damages or Failure</th>
+      </tr>
+    </thead>
+    <tbody>
+
+      <tr>
+        <td class="exclusion-category">A</td>
+        <td><strong>Exclusions Related to Coverage Scope:</strong> Anything not specifically described within
+          the Tier 1 coverage sections of this Plan.</td>
+      </tr>
+
+      <tr>
+        <td class="exclusion-category">B</td>
+        <td><strong>Not Reported, Late Reporting & Expired Plan:</strong> Any Failure, Loss, Injury, or Damage that is not reported
+           within the required time frame or in accordance with the terms of this Plan is excluded.</td>
+      </tr>
+
+      <tr>
+        <td class="exclusion-category">C</td>
+        <td><strong>Unauthorized Services, Alterations, Products & Accessories:</strong> Any Damage or Failure resulting from 
+          repairs, services, or alterations not authorized by Us; the use of maintenance products not approved by the manufacturer; 
+          or accessories not installed by the Item(s)’ manufacturer.</td>
+      </tr>
+
+      <tr>
+        <td class="exclusion-category">D</td>
+        <td><strong>Previously Owned & Pre-Existing Items:</strong> Second-hand, pre-owned, or refurbished Items, or Items sold
+           without a warranty from a Retailer, distributor, or manufacturer.</td>
+      </tr>
+
+      <tr>
+        <td class="exclusion-category">E</td>
+        <td><strong>Coverage Overlaps:</strong> This Plan does not apply to any Damage or Failure already covered by another warranty, 
+          guaranty, or service contract.</td>
+      </tr>
+
+      <tr>
+        <td class="exclusion-category">F</td>
+        <td><strong>Wear & Tear, Unsupervised Minors, Foam Resilency, Recurring & Intentional Damage:
+          </strong> Any Failure, Loss, Injury, or Damage caused by wear and tear including, but not limited to,
+          loss of foam resilency, unsupervised minors, intentional acts, recurring or habitual, or normal use,
+          is excluded – <strong>except.</td>
+      </tr>
+
+        
+      <tr>
+        <td class="exclusion-category">G</td>
+        <td><strong>Natural Disasters, Acts of God, Peril, Sun & Light Exposure:</strong> Any Failure, Loss, Injury, or Damage caused
+           by fire, theft, loss or misplacement of Items; insects or animals (other than Pets); exposure to weather
+            (e.g., wind, rain, hail, sand, dirt, earthquake, flood, or water); sun or ultraviolet (UV) light exposure; or events 
+            such as crime, invasion, rebellion, riot, strike, labor disturbance, war, lockout, civil disturbance, or police/military
+             action.</td>
+      </tr>
+
+      <tr>
+        <td class="exclusion-category">H</td>
+        <td><strong>Commercial Use, Outdoor Use, Rental & Institutional Use:</strong> Any Failure, Loss, Injury, or Damage arising 
+          from commercial, business, or institutional use, including in-home daycare or supervised care, or use within for-profit,
+           dormitory, timeshare, rental, or not-for-profit institutional environments.</td>
+      </tr>
+
+      <tr>
+        <td class="exclusion-category">I</td>
+        <td><strong>Mold, Pest & Infestation:</strong> Damage caused by mold, mildew, fungus, rust, corrosion, pests, or infestation 
+          is excluded. <strong>This includes any Odors resulting from these sources.</strong></td>
+      </tr>
+
+      <tr>
+        <td class="exclusion-category">J</td>
+        <td><strong>Storage, Handling & Item Misuse:</strong> Placement of Items on balconies, patios, or within
+           any non-enclosed or non-temperature-controlled space; exposure to extreme heat or cold; Item misuse; or neglect.</td>
+      </tr>
+
+      <tr>
+        <td class="exclusion-category">K</td>
+        <td><strong>Inadequate or Excessive Maintenance, Cleaning & Packaging:</strong>
+         Inadequate or excessive maintenance; use of cleaning methods or materials not recommended by the manufacturer; lack
+          of reasonable cleaning or maintenance; or Damage caused during the packaging or transport of Items, and similar
+           issues.</td>     
+      </tr>
+
+      <tr>
+        <td class="exclusion-category">L</td>
+        <td><strong>Manufacturer Defects, Inherent Design Issues & Recalls:</strong> Pre-existing manufacturer’s defects, 
+          inherent design flaws, manufacturer’s quality issues or recalls, Damage incurred during shipment to the original 
+          delivery location, or issues covered by pre-delivery services or product recalls.</td>
+      </tr>
+
+      <tr>
+        <td class="exclusion-category">M</td>
+        <td><strong>Matching Pieces, Texture & Dye Lot:</strong> We do not guarantee the matching of colors, dyes,
+          patterns, textures, or the exact replacement of lost, damaged, or non-repairable Items.  This Plan does
+        not cover matching items or pieces.</td>
+      </tr>
+
+      <tr>
+        <td class="exclusion-category">N</td>
+        <td><strong>Consumables:</strong> This Plan does not cover consumable components such as lights or batteries, or Damage
+           or stains caused by such components, except to the limited extent expressly provided under Tier 1
+           coverage of this Plan.</td>
+      </tr>
+
+      <tr>
+        <td class="exclusion-category">O</td>
+        <td><strong>Installation & Removal:</strong> Any Damage, Loss, or Failure arising from or related to the installation,
+           hook-up, or removal of the Item(s).</td>
+      </tr>
+
+      <tr>
+        <td class="exclusion-category">P</td>
+        <td><strong>Cushions, Upholstery & Resiliency:</strong> Loss of support, comfort, or feel in foam cushions,
+          stuffing, or other cushion materials. “<strong>Sagging</strong>” means a deflection of the surface and
+          is distinct from “<strong>Resiliency</strong>,” which refers to support or feel. Both are not covered.</td>
+      </tr>
+
+      <tr>
+        <td class="exclusion-category">Q</td>
+        <td><strong>Transit, Storage & Outdoor Storage Damage:</strong> Any Damage, Loss, or Failure caused by or resulting
+           from transit, delivery, re-delivery, or the moving of Item(s) between residences; storing or using Item(s)
+            in commercial storage units or in non-climate-controlled residential areas; or storing Item(s) outdoors, on patios,
+             or in screened rooms when they are not specifically designed, manufactured, and marketed for that purpose.</td>
+      </tr>
+
+      <tr>
+        <td class="exclusion-category">R</td>
+        <td><strong>Inherent Design Flaws & Dye Lot or Texture Variations:</strong> Inherent design flaws, including natural 
+          inconsistencies in finishes or dye lot variations, are not covered even if We replace part of an Item.</td>
+      </tr>
+
+      <tr>
+        <td class="exclusion-category">S</td>
+        <td><strong>Mattresses, Mattress Base, Pillows & Bedlinens:</strong> Any damage or discomfort to mattresses, mattress base,
+           pillows or bedlinens even if from normal use and caused by operation of the Item or failure of the Item.</td>
+      </tr>
+
+      <tr>
+        <td class="exclusion-category">T</td>
+        <td><strong>Broken or Loose Legs, Rungs & Joints:</strong> Broken, loose or damaged legs, rungs and joints
+          of any, including tables and chairs by way of example, are not covered under this Plan even if from
+          accidental damage or wear & tear.</td>
+      </tr>
+
+      <tr>
+        <td class="exclusion-category">U</td>
+        <td><strong>Broken & Non-Functioning Zippers, Seam Splits or Seam Separation:</strong> Broken, loose or damaged zippers are
+          not covered.  Seams splitting, opening, or lose threads are not covered even if from
+           accidental damage or wear & tear.</td>
+      </tr>
+
+      <tr>
+        <td class="exclusion-category">V</td>
+        <td><strong>Cracking, Peeling, Piling or Discoloration:</strong> Lifting of surface, flaking of paint, pealing,
+          piling of fabric, discoloration, loss of paint - including discoloration and fading, are exclueded under this Plan even if from
+           accidental damage or wear & tear.</td>
+      </tr>
+
+    </tbody>
+  </table>
+</div>
+
+</section>
+
+
+<h2 id="indirect-loss" data-index="Indirect Loss">INDIRECT & CONSEQUENTIAL LOSS</h2>
+    <section aria-labelledby="indirect-loss">
+      <p><strong>This Plan does not cover:</strong></p>
+      <ul aria-label="Indirect and consequential losses not covered">
+        <li><strong>Incidental or Special Damages:</strong> Losses not directly related to the physical state of the covered
+           Item(s), such as personal inconvenience or loss of use.</li>
+        <li><strong>Service Delays:</strong> Financial or personal repercussions resulting from delays in service or repair times.</li>
+        <li><strong>Voiding Other Agreements:</strong> Complications, including voiding warranties or insurance, arising from the
+           use of this Plan.</li>
+        <li><strong>Inability to Use Items:</strong> Indirect losses incurred due to the inability to use the Item(s) during repair
+           or while awaiting replacement.</li>
+        <li><strong>Damage to Other Property:</strong> Damage or loss to other items or structures (including walls, floors,
+           paint, carpet, or rugs) caused by the failure of a covered Item or by Our attempts to repair or replace it.</li>
+      </ul>
+    </section>
+    
+
+<h2 id="questions-copay" data-index="Questions & Fraud">QUESTIONS, CO-PAY, REPORTING DAMAGE & FRAUD</h2>
+    <section aria-labelledby="questions-copay">
+      <ul aria-label="Important notices about questions, co-pay, reporting, and fraud">
+        <li><strong>Questions:</strong> For questions about Coverage, Exclusions, or Co-Pays, contact us toll-free at 1-833-395-7824
+           or email us at claims@raptns.com.</li>
+        <li><strong>Notice of Co-Pay:</strong> This Plan does not require a Co-Pay to activate coverage or service.</li>
+        <li><strong>Reporting Damage:</strong> You must report all Damage or failure within sixty (60) days of the incident to be
+           eligible for coverage according to Plan terms.</li>
+        <li><strong>Fraud:</strong> Filing false claims or providing Us with intentionally inaccurate information is a crime and
+           raises costs for everyone and will void Your coverage under this Plan.</li>
+      </ul>
+    </section>
+
+
+<h2 id="obtain-service" data-index="How to Make a Claim">TO OBTAIN SERVICE</h2>
+    <section aria-labelledby="obtain-service">
+      <p>You may initiate a claim for service under this Plan in one of the following ways:</p>
+      <ol aria-label="Ways to obtain service">
+        <li>Online using any web-connected device at 5Starservice.net, 24 hours a day, 7 days a week.</li>
+        <li>Call Us at [1-833-395-7824], Monday through Friday, 9 a.m. to 6 p.m. EST, excluding holidays.</li>
+        <li>Email Us at claims@raptns.com.</li>
+        <li>When filing a claim, You must provide:
+          <ol type="a">
+            <li>Your original Sales Receipt, which shows Your purchase of the Item(s) and this Plan.</li>
+            <li>The Plan Confirmation Number that We issued to You, which helps Us process Your claim.</li>
+            <li>The date that You took possession of the Item.</li>
+            <li>The date that You discovered the failure or damage that You are reporting.</li>
+          </ol>
+        </li>
+      </ol>
+      <p>Your cooperation with the Administrator is essential for the processing of Your claim. Your failure to fully 
+        cooperate may result in denial of Your claim or cancellation of Your Plan. Failure to cooperate includes, by way of
+         example and not limitation: (a) failure to provide timely access for a service technician to inspect or repair
+          damaged Item(s); (b) failure to timely respond to requests for additional information; (c) providing false or
+           misleading information; or (e) repeatedly submitting claims for the same damage to the same Item after a claim has
+            been settled by Us.</p>
+    </section>
+    
+<h2 id="service-process" data-index="Our Processes">THE SERVICE PROCESS</h2>
+    <section aria-labelledby="service-process">
+      <p>Upon receiving a claim for an Item covered by this Plan, We will provide repair advice and/or products to assist with
+         stain removal or damage repair. We may request photographs to help determine whether You are eligible to receive, at no
+          charge, an in-home visit by a professional technician, a part, or a replacement. If a technician determines that repairs
+           must be completed off-site, the damaged Item will be removed and returned at no cost to You. With or without a technician
+            visit, We may elect to replace the damaged part or area of the Item. If the stain or damage cannot be repaired or
+             replaced, or if a necessary part is unavailable, We will issue a store Replacement credit.</p>
+      <p>The value of a Replacement credit is determined by the coverage Tier under which the Item is replaced. 
+        See Plan Coverage above, including any applicable No Aggregation Provisions. Replacement credits exclude taxes and
+         fees previously paid for the Item being replaced or for new replacement items. Any difference between the face value
+          of the Replacement credit and the total cost of a new item must be paid by You to the Reseller. Replacement 
+          credits are non-transferable, may not be redeemed for cash, and will expire six (6) months from the date
+           of issue.</p>
+      <p>Replacement credits may only be used at a location or purchased through the Reseller who sold You this Plan. If that
+         Reseller is closed, out of business, or You have relocated outside of the Reseller's normal delivery area, this Plan
+          will be limited to repair service only, or You will receive a pro-rata refund of the purchase price of this Plan,
+           based on the time elapsed since the commencement of this Plan, less any claims paid.</p>
+      <p>We will not replace or otherwise service matching pieces or parts that are not damaged, even if they are covered
+         under this Plan. We are not responsible for, and will not take action to correct, dye lot or texture variations
+          resulting from repair or replacement of a part or an entire Item. If You financed the purchase of this Plan, any
+           refund due under this section will be paid directly to the lender of record. If You rent or lease Item(s) covered
+            by this Plan, see the LTO Transaction Notice included in this Plan.</p>
+      <p>If a manufacturer's warranty covers the damage reported under this Plan, coverage under this Plan will not apply.
+         Service or replacement is limited only to damaged Items specifically named as covered by this Plan. Coverage does
+          not transfer to Items provided as replacements. Once a Replacement credit is used, coverage under this Plan for the 
+          Item named in the credit ends. Only Item(s) shown on the original sales receipt that are covered by this Plan, and that 
+          remain in Your possession, are eligible for coverage. Terms written in Replacement credits are incorporated in and are
+           subordinate to the Terms and Conditions of this Plan with this Plan's Terms and Conditions prevailing in the event of 
+           conflict.</p>
+      <p><strong>This Plan does not eliminate the need for routine care and maintenance, which remains solely Your responsibility.
+         General soiling and wear and tear (defined as a gradual buildup or accumulation of dirt, dust, body oils, perspiration,
+          and damage that cannot be attributed to a single incident) are excluded except to the extent covered under
+           Tier 1, or if applicable Tier 2 coverage, described above. Failure to maintain Items according to the manufacturers 
+           or Retailer's use and care instructions may void this Plan. Matching Item(s) covered by this Plan that are not
+            damaged will not be serviced or replaced, even if We replace or service an Item under the terms of this Plan.</strong></p>
+    </section>
+    
+    
+<h2 id="copay-deductible" data-index="Co-Pays & Deductibles">CO-PAY & DEDUCTIBLE</h2>
+    <section aria-labelledby="copay-deductible">
+      <p><strong>This Plan does not require a Co-Pay or Deductible.</strong></p>
+    </section>
+
+
+<h2 id="lto-transactions" data-index="Lease to Own">LEASE TO OWN TRANSACTIONS</h2>
+    <section aria-labelledby="lto-transactions">
+      <p><strong>LTO TRANSACTION NOTICE: YOU ARE NOT REQUIRED TO PURCHASE THIS OR ANY OTHER PROTECTION PLAN OR SERVICE AGREEMENT
+         AS A CONDITION OF ENTERING INTO AN LTO TRANSACTION.</strong></p>
+      <p>For purposes of this Plan, an "LTO Transaction" means a transaction under which You rent or lease Item(s) as described
+         by this Plan. Item(s) shall not be treated as part of an LTO Transaction unless the lessor is identified on Your Sales Receipt, together with Your name and the address where the Item(s) are delivered. Where Item(s) covered by this Plan are initially acquired through an LTO Transaction, and You have not obtained ownership of the Item(s), any cash settlement under this Plan will accrue to the benefit of the lessor. In all other respects, You will retain a beneficial interest in this Plan, including all non-cash benefits described herein. Subject to the terms of the LTO Transaction, the lessor may elect to apply cash settlement benefits under this Plan to Your obligations under such LTO Transaction. Any amount paid in excess of the balance due may, at the lessor's discretion and subject to the terms of the LTO Transaction, be paid to You. You are solely responsible for maintaining any Item(s) covered by this Plan, whether purchased under an LTO Transaction or otherwise.</p>
+      <p><strong>WE ARE NOT A PARTY TO ANY LTO TRANSACTION. REFERENCE TO ANY LTO TRANSACTION UNDER THE TERMS OF THIS PLAN SHALL
+         NOT OPERATE TO CAUSE US TO BECOME A PARTY TO THAT TRANSACTION, AND WE SPECIFICALLY DISCLAIM ANY AND ALL LIABILITY ACCRUING TO ANY PARTY UNDER ANY LTO TRANSACTION. WE ARE NOT OBLIGATED AND SHALL NOT NEGOTIATE FOR ANY THIRD-PARTY BENEFITS OR DISPUTES WHATSOEVER ARISING FROM OR RELATING TO LTO TRANSACTIONS WITH RESPECT TO ANY QUALIFIED ITEM COVERED UNDER THIS PLAN, OR ANY TRANSACTION, ACTION, OR OBLIGATION ARISING OR ACCRUING TO ANY PARTY UNDER ANY LTO TRANSACTION.</strong></p>
+    </section>
+    
+
+<h2 id="limit-liability" data-index="Limit of Liability">LIMIT OF LIABILITY</h2>
+    <section aria-labelledby="limit-liability">
+      <p><strong>IN NO EVENT SHALL OUR LIABILITY UNDER THIS PLAN EXCEED:</strong></p>
+      <ol>
+        <li><strong>PLAN COVERAGE LIMIT: A MAXIMUM OF FIVE THOUSAND DOLLARS ($5,000.00 USD) OF QUALIFIED RETAIL IN TOTAL DURING THE TERM OF THIS PLAN.</strong></li>
+      </ol>
+      <p><strong>IN NO EVENT SHALL WE BE LIABLE FOR SPECIAL, INDIRECT, INCIDENTAL, OR CONSEQUENTIAL DAMAGES, WHETHER
+         IN CONTRACT OR TORT, AT LAW OR IN EQUITY, INCLUDING LOSS OR DAMAGE TO PERSON OR PROPERTY ARISING FROM OR RELATING
+          TO THIS PLAN, THE SALE OR PURCHASE OF THIS PLAN, OR THE USE, THE INABILITY TO USE, OR FROM THE REPAIR OR REPLACEMENT
+           OF AN ITEM.</strong></p>
+    </section>
+    
+   
+<h2 id="fee-shifting" data-index="Fee Shifting">FEE SHIFTING PROVISION</h2>
+    <section aria-labelledby="fee-shifting">
+      <p>If You institute or bring an action, lawsuit, or claim against Us, whether in court or in arbitration, and regardless 
+        of whether the claim is brought as a contract claim or as a statutory claim, which arises from or relates to this Plan,
+         actions, services, goods, or performance related to this Plan, or the failure to act or perform or to provide services,
+          goods, and We are the prevailing party, You shall be required to pay Us our reasonable attorney's fees and costs that were 
+          incurred in the action, lawsuit, or otherwise litigating the claim.</p>
+    </section>
+
+
+<h2 id="class-action" data-index="No Class Action">CLASS ACTION WAIVER</h2>
+    <section aria-labelledby="class-action">
+      <p>EACH PARTY HEREBY AGREES TO WAIVE THE RIGHT TO LITIGATE IN COURT OR ARBITRATE ANY CLAIM OR DISPUTE 
+        AS A CLASS ACTION PROCEEDING, WHETHER IN CONTRACT OR TORT, AT LAW OR IN EQUITY, EITHER AS A MEMBER OF A 
+        CLASS OR AS A REPRESENTATIVE, REGARDLESS OF WHICH PARTY BRINGS SUIT, OR TO ACT AS A PRIVATE ATTORNEY GENERAL.
+         THIS WAIVER SHALL APPLY TO ANY MATTER WHATSOEVER BETWEEN THE PARTIES (INCLUDING OUR AFFILIATES AND ASSIGNS) 
+         THAT ARISE OUT OF OR RELATES IN ANY WAY TO THIS PLAN, THE SALE OR PURCHASE OF THIS PLAN, OUR PERFORMANCE UNDER
+          THIS PLAN, OR OUR AGENT'S PERFORMANCE UNDER THIS PLAN.</p>
+    </section>
+    
+
+<h2 id="cancellation" data-index="Cancellations">CANCELLATION</h2>
+    <section aria-labelledby="cancellation">
+      <p>This Plan may be cancelled by You for any reason. To cancel this Plan, contact the Administrator toll-free at 1-833-395-7824.
+         If You cancel this Plan within the first thirty (30) days after purchase and no claims have been made hereunder,
+          You will receive a full refund of the Plan purchase price from the Reseller. If You cancel this Plan after the first 
+          thirty (30) days of purchase, or if a claim has been made hereunder, You will receive a pro-rata refund of the purchase
+           price of this Plan from the Reseller, calculated based on the elapsed time since the commencement of this Plan,
+            less any claim losses that We have incurred. <strong>Any refund due under this section shall be the responsibility
+               of the Reseller that sold You this Plan.</strong></p>
+      <p>If We cancel this Plan, We must provide You with written notice at least fifteen (15) days prior to the cancellation
+         date, sent to Your last known address. Such notice must include the effective date of cancellation and the reason
+          for cancellation. If We cancel this Plan, You will receive a refund equal to one hundred percent (100%) of the unearned 
+          pro-rata purchase price of this Plan, less the cost of any services, parts, or replacements
+           (including the issuance of a credit) that We have incurred.</p>
+      <p>The reasons We may cancel this Plan, or void coverage for one or more Item(s) covered by this Plan, include but are not 
+        limited to: any fraudulent or unlawful acts by You in connection with this Plan; any intentional damage to Item(s); any use
+         of Item(s) in a manner other than as intended by the manufacturer that is likely to increase the chances that the Item(s)
+          will be damaged or require repair, service, or replacement (including the issuance of a credit); or any intentionally false 
+          or misleading statements made by You in any forum or to any person(s) regarding this Plan, including any services, repairs,
+           or replacements (including the issuance of a credit) that You have received or claim You should have received under
+            this Plan.</p>
+      <p>If You financed the purchase of this Plan, any refund due as a result of cancellation will be paid directly to the 
+        lender of record. Once this Plan is cancelled, it may not be reinstated.</p>
+    </section>
+    
+
+<h2 id="recover-payment" data-index="Recover Payments">OUR RIGHT TO RECOVER PAYMENT</h2>
+    <section aria-labelledby="recover-payment">
+      <p>If You have a right to recover against another party for anything We have paid under this Plan, Your rights 
+        shall become Our rights. You shall do whatever is necessary to enable Us to enforce these rights. We shall recover
+         only the excess after You are fully compensated for Your loss.</p>
+    </section>
+    
+
+<h2 id="guaranty" data-index="Guaranty">GUARANTY</h2>
+    <section aria-labelledby="guaranty">
+      <p>This Plan is not an insurance policy. The obligations of the Obligor under this Plan are insured under a contract liability
+         reimbursement insurance policy. If We fail to pay any claim, provide service, or replace the Item(s) in accordance
+          with the terms of this Plan within ninety (90) days after We have settled a claim, You are entitled to make a direct
+           claim against the insurer, Universal Underwriters Insurance Company, by calling 1-888-835-5063 or by mail at 
+           7045 College Boulevard, Overland Park, Kansas 66211.</p>
+    </section>
+    
+
+<h2 id="consumer-info" data-index="Important Information">IMPORTANT CONSUMER INFORMATION</h2>
+    <section aria-labelledby="consumer-info">
+      <p>If Your Item is exchanged by the manufacturer or Reseller, You must notify Us in writing at 1625 South Congress Avenue, 
+        Suite 315, Delray Beach, FL 33445, Attn: Claims Department, or call 1-833-395-7824, and provide the date of 
+        exchange, make, model, and serial number of the replacement product within ten (10) days of the exchange. In the 
+        event of such an exchange, the coverage period shall not exceed the expiration date of the original Plan.</p>
+      <p>If You fail to notify Us in accordance with these requirements, We may, at Our sole discretion, elect 
+        not to provide coverage for any claims submitted under this Plan for the exchanged Item.</p>
+    </section>
+
+
+<h2 id="not-transferable" data-index="No Transfers or Assignments">THIS PLAN IS NOT TRANSFERABLE, NO ASSIGNMENT OF BENEFITS</h2>
+    <section aria-labelledby="not-transferable">
+      <p>Neither this Plan, nor any of the benefits or rights accruing to You under or because of this Plan may be transferred,
+         assigned, pledged, sold, or hypothecated by You to any person or entity. For example, and by no way limiting the
+          generality of the foregoing sentence, You shall not transfer or assign any action, cause of action, claim, demand,
+           lawsuit, or suit, whether in contract or tort, at law or in equity, arising from or relating to this Plan, the sale
+            or purchase of this Plan, or the performance, non-performance, actions, or inactions by Us or Our agents under, 
+            arising from, or relating to this Plan. In the event that a court or regulatory body of competent jurisdiction 
+            determines that this provision is invalid, You agree that We shall have the exclusive and first right to purchase 
+            all of Your rights and benefits under or because of this Plan, including any potential action, cause of action,
+             claim, demand, lawsuit, or suit, whether at law or in equity, for ten dollars ($10.00), which You acknowledge
+              is good, adequate, valuable, and sufficient.</p>
+    </section>
+    
+
+<h2 id="state-requirements" data-index="State Requirements">SPECIAL STATE REQUIREMENTS</h2>
+    <section aria-labelledby="state-requirements">
+      <p>Regulation of service agreements, like this Plan, varies widely from state to state.
+         Any provisions within this Plan that conflict with the laws of the state where You live shall automatically be modified to
+          conform with the applicable state laws where You live. The following state requirements apply to Your Plan:</p>
+      <p>Texas: Risk Assurance Partners, LLC. Service Contract Administrator [No. 730]. If You have any questions regarding the 
+        regulation of this Plan Provider or a complaint against the Obligor (Provider), You may contact the Texas Department of
+         Licensing & Regulation, 920 Colorado, P.O. Box 12157, Austin, Texas 78711, (800) 803‐9202. You may return this Plan
+          within thirty (30) days of the date of purchase of this Plan. If this Plan is cancelled within the first thirty (30) days,
+           We will refund the entire Plan charge, less claims paid.  If this Plan is cancelled after the first thirty (30) days,
+            You will receive a pro‐rata and less claims paid. A ten percent (10%) penalty per month will be added to a refund that
+             is not made within forty‐five (45) days of Your return of this Plan to the Provider. You may apply for reimbursement
+              directly to the insurer if a refund or credit is not paid before the 46th day after the date on which this Plan is 
+              canceled. These provisions apply only to the original purchaser of this Plan. If We cancel this Plan, We shall
+               mail a written notice to You at the last known address held by Us before the fifth day preceding the effective 
+               date of cancellation. The notice will state the effective date and the reason for the cancellation. However,
+                prior notice is not required if the reason for cancellation is nonpayment of the provider fee, fraud or a material
+                 misrepresentation by the Plan Holder to the Provider or the Provider’s Administrator, or a substantial breach 
+                 of duties by the Plan Holder relating to the covered product or its use. If We cancel this Plan, no cancellation
+                  fee shall apply.</p>
+    </section>
+    
+    <p><strong>END OF PLAN TERMS</strong></p>
+    
+
+</main>
+  
+  <footer>
+    <p><strong>END OF DOCUMENT, NOTHING FOLLOWS</strong></p>
+    <p>Furniture-Rx-Protection-Plan-Terms</p>
+  </footer>
+  
+  <script>
+    // Smooth scrolling for anchor links
+    document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+      anchor.addEventListener('click', function (e) {
+        e.preventDefault();
+        const target = document.querySelector(this.getAttribute('href'));
+        if (target) {
+          target.scrollIntoView({
+            behavior: 'smooth',
+            block: 'start'
+          });
+        }
+      });
+    });
+    
+    // Print functionality
+    function printDocument() {
+      window.print();
+    }
+    
+    // Table row highlighting with keyboard support
+    document.querySelectorAll('table tbody tr').forEach(row => {
+      // Make rows focusable for keyboard navigation
+      row.setAttribute('tabindex', '0');
+      
+      row.addEventListener('mouseenter', function() {
+        this.style.backgroundColor = '#dbeafe';
+      });
+      
+      row.addEventListener('mouseleave', function() {
+        if (!this.matches('tr:nth-child(even)')) {
+          this.style.backgroundColor = '';
+        } else {
+          this.style.backgroundColor = '#f9f9f9';
+        }
+      });
+      
+      // Keyboard support for table navigation
+      row.addEventListener('keydown', function(e) {
+        if (e.key === 'Enter' || e.key === ' ') {
+          e.preventDefault();
+          // Trigger any row click actions here if needed
+        }
+      });
+    });
+    
+    // Enhanced keyboard navigation for the entire document
+    
+      // Set focus to main content when skip link is used
+      const skipLink = document.querySelector('.skip-link');
+      if (skipLink) {
+        skipLink.addEventListener('click', function(e) {
+          e.preventDefault();
+          const target = document.querySelector(this.getAttribute('href'));
+          if (target) {
+            target.focus();
+            target.scrollIntoView();
+          }
+        });
+      }
+  </script>
+
+
+
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+  const sidebar = document.getElementById("sidebar");
+  const sidebarToggle = document.getElementById("sidebarToggle");
+  const closeSidebar = document.getElementById("closeSidebar");
+  const sidebarLinks = document.getElementById("sidebarLinks");
+  const closeArrow = document.getElementById("sidebarCloseArrow");
+
+  // Allow ESC key to close sidebar
+  document.addEventListener("keydown", (e) => {
+    if (e.key === "Escape" && sidebar.classList.contains("open")) {
+      sidebar.classList.remove("open");
+    }
+  });
+
+  // Collect section headers (all h2 with ids, PLUS Tier 1/2 h3s in .coverage-header with ids)
+  const headers = document.querySelectorAll("h2[id]:not(#plan-coverage), .coverage-header h3[id]");
+
+  headers.forEach(h => {
+    const li = document.createElement("li");
+    const a = document.createElement("a");
+    a.href = "#" + h.id;
+    a.textContent = h.getAttribute("data-index") || h.textContent;
+    // Nest program + tier coverage links under "Coverage by Plan Type"
+    if (h.closest(".plan-type-coverage")) {
+      li.classList.add(h.tagName === "H3" ? "nav-tier" : "nav-program");
+    }
+    li.appendChild(a);
+    sidebarLinks.appendChild(li);
+  });
+
+  // Open/close sidebar
+  sidebarToggle.addEventListener("click", () => sidebar.classList.add("open"));
+  closeSidebar.addEventListener("click", () => sidebar.classList.remove("open"));
+  closeArrow.addEventListener("click", () => sidebar.classList.remove("open"));
+
+  // Close when clicking a link
+  sidebarLinks.addEventListener("click", (e) => {
+    if (e.target.tagName === "A") {
+      sidebar.classList.remove("open");
+    }
+  });
+});
+</script>
+
+
+<script>
+
+// ==============================
+// SMART BAR, CHAT SHEET & HELP SHEET LOGIC
+// ==============================
+document.addEventListener("DOMContentLoaded", function () {
+  const smartBar = document.getElementById("smartBar");
+  const chatSheet = document.getElementById("chatSheet");
+  const helpSheet = document.getElementById("helpSheet");
+
+  const chatBtn = smartBar.querySelector('[data-action="chat"]');
+  const claimBtn = smartBar.querySelector('[data-action="claim"]');
+  const helpBtn = smartBar.querySelector('[data-action="help"]');
+  const topBtn = smartBar.querySelector('[data-action="top"]');
+
+
+  const closeChatBtn = chatSheet.querySelector(".chat-close-btn");
+  const closeHelpBtn = helpSheet.querySelector(".sheet-close");
+
+  // === Restore chat sheet state from localStorage with expiry ===
+  const EXPIRY_MINUTES = 15; // adjust window as needed
+  const saved = JSON.parse(localStorage.getItem("chatSheetState") || "{}");
+
+  if (saved.state && saved.state !== "closed") {
+    const age = Date.now() - (saved.savedAt || 0);
+    if (age < EXPIRY_MINUTES * 60 * 1000) {
+      chatSheet.setAttribute("data-state", saved.state);
+      chatSheet.setAttribute("aria-hidden", "false");
+    } else {
+      // Expired, reset to closed
+      chatSheet.setAttribute("data-state", "closed");
+      chatSheet.setAttribute("aria-hidden", "true");
+      localStorage.removeItem("chatSheetState");
+    }
+  }
+
+  // === Chat Sheet helpers with state + timestamp ===
+  function openChatSheet(state = "open") {
+    chatSheet.setAttribute("data-state", state);
+    chatSheet.setAttribute("aria-hidden", "false");
+    localStorage.setItem("chatSheetState", JSON.stringify({
+      state,
+      savedAt: Date.now()
+    }));
+  }
+
+  function closeChatSheet() {
+    chatSheet.setAttribute("data-state", "closed");
+    chatSheet.setAttribute("aria-hidden", "true");
+    localStorage.setItem("chatSheetState", JSON.stringify({
+      state: "closed",
+      savedAt: Date.now()
+    }));
+  }
+
+  // === Help Sheet helpers ===
+  function openHelpSheet() {
+    helpSheet.setAttribute("data-state", "open");
+    helpSheet.setAttribute("aria-hidden", "false");
+  }
+
+  function closeHelpSheet() {
+    helpSheet.setAttribute("data-state", "closed");
+    helpSheet.setAttribute("aria-hidden", "true");
+  }
+
+  // === Event listeners ===
+  const INTRO_TYPING_DELAY = 1500; // ms, adjust Alice's intro typing duration
+  chatBtn.addEventListener("click", () => {
+    openChatSheet("open");
+
+    // Show Alice intro once per session with typing indicator
+    if (!sessionStorage.getItem("aliceGreeted")) {
+      const messagesDiv = document.getElementById('chatMessages');
+
+      // Add typing indicator
+      const typingMsg = document.createElement('div');
+      typingMsg.className = 'chat-message bot-message';
+      typingMsg.innerHTML = `
+        <div class="typing-indicator">
+          <span></span><span></span><span></span>
+        </div>
+      `;
+      messagesDiv.appendChild(typingMsg);
+      messagesDiv.scrollTop = messagesDiv.scrollHeight;
+
+      // After delay, replace typing indicator with Alice's intro
+      setTimeout(() => {
+        typingMsg.innerHTML = `
+          <p>👋 Hi, I’m Alice. I’m not human, but I can help you by finding the closest match in our FAQs.<br>
+          If you’d prefer to speak with a person, just tap <strong>Get Help</strong>.</p>
+        `;
+        typingMsg.style.animationDelay = "0.1s"; // trigger fade-in
+        sessionStorage.setItem("aliceGreeted", "true");
+      }, INTRO_TYPING_DELAY);
+    }
+  });
+
+  claimBtn.addEventListener("click", () => {
+    window.open("https://www.5starservice.net/", "_blank");
+  });
+
+  helpBtn.addEventListener("click", openHelpSheet);
+
+  // Smooth scroll to top
+  topBtn.addEventListener("click", () => {
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  });
+
+
+  // Highlight Top button after scrolling
+  window.addEventListener("scroll", () => {
+    if (window.scrollY > 400) {
+     topBtn.classList.add("active-top");
+     } else {
+    topBtn.classList.remove("active-top");
+    }
+   });
+
+
+  closeChatBtn.addEventListener("click", closeChatSheet);
+  closeHelpBtn.addEventListener("click", closeHelpSheet);
+
+  // === Quick Reply Interactions ===
+  document.querySelectorAll('.quick-reply-chip').forEach(chip => {
+    chip.addEventListener('click', function() {
+      console.log('[CHAT API] Quick reply:', this.dataset.reply);
+
+      // Visual feedback
+      this.style.transform = 'scale(0.95)';
+      this.style.transition = 'transform 0.1s ease';
+      setTimeout(() => {
+        this.style.transform = '';
+      }, 100);
+
+      const messagesDiv = document.getElementById('chatMessages');
+
+      // Add typing indicator
+      const typingMsg = document.createElement('div');
+      typingMsg.className = 'chat-message bot-message';
+      typingMsg.innerHTML = `
+        <div class="typing-indicator">
+          <span></span><span></span><span></span>
+        </div>
+      `;
+      messagesDiv.appendChild(typingMsg);
+      messagesDiv.scrollTop = messagesDiv.scrollHeight;
+
+      // Call backend API for real FAQ match
+      fetch("/api/faq-search", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ question: this.dataset.reply })
+      })
+      .then(res => res.json())
+      .then(data => {
+        const threshold = 0.7;
+
+        if (data.confidence && data.confidence < threshold) {
+          if (data.sectionId && document.getElementById(data.sectionId)) {
+            const target = document.getElementById(data.sectionId);
+
+       // Scroll to suggested section
+            target.scrollIntoView({
+              behavior: "smooth",
+              block: "start"
+            });
+
+            // Briefly highlight the target section
+            target.classList.add("highlight-flash");
+            setTimeout(() => target.classList.remove("highlight-flash"), 2000);
+
+            /* XSS-safe: build with textContent + setAttribute, never innerHTML with server data (audit 2026-07-02) */
+            while (typingMsg.firstChild) typingMsg.removeChild(typingMsg.firstChild);
+            var _p1 = document.createElement('p');
+            _p1.textContent = '⚠️ I couldn’t find a clear FAQ, but this section might answer your question:';
+            var _p2 = document.createElement('p');
+            var _a = document.createElement('a');
+            _a.setAttribute('href', '#' + String(data.sectionId));
+            _a.textContent = 'Go to section: ' + (data.sectionLabel || data.sectionId);
+            _p2.appendChild(_a);
+            typingMsg.appendChild(_p1); typingMsg.appendChild(_p2);
+          } else {
+            // No section to suggest → fallback
+            typingMsg.innerHTML = `<p>⚠️ I couldn’t find a clear FAQ for that.<br>
+            Please try rephrasing, or tap <strong>Get Help</strong>.</p>`;
+          }
+        } else {
+       
+      // Normal FAQ answer — XSS-safe: textContent, never innerHTML with server data (audit 2026-07-02)
+          while (typingMsg.firstChild) typingMsg.removeChild(typingMsg.firstChild);
+          var _pa = document.createElement('p');
+          _pa.textContent = data.answer;
+          typingMsg.appendChild(_pa);
+        }
+
+        typingMsg.style.animationDelay = "0.1s"; // trigger fade-in
+      })
+      .catch(err => {
+        console.error("FAQ fetch error:", err);
+        typingMsg.innerHTML = `<p>⚠️ I couldn’t find a clear FAQ for that.<br>
+        Please try rephrasing, or tap <strong>Get Help</strong>.</p>`;
+      });
+    });
+  });
+
+  // ESC closes whichever sheet is open
+  document.addEventListener("keydown", (e) => {
+    if (e.key === "Escape") {
+      if (chatSheet.getAttribute("data-state") !== "closed") {
+        closeChatSheet();
+      }
+      if (helpSheet.getAttribute("data-state") !== "closed") {
+        closeHelpSheet();
+      }
+    }
+  });
+});
+</script>
+
+
+
+<!-- ==============================
+     PLAN HOLDER INPUT LOGIC
+     ============================== -->
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+  const STORAGE_KEY = 'planHolderData';
+
+  // DOM Elements
+  const planHolder = document.getElementById('input-plan-holder');
+  const confirmation = document.getElementById('input-confirmation');
+  const effectiveDate = document.getElementById('input-effective-date');
+  const endDate = document.getElementById('input-end-date');
+  const retailPaid = document.getElementById('input-retail-paid');
+
+  // Exit early if elements don't exist (Thymeleaf server-side render)
+  if (!planHolder || !confirmation || !effectiveDate || !endDate || !retailPaid) {
+    return;
+  }
+
+  // === SESSION STORAGE ===
+  function saveToSession() {
+    const data = {
+      planHolder: planHolder.value,
+      confirmation: confirmation.value,
+      effectiveDate: effectiveDate.value,
+      retailPaid: retailPaid.value
+    };
+    sessionStorage.setItem(STORAGE_KEY, JSON.stringify(data));
+  }
+
+  function loadFromSession() {
+    const saved = sessionStorage.getItem(STORAGE_KEY);
+    if (saved) {
+      try {
+        const data = JSON.parse(saved);
+        planHolder.value = data.planHolder || '';
+        confirmation.value = data.confirmation || '';
+        effectiveDate.value = data.effectiveDate || '';
+        retailPaid.value = data.retailPaid || '';
+        // Recalculate end date if effective date exists
+        if (data.effectiveDate) {
+          calculateEndDate();
+        }
+      } catch (e) {
+        console.warn('Failed to parse planHolderData:', e);
+      }
+    }
+  }
+
+  // === DATE CALCULATION (30-day renewable subscription, max 36 months) ===
+  function calculateEndDate() {
+    if (!effectiveDate.value) {
+      endDate.value = '';
+      return;
+    }
+    const start = new Date(effectiveDate.value);
+    if (isNaN(start.getTime())) {
+      endDate.value = '';
+      return;
+    }
+    const end = new Date(start);
+    end.setMonth(start.getMonth() + 36);
+
+    // Format as MM/DD/YYYY
+    const mm = String(end.getMonth() + 1).padStart(2, '0');
+    const dd = String(end.getDate()).padStart(2, '0');
+    const yyyy = end.getFullYear();
+    endDate.value = mm + '/' + dd + '/' + yyyy;
+    saveToSession();
+  }
+
+  // === CONFIRMATION NUMBER VALIDATION ===
+  function sanitizeConfirmation() {
+    confirmation.value = confirmation.value.replace(/\D/g, '');
+  }
+
+  function validateConfirmationLength() {
+    const len = confirmation.value.length;
+    if (len > 0 && len !== 12 && len !== 16) {
+      alert('Confirmation number must be exactly 12 or 16 digits.');
+      confirmation.focus();
+      return;
+    }
+    saveToSession();
+  }
+
+  // === CURRENCY FORMATTING ===
+  function formatCurrency() {
+    // Strip everything except digits and decimal
+    let val = retailPaid.value.replace(/[^0-9.]/g, '');
+    
+    if (val === '') {
+      retailPaid.value = '';
+      saveToSession();
+      return;
+    }
+    
+    const num = parseFloat(val);
+    if (isNaN(num) || num < 0) {
+      alert('Please enter a valid dollar amount.');
+      retailPaid.value = '';
+      retailPaid.focus();
+      return;
+    }
+    
+    retailPaid.value = '$' + num.toLocaleString('en-US', {
+      minimumFractionDigits: 2,
+      maximumFractionDigits: 2
+    });
+    saveToSession();
+  }
+
+  // === PLAN HOLDER SAVE ===
+  function savePlanHolder() {
+    saveToSession();
+  }
+
+  // === EVENT LISTENERS ===
+  planHolder.addEventListener('blur', savePlanHolder);
+  confirmation.addEventListener('input', sanitizeConfirmation);
+  confirmation.addEventListener('blur', validateConfirmationLength);
+  effectiveDate.addEventListener('change', calculateEndDate);
+  retailPaid.addEventListener('blur', formatCurrency);
+
+  // Load saved data on page load
+  loadFromSession();
+});
+</script>
+
+
+<!-- SMART BAR AND BOTTOM SHEET UI -->
+
+<div id="smartBar" class="smart-bar" data-state="collapsed">
+  <div class="smart-bar-container">
+    <button class="smart-bar-action" data-action="chat" aria-label="Ask questions about coverage">
+      <span class="bar-icon">💬</span>
+      <span class="bar-label">Feature Coming Soon</span>
+    </button>
+    <button class="smart-bar-action" data-action="claim" aria-label="File a claim online">
+      <span class="bar-icon">📋</span>
+      <span class="bar-label">File claim</span>
+    </button>
+    <button class="smart-bar-action" data-action="help" aria-label="Get help or contact support">
+      <span class="bar-icon">✨</span>
+      <span class="bar-label">Get help</span>
+    </button>
+    <button class="smart-bar-action" onclick="printDocument()" aria-label="Print this plan">
+      <span class="bar-icon">🖨️</span>
+      <span class="bar-label">Print plan</span>
+    </button>
+    <button class="smart-bar-action" data-action="top" aria-label="Back to top">
+      <span class="bar-icon">⬆</span>
+      <span class="bar-label">Top</span>
+    </button>
+  </div>
+</div>
+
+
+
+  <!-- Bottom Sheet (Hidden by default) -->
+
+  <div id="chatSheet" class="bottom-sheet" aria-hidden="true" data-state="closed">
+    <div class="sheet-header">
+      <h3 class="sheet-title">Alice, Your Coverage Assistant</h3>
+             <button class="chat-close-btn" aria-label="Close chat">Close Chat</button>
+    </div>
+    
+    <div class="sheet-content">
+      <!-- Placeholder chat messages -->
+      <div id="chatMessages" class="chat-messages">
+        <div class="chat-message bot-message">
+          <p>👋 Hi! I can help you understand your Protection Plan. What would you like to know?</p>
+        </div>
+
+      </div>
+      
+      <!-- Quick reply chips -->
+      <div id="quickReplies" class="quick-replies">
+        <button class="quick-reply-chip" data-reply="coverage">What's covered?</button>
+        <button class="quick-reply-chip" data-reply="claim">How do I file a claim?</button>
+        <button class="quick-reply-chip" data-reply="copay">Do I need a co-pay?</button>
+      </div>
+      
+
+      <!-- Input area (disabled for now) -->
+      <div class="chat-input-area">
+        <form id="chatForm" class="chat-form">
+          <input 
+            type="text" 
+            id="chatInput" 
+            class="chat-input" 
+            placeholder="Type your question..." 
+            disabled
+            aria-label="Type your question"
+          >
+          <button type="submit" class="chat-send" disabled aria-label="Send message">
+            Send
+          </button>
+        </form>
+        <p class="chat-notice">Chat feature coming soon</p>
+      </div>
+    </div>
+    
+
+    <!-- Hidden data attributes for future integration -->
+    <div class="chat-metadata" style="display: none;">
+      <span data-plan-sku="F3-30-Day-Subscription"></span>
+      <span data-max-messages="20"></span>
+      <span data-endpoint="/api/chat"></span>
+    </div>
+  </div>
+
+
+
+  <!-- Help Sheet (Dedicated for contact info) -->
+  <div id="helpSheet" class="help-sheet" aria-hidden="true" data-state="closed">
+    <div class="sheet-header">
+      <h3 class="sheet-title">Need Help?</h3>
+      <button class="sheet-close" aria-label="Close help panel">×</button>
+    </div>
+
+    <div class="sheet-content">
+      <p><span class="bar-icon">📧</span> 
+         <a href="mailto:claims@raptns.com">claims@raptns.com</a>
+      </p>
+      <p><span class="bar-icon">📞</span> 
+         <a href="tel:1-855-513-5435">1-855-513-5435</a>
+      </p>
+      <p><span class="bar-icon">🕐</span> Mon—Fri, 9am—6pm EST</p>
+    </div>
+  </div>
+
+
+</body>
+</html>

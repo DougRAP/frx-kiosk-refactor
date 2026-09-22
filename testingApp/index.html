@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Furniture-Rx QA — Coast to Coast</title>
+<style>
+  :root{
+    --paper:#faf7f2;--card:#fff;--ink:#1c2430;--soft:#5b6572;--line:#e6e0d6;
+    --navy:#14263c;--orange:#e8622c;--gold:#c99a3c;--rim:4px solid var(--orange);
+    --sans:system-ui,-apple-system,"Segoe UI",Roboto,Arial,sans-serif;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:var(--sans);background:var(--paper);color:var(--ink);line-height:1.55;padding:0 20px 60px}
+  header{max-width:960px;margin:0 auto;padding:44px 0 8px}
+  h1{font-size:30px;letter-spacing:-.3px}
+  h1 .p{color:var(--orange)}
+  .sub{color:var(--soft);margin-top:8px;max-width:680px}
+  main{max-width:960px;margin:0 auto}
+  .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:16px;margin-top:26px}
+  a.card{display:block;background:var(--card);border:1px solid var(--line);border-left:var(--rim);border-radius:12px;padding:20px 22px;text-decoration:none;color:inherit;box-shadow:0 1px 3px rgba(20,38,60,.06);transition:transform .12s,box-shadow .12s}
+  a.card:hover{transform:translateY(-2px);box-shadow:0 6px 18px rgba(20,38,60,.12)}
+  a.card h2{font-size:19px;margin-bottom:4px}
+  a.card .n{font-size:12px;color:var(--orange);font-weight:700;letter-spacing:.5px;text-transform:uppercase}
+  a.card p{font-size:13.5px;color:var(--soft);margin-top:8px}
+  .note{margin-top:30px;background:#fffdf7;border:1px dashed var(--gold);border-radius:12px;padding:16px 20px;max-width:960px}
+  .note h3{font-size:13px;text-transform:uppercase;letter-spacing:.6px;color:#8a6d28;margin-bottom:8px}
+  .note ul{margin-left:20px}.note li{margin-bottom:5px;font-size:14px}
+  footer{max-width:960px;margin:34px auto 0;color:var(--soft);font-size:12.5px}
+</style>
+</head>
+<body>
+<header>
+  <h1>Furniture-Rx QA <span class="p">Coast to Coast</span></h1>
+  <p class="sub">Four independent, step-by-step test wizards, one per front. Hand each to a different tester. Every case is based on the real code and on decisions taken with Doug, plus edge cases that stress the system the way real, distracted users would.</p>
+</header>
+<main>
+  <div class="grid">
+    <a class="card" href="d2c/index.html">
+      <span class="n">64 cases</span>
+      <h2>D2C Storefront</h2>
+      <p>furniturerx.net — configurator, cart, checkout, Maya, gifts, account & dashboard.</p>
+    </a>
+    <a class="card" href="kiosk/index.html">
+      <span class="n">45 cases</span>
+      <h2>In-Store Kiosk</h2>
+      <p>Associate tablet — store fields, receipt capture, single-QR handoff, sales mode, portal cross-checks.</p>
+    </a>
+    <a class="card" href="tech/index.html">
+      <span class="n">59 cases</span>
+      <h2>Tech (Technician) Site</h2>
+      <p>Kits + Repair Membership (90-day trial), three ways to pay, Technician ID.</p>
+    </a>
+    <a class="card" href="portal/index.html">
+      <span class="n">63 cases</span>
+      <h2>Subscription Portal</h2>
+      <p>Back office — role access matrix, subscribers, commissions, dealer admin, exports, cross-site checks.</p>
+    </a>
+  </div>
+  <div class="note">
+    <h3>How to use</h3>
+    <ul>
+      <li>Open any wizard, pick the environment (Live is the default), type your name, and start.</li>
+      <li>For each case: do the steps, press <strong>Pass / Fail / N/A</strong>, and leave a note. Each section also has a free "General observations" box.</li>
+      <li>Progress is saved automatically in that browser. Use <strong>Export progress</strong> often to get a JSON backup, and <strong>Import</strong> to restore it or continue on another machine.</li>
+      <li>The four wizards keep separate storage, so different people can run different fronts without clashing.</li>
+    </ul>
+  </div>
+</main>
+<footer>Furniture-Rx Second Chance · QA test app · generated 2026-07-29 · open these files directly in a browser (no server needed).</footer>
+</body>
+</html>

@@ -1,0 +1,743 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Furniture-Rx QA — Subscription Portal</title>
+<style>
+  :root{
+    --paper:#faf7f2; --card:#ffffff; --ink:#1c2430; --ink-soft:#5b6572; --line:#e6e0d6;
+    --navy:#14263c; --orange:#e8622c; --gold:#c99a3c; --green:#2e7d4f; --red:#b3372e; --gray:#8a94a0; --blue:#274a72;
+    --rim:4px solid var(--orange);
+    --sans:system-ui,-apple-system,"Segoe UI",Roboto,Arial,sans-serif;
+    --mono:ui-monospace,Consolas,"Cascadia Mono",Menlo,monospace;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html,body{height:100%}
+  body{font-family:var(--sans);background:var(--paper);color:var(--ink);font-size:15px;line-height:1.5}
+  button{font:inherit;cursor:pointer}
+  input,textarea,select{font:inherit;color:var(--ink)}
+  a{color:var(--orange)}
+  code{font-family:var(--mono);font-size:.88em;background:#f1ede4;padding:1px 5px;border-radius:4px}
+
+  #app{display:flex;flex-direction:column;height:100%}
+  header{background:var(--navy);color:#fff;padding:10px 16px;display:flex;flex-wrap:wrap;gap:10px 18px;align-items:center}
+  header h1{font-size:16px;font-weight:700;letter-spacing:.2px;margin-right:auto}
+  header h1 small{display:block;font-size:11px;font-weight:400;opacity:.75}
+  .hgroup{display:flex;align-items:center;gap:6px;font-size:12.5px}
+  .hgroup label{opacity:.8}
+  header select,header input[type=text]{background:#0e1c2e;border:1px solid #33465d;color:#fff;border-radius:6px;padding:4px 8px;font-size:12.5px}
+  header input[type=text]{width:230px}
+  .hbtn{background:#0e1c2e;border:1px solid #33465d;color:#fff;border-radius:6px;padding:5px 11px;font-size:12.5px}
+  .hbtn:hover{border-color:var(--orange)}
+  .hbtn.accent{background:var(--orange);border-color:var(--orange);font-weight:600}
+  .hbtn.on{background:var(--gold);border-color:var(--gold);color:#231c08}
+
+  #progressbar{height:5px;background:#dcd5c8}
+  #progressbar>div{height:100%;width:0;background:linear-gradient(90deg,var(--orange),var(--gold));transition:width .3s}
+
+  #main{flex:1;display:flex;min-height:0}
+  nav{width:320px;min-width:250px;border-right:1px solid var(--line);overflow-y:auto;background:#f4f0e8;padding-bottom:40px}
+  #content{flex:1;overflow-y:auto;padding:22px 26px 90px}
+
+  .navsec{border-bottom:1px solid var(--line)}
+  .navsec>button{width:100%;text-align:left;background:none;border:none;padding:10px 12px;font-weight:700;font-size:13px;display:flex;align-items:center;gap:8px;color:var(--ink)}
+  .navsec>button .cnt{margin-left:auto;font-weight:400;font-size:11px;color:var(--ink-soft)}
+  .navsec>button .chev{transition:transform .15s;font-size:10px;color:var(--ink-soft)}
+  .navsec.open>button .chev{transform:rotate(90deg)}
+  .navcases{display:none}
+  .navsec.open .navcases{display:block}
+  .navcase{width:100%;text-align:left;background:none;border:none;border-left:3px solid transparent;padding:5px 10px 5px 14px;font-size:12.3px;display:flex;gap:7px;align-items:baseline;color:var(--ink)}
+  .navcase:hover{background:#ece6da}
+  .navcase.current{background:#fff;border-left-color:var(--orange);font-weight:600}
+  .navcase .cid{font-family:var(--mono);font-size:10.5px;color:var(--ink-soft);white-space:nowrap}
+  .navcase .mk{font-size:10px;margin-left:auto}
+  .dot{width:9px;height:9px;border-radius:50%;background:#cfc8ba;flex:none;position:relative;top:1px}
+  .dot.pass{background:var(--green)} .dot.fail{background:var(--red)} .dot.na{background:var(--gray)}
+
+  .crumb{font-size:12px;color:var(--ink-soft);margin-bottom:8px}
+  .card{background:var(--card);border:1px solid var(--line);border-left:var(--rim);border-radius:10px;padding:20px 24px;max-width:900px;box-shadow:0 1px 3px rgba(20,38,60,.06)}
+  .case-top{display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin-bottom:4px}
+  .case-id{font-family:var(--mono);font-size:12px;color:var(--ink-soft)}
+  .tag{font-size:10.5px;font-weight:700;letter-spacing:.4px;text-transform:uppercase;border-radius:20px;padding:2px 9px}
+  .tag.happy{background:#e3efe7;color:#22603d} .tag.validation{background:#eee7f5;color:#5b3d84}
+  .tag.access{background:#e5ecf5;color:#274a72} .tag.edge{background:#fbe9e0;color:#9c3d12}
+  .tag.role{background:#f1ede4;color:#6b6252;text-transform:none;letter-spacing:0}
+  .tag.tech{background:#e7edf2;color:#2b4a63}
+  .card h2{font-size:19px;margin:2px 0 12px;line-height:1.3}
+  .lbl{font-size:11px;font-weight:700;letter-spacing:.8px;text-transform:uppercase;color:var(--ink-soft);margin:16px 0 6px}
+  ol.steps{margin:0 0 4px 22px}
+  ol.steps li{margin-bottom:6px}
+  .expected{background:#f6f3ec;border:1px solid var(--line);border-radius:8px;padding:10px 14px}
+  .why{font-size:12.5px;color:var(--ink-soft);margin-top:8px;font-style:italic}
+  .source{font-size:11.5px;color:var(--ink-soft);margin-top:12px;background:#f4f0e8;border:1px dashed var(--line);border-radius:6px;padding:6px 10px}
+  .source b{font-weight:600}
+
+  .tech-banner{background:#eef3f7;border:1px solid #cfdce6;border-radius:8px;padding:10px 14px;margin:10px 0}
+  .tech-banner p{font-size:13px;margin-bottom:8px}
+  .tech-banner .row{display:flex;gap:8px;flex-wrap:wrap}
+  .backup-reminder{background:#fff6ec;border:1px solid #f2ceac;border-left:var(--rim);border-radius:8px;padding:10px 14px;margin:0 0 14px;max-width:900px}
+  .backup-reminder .bm-txt{font-size:13px;font-weight:600;color:#8a4a1e}
+  .backup-reminder .bm-row{display:flex;gap:14px;align-items:center;flex-wrap:wrap;margin-top:8px}
+  .backup-reminder .bm-off{font-size:12px;color:var(--ink-soft);display:flex;align-items:center;gap:5px;cursor:pointer}
+  .minibtn{border:1px solid var(--line);background:#fff;border-radius:7px;padding:6px 12px;font-size:12.5px;font-weight:600}
+  .minibtn:hover{border-color:var(--orange)}
+
+  .datablock{background:#fbfaf6;border:1px solid var(--line);border-radius:8px;padding:12px 14px;margin-top:14px}
+  .datablock .lbl{margin-top:0}
+  .chiprow{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin:6px 0}
+  .chip{display:inline-flex;gap:8px;align-items:center;background:#f1ede4;border:1px solid var(--line);border-radius:20px;padding:4px 6px 4px 12px;font-family:var(--mono);font-size:12.5px}
+  .chip .clab{font-family:var(--sans);font-size:11px;color:var(--ink-soft);font-weight:600;margin-right:2px}
+  .chip button{border:none;background:#e3ddd0;border-radius:14px;width:24px;height:24px;font-size:12px;line-height:1}
+  .chip button:hover{background:var(--orange);color:#fff}
+  .datahint{font-size:12px;color:var(--ink-soft);margin-top:6px}
+  .datahint b{color:var(--ink)}
+
+  .openwin{display:inline-flex;align-items:center;gap:6px;background:var(--navy);color:#fff;border:none;border-radius:8px;padding:8px 14px;font-weight:600;font-size:13px;margin-bottom:12px}
+  .openwin:hover{background:var(--orange)}
+
+  .verdict{display:flex;gap:10px;margin:18px 0 12px;flex-wrap:wrap}
+  .vbtn{border:2px solid var(--line);background:#fff;border-radius:8px;padding:9px 26px;font-weight:700;font-size:14px;color:var(--ink-soft)}
+  .vbtn:hover{border-color:var(--ink-soft)}
+  .vbtn.pass.on{background:var(--green);border-color:var(--green);color:#fff}
+  .vbtn.fail.on{background:var(--red);border-color:var(--red);color:#fff}
+  .vbtn.na.on{background:var(--gray);border-color:var(--gray);color:#fff}
+  textarea{width:100%;border:1px solid var(--line);border-radius:8px;padding:9px 12px;min-height:64px;resize:vertical;background:#fff}
+  textarea:focus{outline:2px solid var(--orange);outline-offset:-1px;border-color:var(--orange)}
+
+  .shots{display:flex;flex-wrap:wrap;gap:8px;margin-top:8px}
+  .shot{position:relative;width:96px;height:96px;border:1px solid var(--line);border-radius:8px;overflow:hidden;background:#f1ede4}
+  .shot img{width:100%;height:100%;object-fit:cover;cursor:zoom-in}
+  .shot button{position:absolute;top:2px;right:2px;background:rgba(20,38,60,.8);color:#fff;border:none;border-radius:12px;width:20px;height:20px;font-size:11px;line-height:1}
+  .attachrow{display:flex;gap:8px;align-items:center;margin-top:8px;flex-wrap:wrap}
+  .attachrow .hint{font-size:11.5px;color:var(--ink-soft)}
+
+  .reso{border:1px solid #cfe0cf;background:#eef6ef;border-radius:8px;padding:10px 14px;margin:12px 0}
+  .reso.wontfix{border-color:#e6d3ce;background:#f8efec}
+  .reso.needinfo{border-color:#e6ddc4;background:#fbf6e7}
+  .reso b{font-weight:700}
+  .reso .rpill{font-size:10.5px;font-weight:700;text-transform:uppercase;border-radius:20px;padding:2px 9px;margin-right:6px}
+  .rpill.fixed{background:#dcefe0;color:#1f5b39}.rpill.wontfix{background:#f2d9d1;color:#8a3b25}.rpill.needinfo{background:#f0e6c6;color:#7a5c10}
+
+  .wiznav{display:flex;gap:10px;margin-top:18px;max-width:900px}
+  .wiznav button{border:1px solid var(--line);background:#fff;border-radius:8px;padding:9px 18px;font-weight:600}
+  .wiznav button:hover{border-color:var(--orange)}
+  .wiznav .next{margin-left:auto;background:var(--navy);color:#fff;border-color:var(--navy)}
+  .wiznav .next:hover{background:var(--orange);border-color:var(--orange)}
+  .savehint{font-size:11.5px;color:var(--ink-soft);align-self:center}
+
+  .obsbox{max-width:900px;margin-top:22px;background:#fffdf7;border:1px dashed var(--gold);border-radius:10px;padding:14px 18px}
+  .obsbox .lbl{margin-top:0;color:#8a6d28}
+  .obslog{margin-top:10px;display:flex;flex-direction:column;gap:8px}
+  .obsentry{background:#fff;border:1px solid var(--line);border-radius:8px;padding:8px 10px}
+  .obsentry .ots{font-size:11px;color:var(--ink-soft);margin-bottom:3px;display:flex;justify-content:space-between}
+  .obsentry .odel{border:none;background:none;color:var(--red);font-size:11px;cursor:pointer}
+  .obsentry .otext{width:100%;border:1px solid transparent;border-radius:5px;padding:3px 5px;background:#fbfaf6}
+  .obsentry .otext:focus{outline:none;border-color:var(--orange);background:#fff}
+
+  .sum-tiles{display:flex;gap:12px;flex-wrap:wrap;margin:14px 0 22px}
+  .tile{background:var(--card);border:1px solid var(--line);border-left:var(--rim);border-radius:10px;padding:12px 20px;min-width:110px}
+  .tile b{display:block;font-size:24px}.tile span{font-size:12px;color:var(--ink-soft)}
+  table.sum{border-collapse:collapse;width:100%;max-width:1040px;background:#fff;font-size:13px}
+  table.sum th,table.sum td{border:1px solid var(--line);padding:6px 10px;text-align:left;vertical-align:top}
+  table.sum th{background:#f1ede4;font-size:11.5px;text-transform:uppercase;letter-spacing:.5px}
+  td.st-pass{color:var(--green);font-weight:700} td.st-fail{color:var(--red);font-weight:700}
+  td.st-na{color:var(--gray);font-weight:700} td.st-pending{color:var(--ink-soft)}
+
+  .intro p{margin-bottom:10px;max-width:780px}
+  .intro ul{margin:0 0 10px 22px;max-width:780px}
+  .intro li{margin-bottom:5px}
+  .panel{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:18px 22px;max-width:820px;margin-top:16px}
+  .panel.accent{border-left:var(--rim)}
+  .field{margin-bottom:12px}
+  .field label{display:block;font-size:12.5px;font-weight:600;color:var(--ink-soft);margin-bottom:4px}
+  .field input[type=text],.field input[type=email]{width:100%;max-width:420px;border:1px solid var(--line);border-radius:8px;padding:8px 11px;background:#fff}
+  .radio{display:inline-flex;gap:6px;align-items:center;margin-right:16px;font-size:14px}
+  .credtable{border-collapse:collapse;width:100%;margin-top:8px;font-size:13px}
+  .credtable th,.credtable td{border:1px solid var(--line);padding:6px 8px;text-align:left}
+  .credtable th{background:#f1ede4;font-size:11px;text-transform:uppercase;letter-spacing:.4px}
+  .linkrow{display:flex;flex-wrap:wrap;gap:8px;margin-top:10px}
+
+  .modal-bg{position:fixed;inset:0;background:rgba(20,38,60,.5);display:none;align-items:center;justify-content:center;z-index:20;padding:20px}
+  .modal-bg.show{display:flex}
+  .modal{background:#fff;border-radius:12px;max-width:640px;width:100%;max-height:86vh;overflow-y:auto;padding:22px 26px;box-shadow:0 20px 60px rgba(0,0,0,.3)}
+  .modal h3{font-size:18px;margin-bottom:10px}
+  .modal .x{float:right;border:none;background:none;font-size:20px;cursor:pointer;color:var(--ink-soft)}
+  .imgmodal img{max-width:100%;border-radius:8px}
+
+  #toast{position:fixed;bottom:18px;right:18px;background:var(--navy);color:#fff;border-radius:8px;padding:10px 16px;font-size:13px;opacity:0;transition:opacity .25s;pointer-events:none;z-index:30}
+  #toast.show{opacity:.96}
+
+  @media(max-width:900px){
+    #main{flex-direction:column}
+    nav{width:100%;max-height:38vh;border-right:none;border-bottom:1px solid var(--line)}
+    header input[type=text]{width:150px}
+  }
+  @media print{ header,nav,.wiznav,#progressbar{display:none} #content{overflow:visible} }
+</style>
+</head>
+<body>
+<div id="app">
+  <header>
+    <h1 id="apptitle"></h1>
+    <div class="hgroup"><label for="envsel">Environment</label>
+      <select id="envsel"></select>
+      <input type="text" id="envbase" spellcheck="false" title="Base URL used in the steps">
+    </div>
+    <div class="hgroup">
+      <button class="hbtn" id="btn-creds">Access &amp; creds</button>
+      <button class="hbtn" id="btn-profile">Profile</button>
+      <button class="hbtn" id="btn-evidence" title="Show developer evidence on cases">Evidence</button>
+      <button class="hbtn" id="btn-summary">Summary</button>
+      <button class="hbtn" id="btn-import">Import</button>
+      <button class="hbtn" id="btn-merge" title="Merge developer resolutions">Merge fixes</button>
+      <button class="hbtn accent" id="btn-export">Export</button>
+      <input type="file" id="importfile" accept=".json,application/json" hidden>
+      <input type="file" id="mergefile" accept=".json,application/json" hidden>
+    </div>
+  </header>
+  <div id="progressbar"><div></div></div>
+  <div id="main">
+    <nav id="nav"></nav>
+    <div id="content"></div>
+  </div>
+</div>
+<div class="modal-bg" id="modal-bg"><div class="modal" id="modal"></div></div>
+<div id="toast"></div>
+
+<script id="appdata" type="application/json">{"appId":"furnfx-qa-portal","title":"Furniture-Rx QA — Subscription Portal","version":"2026-07-30","envs":[{"id":"live","label":"Live","base":"https://portal.furniturerx.net"},{"id":"local","label":"Localhost (netlify dev)","base":"http://localhost:8888/portal"}],"access":{"note":"Sign in with the shared test logins below. Each role sees a different portal — that is the point of many cases. For cross-site cases, open the selling front (D2C / kiosk) in a **separate window**.","links":[{"label":"D2C storefront","urlByEnv":{"live":"https://www.furniturerx.net","local":"http://localhost:8888"}},{"label":"Kiosk","urlByEnv":{"live":"https://kiosk.furniturerx.net","local":"http://localhost:8888/kiosk"}}],"credentials":[{"role":"RAP admin (everything)","email":"admin@raptns.com","password":"12345678"},{"role":"Dealer owner (Summit Home Furnishings)","email":"owner@rapqa.com","password":"12345678"},{"role":"Store manager (reduced)","email":"store@rapqa.com","password":"12345678"},{"role":"Customer (account.html only, NOT the portal)","email":"customer1@rapqa.com","password":"12345678"}]},"intro":["The portal is the back office that dealers and RAP staff sign into. What you can see and do depends on which login you use, so most cases tell you exactly which account to sign in with.","RAP admin (admin@raptns.com) sees everything: every dealer and every menu item. Only this login has the two dropdowns at the top of the page, \"World\" and \"Viewing\", that switch between the Retail and Technician versions of the portal and choose which dealer you are looking at. This login can manage dealers, generate codes, cancel subscriptions and open the Audit Log.","Dealer owner (owner@rapqa.com) sees one company, Summit Home Furnishings, with all of its stores and staff. It can export lists and see commissions, but it has no Dealer Admin, no Audit Log and cannot generate codes.","Store manager (store@rapqa.com) sees a single store and less of it: no exports, no referral codes, and no Stripe or commission screens.","Many cases are ACCESS cases: the whole point is that a login is BLOCKED from something. For those, \"Pass\" means the thing was correctly hidden or refused.","The \"World\" and \"Viewing\" dropdowns at the top of the page appear only for the RAP admin. Switching World also renames some labels on screen (for example \"Dealer\" becomes \"Company\", and \"Sales order #\" becomes \"Workorder #\"), and checking that the renaming is correct is itself part of the test.","A few cases are marked technical: they ask you to open the browser developer tools, copy the sign-in token from a network request and send a request by hand. If you are not sure how, ask the team; each case spells out what to paste."],"sections":[{"id":"login","title":"1 · Login, sessions & rate limits","cases":[{"id":"POR-001","kind":"happy","role":"Any","title":"Landing page and login","steps":["Open {BASE}/ while signed out.","Sign in with one of the test logins above."],"expected":"The signed-out page shows the welcome banner and a \"Become a reseller\" button. After you sign in you land on the dashboard, and if you reload the page you stay signed in.","source":"portal/index.html:12-35; portal.js session frx_portal_session"},{"id":"POR-002","kind":"validation","role":"Any","title":"Wrong credentials give a uniform error","steps":["Try a real login email with the wrong password.","Try an email that does not exist at all."],"expected":"Both attempts show the exact same message, \"Wrong email or password.\"","why":"Showing one message for both means the portal never reveals whether an email is registered.","source":"auth-login.mjs uniform 401 invalid_credentials"},{"id":"POR-003","kind":"access","role":"Customer","title":"A normal customer account cannot enter the portal","steps":["If you have a plain customer login (one created by a normal storefront or kiosk purchase, e.g. customer1@rapqa.com), try signing in here."],"expected":"The portal refuses with \"This account has no portal access.\"","why":"Customer accounts are not portal users; they belong on the customer sign-in page.","source":"portal-me.mjs:35 not_portal_user 403"},{"id":"POR-004","kind":"edge","role":"Any","title":"Login rate limit (per IP and per account)","steps":["On purpose, fail the login six or more times quickly using the same email."],"expected":"Around the sixth attempt you get \"Too many attempts. Please wait a moment and try again.\" Repeated wrong tries against one account keep getting throttled even from a different network or computer.","why":"There are two limits at once: one on how fast a single computer can try, and one on how many times a single account can be targeted, so switching networks does not get around it.","source":"auth-login.mjs:43,63 (SEC-2 dual rate limit)"},{"id":"POR-005","kind":"edge","tech":true,"role":"Any","title":"Expired / tampered session is handled","steps":["This checks that a broken sign-in is cleaned up rather than left half-loaded. After signing in, press F12 to open developer tools and click the \"Console\" tab.","Paste and run: localStorage.setItem(\"frx_portal_session\", \"{}\"), then reload the page."],"expected":"You are returned to the landing/login page cleanly with \"Session expired. Please sign in again.\", not into a broken half-loaded portal.","source":"portal.js:41-47 session validation, 92-93"}]},{"id":"access","title":"2 · Role access matrix (deny tests)","cases":[{"id":"POR-020","kind":"access","role":"Admin","title":"Admin sees every tab and both selectors","steps":["Sign in as the RAP admin (admin@raptns.com). Read the items in the left menu, then look at the top of the page."],"expected":"The left menu includes Dashboard, Sales Stats, Subscribers, Referral Codes, Stripe Account, Dealer Admin, Pricing & Plans and Audit Log. At the top of the page you see the \"World\" and \"Viewing\" dropdowns.","source":"index.html data-roles; portal.js:149-156 #hdr-admin"},{"id":"POR-021","kind":"access","role":"Org","title":"Dealer is denied admin-only tabs","steps":["Sign in as the Dealer owner (owner@rapqa.com). Read the left menu.","Check whether Dealer Admin, Pricing & Plans, Audit Log and the top \"World\"/\"Viewing\" dropdowns are there."],"expected":"Dealer Admin, Pricing & Plans, Audit Log and the \"World\"/\"Viewing\" dropdowns are all missing. Dashboard, Sales Stats, Subscribers, Referral Codes and Stripe Account are still there.","source":"data-roles=\"admin\" on those items; portal.js:149-156"},{"id":"POR-022","kind":"access","role":"Sub","title":"Store role is reduced (no export/referral/stripe)","steps":["Sign in as the Store manager (store@rapqa.com). Read the left menu and open Subscribers.","Look for an \"Export to Excel\" button, a \"Referral Codes\" menu item, and a \"Stripe Account\" menu item."],"expected":"There is no Export button, no Referral Codes and no Stripe Account. The \"Your access\" card describes a reduced store view. Subscribers is still visible.","why":"Seeing the company-wide subscriber list is intentionally allowed even for the store role.","source":"deriveScope: sub excluded from export/api/stripe/referral (_lib/portal.mjs:42)"},{"id":"POR-023","kind":"access","tech":true,"role":"Org","title":"Server enforces export deny, not just the UI","steps":["This checks the server blocks the export for a store role even if someone bypasses the button. The Dealer owner is allowed to export, so sign in as the Store manager (store@rapqa.com) for the real test.","Open developer tools (F12), click the \"Console\" tab, and run: fetch(\"/api/portal-exports\",{method:\"POST\",headers:{Authorization:\"Bearer \"+JSON.parse(localStorage.frx_portal_session).access_token,\"Content-Type\":\"application/json\"},body:\"{}\"}).then(r=>r.status).then(console.log)"],"expected":"The request comes back 403. The export is refused by the server for a store role, not just hidden in the menu.","source":"portal-exports.mjs:31 assertCanExport"},{"id":"POR-024","kind":"access","tech":true,"role":"Sub","title":"Referral generation is admin-only on the server","steps":["This checks the server blocks code creation even if the button is bypassed. Signed in as the Store manager (or the Dealer owner), open developer tools, click the \"Console\" tab, and run: fetch(\"/api/portal-referral-codes\",{method:\"POST\",headers:{Authorization:\"Bearer \"+JSON.parse(localStorage.frx_portal_session).access_token,\"Content-Type\":\"application/json\"},body:JSON.stringify({org_id:\"any\"})}).then(r=>r.status).then(console.log)"],"expected":"The request comes back 403. Only the RAP admin can create referral codes, and the server enforces it.","source":"portal-referral-codes.mjs:77 canReferralCreate"},{"id":"POR-025","kind":"access","tech":true,"role":"Org","title":"Cross-tenant data returns 404, not 403","steps":["Sign in as the Dealer owner. Open one of your own customer records and note the id in its address.","This checks a dealer cannot fish for another dealer's records. In developer tools, call /api/portal-customer for an id you believe belongs to ANOTHER dealer (or a random id)."],"expected":"The request comes back 404 (not found), not 403 (forbidden). A dealer cannot use the difference between those answers to discover that another dealer's record exists.","source":"readOrgScope → 404 (_lib/portal.mjs:126); portal-customer.mjs:48"},{"id":"POR-026","kind":"access","role":"Org","title":"Stripe subscription id is hidden from dealers","steps":["Sign in as the RAP admin, open any customer record, and note the \"Stripe subscription\" value.","Sign in as the Dealer owner, open the SAME customer record, and compare that value."],"expected":"The admin sees the real Stripe id. The dealer sees it masked as \"•••• •••• •••• (admin only)\" or a dash. The real id is never sent to a dealer, not even in the network data.","source":"ADMIN_ONLY_FIELDS + stripe_sub_display (_lib/portal.mjs:31, 262-266); Doug 17-jul item 13"},{"id":"POR-027","kind":"access","tech":true,"role":"Sub","title":"KNOWN GAP: Pricing & Plans data has no server guard","steps":["This documents a known gap. Sign in as the Store manager, open developer tools, click the \"Console\" tab, and run: fetch(\"/api/portal-plans\",{headers:{Authorization:\"Bearer \"+JSON.parse(localStorage.frx_portal_session).access_token}}).then(r=>r.status).then(console.log)"],"expected":"Known gap to confirm: the \"Pricing & Plans\" menu item is admin-only, but this endpoint still answers 200 for any signed-in user. It only returns the two display-only plans and prices, so no sensitive data leaks, but the menu label suggests it should be admin-only. Record the status you get.","source":"Gap: portal-plans.mjs:23-24 no assertAdmin vs index.html:118 data-roles=\"admin\""},{"id":"POR-028","kind":"access","tech":true,"role":"Any","title":"Audit log is admin-only on the server","steps":["This checks the audit log is refused to non-admins on the server. Signed in as the Dealer owner or Store manager, open developer tools, click the \"Console\" tab, and run: fetch(\"/api/portal-audit\",{headers:{Authorization:\"Bearer \"+JSON.parse(localStorage.frx_portal_session).access_token}}).then(r=>r.status).then(console.log)"],"expected":"The request comes back 403 for anyone who is not the RAP admin.","source":"portal-audit.mjs:21 assertAdmin"}]},{"id":"world","title":"3 · World, Viewing & label switching (admin)","cases":[{"id":"POR-040","kind":"happy","role":"Admin","title":"Switching World relabels the whole portal","steps":["Sign in as the RAP admin. Set the top \"World\" dropdown to \"Retail\". Note these labels: \"Dealer Admin\", \"Sales order #\", \"Delivery date\", \"Dealer name\".","Switch the \"World\" dropdown to \"Technician\" and read the same labels again across the menu, the Subscribers columns and a customer record."],"expected":"In Technician mode the labels change to \"Company Admin\", \"Workorder #\", \"Service date\", \"Company name\" and \"Technician\". Retail-only blocks such as \"By sales associate\" disappear.","source":"LEX map portal.js:108-123; PORT-19A"},{"id":"POR-041","kind":"happy","role":"Admin","title":"Viewing = a dealer scopes every screen","steps":["Sign in as the RAP admin. Set the top \"Viewing\" dropdown to a single dealer.","Open Dashboard, Sales Stats and Subscribers.","Set \"Viewing\" to \"All resellers\" and compare."],"expected":"With one dealer chosen, every figure and row is for that dealer only. With \"All resellers\" the numbers add up across dealers. The header label reads \"Dealer ID #...\" (or \"Company ID\" in Technician mode).","source":"readOrgScope admin filter; portal.js:159-162"},{"id":"POR-042","kind":"happy","role":"Admin","title":"Rollup exclusion hides a demo dealer from \"All\"","steps":["Sign in as the RAP admin, set \"Viewing\" to \"All resellers\", and note the totals.","Open Dealer Admin for a demo or pilot dealer and turn OFF \"Include in admin reports\".","Go back to the Dashboard with \"Viewing\" set to \"All resellers\" and compare; then set \"Viewing\" to that dealer on its own."],"expected":"With the switch off, that dealer drops out of the \"All resellers\" totals, but viewing that dealer on its own still shows all of its data (nothing is deleted). RAP direct sales are not affected.","source":"PORT-21 include_in_rollups; _lib/portal.mjs:59-76"},{"id":"POR-043","kind":"happy","role":"Admin","title":"Open app (SSO) needs a dealer chosen","steps":["Sign in as the RAP admin. With \"Viewing\" set to \"All resellers\", use \"Open kiosk signed in\".","Now pick one dealer in \"Viewing\" and try \"Open kiosk signed in\" again."],"expected":"With \"All resellers\" it only offers a plain public kiosk link, not a signed-in one. With a single dealer chosen it opens the kiosk already signed in as that dealer.","source":"portal.js:829-833"}]},{"id":"stats","title":"4 · Dashboard & Sales Stats","cases":[{"id":"POR-060","kind":"happy","role":"Any","title":"Dashboard stat cards","steps":["Open the Dashboard."],"expected":"You see four stat cards: Active subscriptions (with \"N new this month\"), Monthly value, Cancellation rate (with an up/down arrow), and Commission (mo). Below them is a recent-activity list of the latest eight subscriptions, each with a short date, contract number, associate and an Active or Cancelled pill.","source":"PORT-16; index.html:135-140; _lib/stats.mjs:91-104"},{"id":"POR-061","kind":"happy","role":"Any","title":"Sales Stats period selector","steps":["Open Sales Stats. Step through the period buttons: All, Year, Month, Today, Custom range.","For Custom range, set a start and an end date."],"expected":"The cards recalculate for each period. A sale dated on the custom end date is included in the count. If you pick an invalid period it quietly falls back to Month.","source":"portal-stats.mjs:38-44; index.html:169-176"},{"id":"POR-062","kind":"happy","role":"Any","title":"Program cards and by-location / by-associate minicards","steps":["On Sales Stats, look at the two program cards: $9.99 Stain and $19.99 Stain + Structure.","Scroll the \"By location\" and \"By associate\" rows sideways."],"expected":"Both program cards show \"Active\". The \"By location\" and \"By associate\" rows always fill to five cards per row (with blank fillers) and scroll sideways, with a visible scrollbar and drag-to-scroll.","source":"PORT-24A; portal.js:474-479, 522-532"},{"id":"POR-063","kind":"edge","role":"Admin","title":"Big numbers and long labels do not break layout","steps":["Sign in as the RAP admin and set \"Viewing\" to \"All resellers\" (the biggest set of data).","Open the Dashboard and Sales Stats and look for text spilling out of cards, clipped words, or cards broken by very long dealer or associate names."],"expected":"Everything fits. Big numbers and long names wrap or trim neatly, and the page never scrolls sideways.","source":"PORT-26 responsive; e2e-responsive fixtures use extreme names"}]},{"id":"subs","title":"5 · Subscribers & Customer Record","cases":[{"id":"POR-080","kind":"happy","role":"Any","title":"Subscribers table, sorting and filters","steps":["Open Subscribers. Click the column headers (Start, Program, Name, Pmts, Contract #, Status) to sort, and click again to reverse the order.","Use the search box (by name or contract number) and the store, associate and date filters. Change the page size between 50, 100 and 250."],"expected":"Sorting works in both directions and the filters narrow the list. The footer reads \"Showing 1-N of M\". Above the table is a note about \"30 days from start\" and the \"RX-#####-NN\" contract format.","source":"PORT-24B; portal.js:857-898; index.html:207,227"},{"id":"POR-081","kind":"happy","role":"Any","title":"SR column reflects open service requests","steps":["Find a subscriber that has an open service request (or create one first, then come back).","Look at the \"SR\" column and click its pill."],"expected":"A subscriber with an open request shows an \"SR · open\" pill in that column; one with none shows a dash. Clicking the pill opens that customer record.","source":"Doug 17-jul items 4-5; portal.js:925-933"},{"id":"POR-082","kind":"happy","role":"Any","title":"Customer Record fields and numbers","steps":["Open any customer record."],"expected":"The header shows the master number \"RX-#####\" and the active \"RX-#####-NN\". The details block lists contact, address, start date, payments, program, sales order (or Workorder) number, delivery (or service) date, associate, dealer/store, a receipt link, an accepted-terms link, and the Stripe subscription (masked for dealers). The checkout summary always has content, even when it falls back to a synthesized line.","source":"PORT-5/19B/24C; portal.js:1043-1044; _lib/portal.mjs:223-231 (Doug 17-jul item 15)"},{"id":"POR-083","kind":"validation","role":"Any","title":"Related purchases block removed from the UI","steps":["In a customer record, look for any \"Related purchases\" section."],"expected":"There is no \"Related purchases\" section anywhere in the record. Confirm it is absent.","source":"Doug 17-jul item 9; no block in portal/index.html"},{"id":"POR-084","kind":"happy","role":"Any","title":"Service requests inside the record","steps":["In a customer record, look at the list of the last five service requests.","Create a new one: the form comes prefilled with the contract, contact and name; choose the category \"Contact customer\"; add a note; submit."],"expected":"A new service request is created with a number like \"SR-#####\", status Open, and a history line \"Request received by RAP's service center\". It shows up in the list. The category menu lets you pick only one at a time (choosing one clears the others).","source":"PORT-24C; portal-service-requests.mjs:56-69; index.html:307-311"},{"id":"POR-085","kind":"happy","role":"Any","title":"Resolve a service request","steps":["With a service request open from the list, tick the \"Resolved (close)\" checkbox and submit."],"expected":"The request flips to Closed. If you try to resolve without first picking a request from the list, you get \"Pick a service request from the list to resolve…\".","source":"portal-service-requests.mjs:88-90; portal.js:611-617"},{"id":"POR-086","kind":"validation","role":"Any","title":"Service request needs a contract and a note","steps":["Start a new service request form, then clear either the contract number or the note and submit."],"expected":"It is blocked with \"Add a contract # and a request before submitting.\" Nothing is created, and no service-request number is used up.","source":"validateServiceRequest invalid_contract / invalid_body_text"},{"id":"POR-087","kind":"access","tech":true,"role":"Org","title":"SEC-3b: cannot file an SR on another dealer's contract","steps":["Sign in as the Dealer owner. This checks the server refuses to file a request against another dealer's contract. In developer tools, click the \"Console\" tab and send a POST to /api/portal-service-requests with a contract number you believe belongs to ANOTHER dealer, for example the body {\"contract_number\":\"RX-19999\",\"body\":\"x\"}."],"expected":"The request comes back 404 (not found). The ownership check runs before anything is created, so no request is filed under the wrong account.","why":"This behavior closed a real security hole.","source":"SEC-3b portal-service-requests.mjs:32-54"}]},{"id":"actions","title":"6 · Quick actions & cancellation","cases":[{"id":"POR-100","kind":"happy","role":"Admin","title":"Resend dashboard link and T&C","steps":["Sign in as the RAP admin, open a customer record, click \"Resend dashboard link\" and confirm in the pop-up.","Then click \"Resend T&C\"."],"expected":"Each one shows a confirm pop-up and then a result pop-up (\"Link sent\" / \"Terms sent\"), and the customer email actually receives them. \"Print T&C\" opens the terms page in a new tab.","source":"portal-resend-link.mjs; portal.js:1000-1020; Doug 17-jul item 14"},{"id":"POR-101","kind":"access","role":"Org","title":"Cancel subscription is visible to all but works only for admin","steps":["Sign in as the Dealer owner, open a customer record and click \"Cancel subscription\".","Then sign in as the RAP admin and do the same on a test or demo subscription."],"expected":"As the dealer it shows \"Admins only\" and nothing happens on the server. As the admin it schedules the cancellation for the end of the billing period and records the action. It stays graceful even when Stripe cannot be reached, as with demo subscriptions.","source":"portal-cancel-subscription.mjs assertAdmin + fail-soft; Doug 17-jul item 14"},{"id":"POR-102","kind":"validation","tech":true,"role":"Admin","title":"Bad contract on quick actions","steps":["This checks the server rejects bad input. In developer tools, call /api/portal-resend-link with the contract \"NOT-A-CONTRACT\"."],"expected":"It returns 400 (invalid contract). A properly formatted but unknown or out-of-scope contract returns 404 instead.","source":"portal-resend-link.mjs:40-53"}]},{"id":"commissions","title":"7 · Stripe Account: commissions & reconciliation","cases":[{"id":"POR-120","kind":"happy","role":"Org","title":"Commission totals and the reinsurance split","steps":["Sign in as the Dealer owner (or as the RAP admin with a dealer chosen in \"Viewing\") and open Stripe Account."],"expected":"The subtitle states the model: \"$2 Stain / $8 Stain+Structure per payment, with your Stripe/reinsurance split.\" There are three cards: Total cash, To commission (your Stripe), and To reinsurance. No gross RAP revenue figure ever appears.","source":"PORT-8/24D; index.html:361-369; portal-commissions.mjs (no gross revenue, HARD)"},{"id":"POR-121","kind":"happy","role":"Admin","title":"Per-dealer override changes the split","steps":["This needs a dealer that has a custom commission split (for example 400/400 on Stain + Structure). Ask the team which dealer to use.","Open that dealer's Stripe Account and look at one Stain + Structure payment row."],"expected":"For that dealer, a Stain + Structure payment splits 400¢ to Stripe and 400¢ to reinsurance instead of the usual 800/0. Ordinary dealers show $2/$8 with reinsurance at 0.","source":"_lib/commissions.mjs pickRate precedence; test-guide-portal-fase3 step 5.3"},{"id":"POR-122","kind":"happy","role":"Org","title":"Reconciliation table (Subscribers clone)","steps":["On Stripe Account, look at the reconciliation table and its date filter."],"expected":"The columns are Start, Name, Contract #, Status, Stripe payment #, Payment date, and a View link to the customer record. Rows with no payment show a dash, never a made-up number. The date filter works on the payment date, not the start date.","source":"Doug 17-jul item 20; portal-reconciliation.mjs:70-76"},{"id":"POR-123","kind":"validation","role":"Org","title":"Membership/kit payments earn no commission","steps":["Find a membership-only or kit-only sale in the reconciliation table."],"expected":"It earns $0 commission (only the two protection plans pay $2/$8). A sale with no dealer attached earns nothing either, counting as RAP direct.","source":"_lib/commissions.mjs unknown SKU → no commission"},{"id":"POR-124","kind":"validation","role":"Any","title":"KNOWN GAP: no clawback on cancellation","steps":["As the RAP admin, cancel a subscription that had at least one commissioned payment, then look at commissions again."],"expected":"Known gap to confirm: cancelling does not reverse any past commission rows (there is no clawback). Note the behavior; it is expected, not a bug to fix on the spot.","source":"Gap: no clawback anywhere in _lib/commissions.mjs"}]},{"id":"referral","title":"8 · Referral codes","cases":[{"id":"POR-140","kind":"happy","role":"Admin","title":"Generate a referral code for a dealer","steps":["Sign in as the RAP admin, set \"Viewing\" to a dealer, open Referral Codes, type a label, and click Generate."],"expected":"A code appears such as \"ABC-2K4M\" (a three-letter dealer prefix plus four characters from an alphabet with no 0, O, 1 or I). \"Copy kiosk link\" and \"Copy online link\" produce addresses ending in ...kiosk.furniturerx.net/?ref=CODE and ...furniturerx.net/?ref=CODE.","source":"PORT-9; _lib/referral.mjs:34-42; portal.js:709-731"},{"id":"POR-141","kind":"happy","role":"Org","title":"Dealer can view codes and their metrics","steps":["Sign in as the Dealer owner and open Referral Codes."],"expected":"The dealer sees its codes with Uses, Attributed subs, Credit earned and Status, but there is no Generate button.","why":"Only the RAP admin can create codes.","source":"canReferralView (org) vs canReferralCreate (admin only)"},{"id":"POR-142","kind":"happy","role":"Any","title":"Metrics reflect real attribution","steps":["Take a code and make a storefront or kiosk purchase using it (either by adding ?ref=CODE to the store address, or by typing the code at checkout).","Go back to Referral Codes and refresh."],"expected":"For that code, Uses (leads) and Attributed subs go up, and Credit earned reflects the commission from those subscriptions.","source":"referralStats (_lib/referral.mjs:83-99)"},{"id":"POR-143","kind":"validation","role":"Any","title":"A disabled code does not block the sale","steps":["Ask an admin to switch a code or its dealer OFF, or use a code that belongs to a disabled dealer.","Try to buy on the D2C store using that code."],"expected":"The purchase still completes, just with no dealer credited (the code is treated as invalid).","why":"A disabled code never stops a sale; contrast this with a disabled dealer selling through the kiosk session, which IS blocked.","source":"Doug 15-jul decision; _lib/referral.mjs:45-49"}]},{"id":"dealeradmin","title":"9 · Dealer Admin (admin only)","cases":[{"id":"POR-160","kind":"happy","role":"Admin","title":"Edit a dealer record","steps":["Sign in as the RAP admin, set \"Viewing\" to a dealer, and open Dealer Admin.","Edit the dealer name and head-office address, set the kiosk access start and end dates, and Save."],"expected":"It saves with a \"Record saved\" message. The Dealer RAP ID and FurnitureRx Account ID cannot be edited. With no dealer chosen it says \"Pick a reseller in Viewing…\".","source":"PORT-18; portal-dealeradmin.mjs whitelist excludes rap_id; portal.js:271-282"},{"id":"POR-161","kind":"happy","role":"Admin","title":"The three dealer toggles","steps":["In Dealer Admin, flip \"Sell through kiosk\", \"Dashboard access\" and \"Include in admin reports\" and watch the messages."],"expected":"Each toggle saves right away (\"Enabled\" / \"Disabled\"). Turning \"Sell through kiosk\" off later blocks that dealer's signed-in kiosk sales; turning \"Include in admin reports\" off removes them from the \"All resellers\" totals.","source":"portal.js:452-461; selling_enabled / dashboard_enabled / include_in_rollups"},{"id":"POR-162","kind":"happy","role":"Admin","title":"Login actions (reset / invite), no password shown","steps":["In Dealer Admin, find the login row, confirm the prefilled login email, then use \"Reset password\" and \"Resend invite\"."],"expected":"Both send emails, and the screen states \"No password is stored or shown\". Trying with the email empty says \"Type the login email first.\"","source":"portal-dealer-login-action.mjs; portal.js:465"},{"id":"POR-163","kind":"happy","role":"Admin","title":"Terms & conditions per plan SKU (PORT-25)","steps":["In Dealer Admin, find the terms & conditions rows for the two plans (Stain and Stain + Structure).","For one, set a terms version and a document link and Save. Then click \"Use generic\"."],"expected":"Saving shows \"Overriding generic \u003cversion>\". \"Use generic\" switches it back to \"Using generic \u003cversion>\" (or \"No generic set\"). Nothing is deleted; rows are only turned on or off.","source":"PORT-25 Doug 18-jul; portal-plan-terms.mjs; portal.js:320-351"},{"id":"POR-164","kind":"happy","role":"Admin","title":"Sales-mode link management (KIOSK-22)","steps":["In Dealer Admin, find the \"Sales-mode link\" box (near Access & credentials).","Generate a link, copy it, download its QR code, then Regenerate, then Disable (confirming the warning pop-up)."],"expected":"With no link yet, a warning banner reads \"No sales-mode link yet\". Generate shows a read-only address plus a QR code inline and a Download QR button. Regenerate kills the old link at once. Disable is behind a confirm pop-up warning that the \"current link and QR will stop working\".","source":"KIOSK-22; index.html:454-475; portal.js:355-436"},{"id":"POR-165","kind":"access","tech":true,"role":"Org","title":"Dealer Admin actions are server-guarded","steps":["Sign in as the Dealer owner. This checks a dealer cannot edit dealer records or make sales-mode links by calling the server directly. In developer tools, send a POST to /api/portal-dealeradmin (or /api/portal-sales-mode) with any body."],"expected":"The request comes back 403 (forbidden). A dealer cannot edit dealer records or create sales-mode links even by calling the server directly.","source":"assertAdmin in portal-dealeradmin / portal-sales-mode / portal-plan-terms"}]},{"id":"exports","title":"10 · Exports, audit & pricing","cases":[{"id":"POR-180","kind":"happy","role":"Org","title":"Export subscribers to CSV (filtered)","steps":["Sign in as the Dealer owner, open Subscribers, apply a filter (for example one store or a date range), then click \"Export to Excel\"."],"expected":"You get a CSV of only the filtered rows, with columns First, Last, Program, Start, End, Payments, Associate, Contract # and Status. If nothing matches, it says \"No rows to export…\".","source":"Doug 17-jul item 7; portal-exports.mjs"},{"id":"POR-181","kind":"edge","role":"Admin","title":"CSV formula injection is neutralized (SEC-3c)","steps":["This needs a customer whose name starts with a formula character. If you can, set a test customer's name to begin with \"=\" (or find one that already does).","Export the list and open the CSV in Excel or Google Sheets.","If you cannot create such data, mark this N/A and note why."],"expected":"A cell that starts with =, +, -, @ (or a tab or carriage return) shows as plain text (with a leading apostrophe) and is never run as a formula. Ordinary values like \"Protection+\", \"RX-10017-12\" or dates are unaffected.","source":"SEC-3c _lib/portal.mjs:288-313"},{"id":"POR-182","kind":"happy","role":"Admin","title":"Audit log records changes","steps":["Sign in as the RAP admin and do a few actions: edit a dealer, generate a code, run an export, cancel a demo subscription.","Open Audit Log and filter by category (Change / Export / Access)."],"expected":"Each action shows up with When, Actor, Role, Action, Target and Details (for example \"Exported subscribers · CSV · N rows · PII included\").","why":"Views and logins are deliberately not recorded in the audit log; note that.","source":"portal-audit.mjs; _lib/portal.mjs:314-319; audit write points"},{"id":"POR-183","kind":"happy","role":"Admin","title":"Pricing & Plans is display-only","steps":["Open Pricing & Plans."],"expected":"Two plans are listed: Protection (Stain) $9.99 and Protection+ (Stain + Structure) $19.99, both marked non-editable. A footer explains that the plan itself is the key, not the type of piece.","source":"portal-plans.mjs:33-43; Doug 15-jul \"just show it\""}]},{"id":"inquiries","title":"11 · Public reseller inquiry","cases":[{"id":"POR-200","kind":"happy","role":"Anonymous","title":"Become a reseller form","steps":["While signed out on {BASE}/, open \"Become a reseller\", fill in name, email, world and phone, then submit."],"expected":"You see \"Thanks — we'll be in touch.\" and the form clears. Later, signed in as the RAP admin, the inquiry appears in the admin inquiries list with status New.","source":"portal-inquiries.mjs; validateInquiry"},{"id":"POR-201","kind":"validation","role":"Anonymous","title":"Inquiry validation and honeypot","steps":["Submit with a bad email and watch what happens. Then submit quickly six times in a row and watch again.","Optional technical step: in developer tools, fill the hidden \"company_url\" field from the Console and submit."],"expected":"A bad email is rejected (\"check your details\"). Rapid submits are rate-limited (\"please wait a moment\"). If the hidden \"company_url\" field is filled in, the server quietly accepts the submission (200) but throws it away as spam.","why":"The hidden \"company_url\" field is a spam trap that a real person never sees or fills.","source":"portal-inquiries.mjs:45 honeypot; rate limit 5/60s"}]},{"id":"responsive","title":"12 · Responsive & resilience","cases":[{"id":"POR-220","kind":"edge","role":"Any","title":"Hamburger nav appears at ≤900px","steps":["Shrink the window to about 360px wide (developer tools device mode).","Open the slide-out menu with the hamburger button, tap a menu item, then press Escape."],"expected":"At 900px wide or narrower, a hamburger button opens a slide-out menu over a dark backdrop. Escape closes it, tapping an item closes it, and the keyboard focus moves into the menu when it opens. At 901px and wider the desktop layout is unchanged.","source":"PORT-27; portal.css hamburger; portal.js:205-218"},{"id":"POR-221","kind":"edge","role":"Admin","title":"No horizontal overflow anywhere","steps":["At window widths of 360, 390, 768, 1024, 1440 and 1920px, walk through Dashboard, Sales Stats, Subscribers, a customer record, Stripe Account and Dealer Admin.","Watch for the whole page scrolling sideways (a wide table scrolling inside its own box is fine)."],"expected":"The page itself never scrolls sideways at any width. Only wide tables scroll, and only inside their own box. Report the exact screen and element for any sideways page scroll.","source":"PORT-26 responsive gate (zero page-level overflow, 3 roles × 7 viewports)"},{"id":"POR-222","kind":"edge","role":"Admin","title":"1440px matches the approved design","steps":["At exactly 1440px wide, compare the Dashboard and Subscribers against the approved design."],"expected":"They match the approved design exactly; the responsive work must not have shifted the desktop layout.","source":"PORT-26 step 11 (1440 unchanged)"},{"id":"POR-223","kind":"edge","tech":true,"role":"Any","title":"Session dies mid-use","steps":["While signed in, open developer tools and delete the \"frx_portal_session\" item, then click into another tab such as Subscribers."],"expected":"The portal notices the session is gone and returns you to the sign-in page, instead of showing empty or broken screens.","source":"portal.js session guard"}]},{"id":"xsite","title":"13 · Cross-site: portal ↔ selling fronts","cases":[{"id":"POR-XS-01","kind":"access","role":"Admin","needs":["email"],"title":"A code generated here counts up after a real purchase","openInWindow":"D2C storefront","steps":["Sign in as the RAP admin. In the top dealer dropdown pick \"Summit Home Furnishings\", open \"Referral Codes\", click \"Generate code\", and copy it (e.g. SUM-7K2M).","Open the D2C storefront in a separate window (the \"Open D2C storefront\" button above). In its address bar, add `?ref=` followed by the code you copied, and press Enter.","On the store, build a plan and pay with the test card (use the customer email from the Test data box below).","Back in the portal Referral Codes screen (Summit selected), wait a minute or two and refresh."],"expected":"On the store the code shows \"Code applied — supporting Summit Home Furnishings.\" After the sale, that code's \"Uses\" and \"Attributed subs\" each go up by one here.","why":"The dollar \"Credit earned\" only moves if commission tracking is switched on in this environment, so $0 there is expected.","source":"portal-referral-codes.mjs generate; index.html ?ref; referralStats _lib/referral.mjs:83-99"},{"id":"POR-XS-02","kind":"happy","role":"Admin + Dealer","title":"A kiosk/store sale appears in Subscribers with its associate #","openInWindow":"Kiosk","steps":["Open the Kiosk in a separate window. Make a plain plan sale, typing a memorable associate number such as A-91, and pay with the test card.","In the portal, open \"Subscribers\" (as the RAP admin with \"All\" selected, or as the Dealer owner).","Wait a minute or two and refresh."],"expected":"The new subscription appears in the list, showing associate A-91 in the associate column, and the Dashboard \"Active subscribers\" count reflects it.","source":"stripe-webhook.mjs:273 (associate copied); portal-subscribers.mjs; _lib/portal.mjs:216"},{"id":"POR-XS-03","kind":"access","role":"Admin","title":"Turning \"Sell through kiosk\" off refuses that dealer's session sales","openInWindow":"Kiosk","steps":["As the RAP admin, pick \"Summit\", open Dealer Admin, and turn \"Sell through kiosk\" OFF.","Generate (or reuse) Summit's sales-mode link, open it in the Kiosk window, build a plan and try to pay.","When done, turn \"Sell through kiosk\" back ON."],"expected":"The checkout is refused and the sale does not complete.","why":"For contrast, the same dealer's referral code typed on the plain kiosk would just be ignored while the sale still completes.","source":"portal-dealeradmin selling_enabled; _lib/checkout.mjs:71-79; _lib/referral.mjs:45-49"},{"id":"POR-XS-04","kind":"validation","role":"Admin + Customer","title":"Cancelling here does not instantly change the customer dashboard","openInWindow":"D2C storefront","steps":["As the RAP admin, open \"Subscribers\", click a demo row (e.g. RX-90001) to open the customer record, and click \"Cancel subscription\", confirm.","In a separate window open the customer sign-in page (the D2C storefront address above, then /account.html), and sign in as customer1@rapqa.com / 12345678.","Look at the plan status."],"expected":"The portal records the cancellation (an audit entry, scheduled for the end of the billing period). Known limitation to confirm: the customer's own dashboard still shows the plan as \"active\" right away, and only changes later when Stripe reports the change. Treat \"no immediate change on the customer side\" as the correct, expected result and flag it for product review.","source":"portal-cancel-subscription.mjs (Stripe cancel + audit, no DB write); get-my-account.mjs status only"},{"id":"POR-XS-05","kind":"access","role":"Admin","title":"KNOWN GAP: portal → Tech-site sign-in does nothing","steps":["This documents a known gap. As the RAP admin, if you have a technician-world dealer, its \"Open kiosk signed in\" points at the Tech site.","Open a Tech-site address with a \"?pt=SOMETOKEN\" on the end."],"expected":"The Tech site loads as a plain public page, with no \"Selling as\" badge and no session, and the \"?pt=\" is ignored. So signing in from the portal to the Tech site currently does nothing, unlike the kiosk which does sign in. Confirm this gap.","source":"tech/index.html has no ?pt= redeem (contrast kiosk/index.html:2711-2716)"}]}]}</script>
+<script>
+'use strict';
+(function(){
+  var DATA = JSON.parse(document.getElementById('appdata').textContent);
+  var LSKEY = 'furnfx_qa_' + DATA.appId;
+  var IMG_MAX_BYTES = 1500000, TOTAL_IMG_WARN = 4000000;
+  var BACKUP_EVERY = 3; // remind the tester to export a backup every N advances
+
+  /* ---------------- data generators ---------------- */
+  function rngLetters(n){ var a='abcdefghijklmnopqrstuvwxyz',s=''; for(var i=0;i<n;i++) s+=a[Math.floor(Math.random()*26)]; return s; }
+  function rngDigits(n){ var s=''; for(var i=0;i<n;i++) s+=Math.floor(Math.random()*10); return s; }
+  function genAssociate(name){ var l=(String(name||'').toUpperCase().replace(/[^A-Z]/g,'')+'XXX').slice(0,3); return l+'-'+rngDigits(3); }
+  function emailValid(e){ return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(String(e||'').trim()); }
+  function genEmail(base){ var b=String(base||'').trim(); var at=b.indexOf('@'); if(at<1) return ''; var local=b.slice(0,at).split('+')[0]; return local+'+'+rngLetters(6)+b.slice(at); }
+  function emailBase(){ var b=String(state.testerEmail||'').trim(); var at=b.indexOf('@'); return at<1? '' : b.slice(0,at).split('+')[0]+b.slice(at); }
+
+  /* ---------------- state ---------------- */
+  function blankState(){
+    return { appId:DATA.appId, version:DATA.version, tester:'', testerEmail:'', isTechnical:null,
+             showEvidence:false, envId:DATA.envs[0].id, customBase:'',
+             results:{}, testdata:{}, observations:'', stepsSinceExport:0, backupReminderOff:false, updatedAt:null };
+  }
+  var state = blankState();
+
+  function coerceNotes(v, fallbackTs){
+    if(Array.isArray(v)) return v.filter(function(e){return e&&typeof e.text==='string';}).map(function(e){return {id:e.id||rid(),ts:e.ts||fallbackTs,text:e.text};});
+    if(typeof v==='string' && v.trim()) return [{id:rid(),ts:fallbackTs,text:v}];
+    return [];
+  }
+  function rid(){ return Math.random().toString(36).slice(2,9); }
+  function nowISO(){ return new Date().toISOString(); }
+
+  function hydrate(s){
+    if(!s || s.appId!==DATA.appId) return;
+    if(typeof s.tester==='string') state.tester=s.tester;
+    if(typeof s.testerEmail==='string') state.testerEmail=s.testerEmail;
+    if(s.isTechnical===true||s.isTechnical===false) state.isTechnical=s.isTechnical;
+    if(typeof s.showEvidence==='boolean') state.showEvidence=s.showEvidence;
+    if(typeof s.envId==='string') state.envId=s.envId;
+    if(typeof s.customBase==='string') state.customBase=s.customBase;
+    state.updatedAt=s.updatedAt||null;
+    var fb=s.updatedAt||nowISO();
+    if(s.results&&typeof s.results==='object') Object.keys(s.results).forEach(function(k){
+      var r=s.results[k]; if(!r) return;
+      var out={status:(r.status==='pass'||r.status==='fail'||r.status==='na')?r.status:null, note:typeof r.note==='string'?r.note:'', shots:[]};
+      if(Array.isArray(r.shots)) out.shots=r.shots.filter(function(x){return x&&typeof x.dataUrl==='string'&&x.dataUrl.indexOf('data:image/')===0;}).map(function(x){return {id:x.id||rid(),ts:x.ts||fb,name:x.name||'shot',dataUrl:x.dataUrl};});
+      if(r.resolution&&typeof r.resolution==='object'&&typeof r.resolution.text==='string') out.resolution={status:r.resolution.status||'fixed',text:r.resolution.text,ts:r.resolution.ts||fb};
+      if(r.retest===true) out.retest=true;
+      state.results[k]=out;
+    });
+    if(typeof s.observations==='string') state.observations=s.observations;
+    if(typeof s.stepsSinceExport==='number' && s.stepsSinceExport>=0) state.stepsSinceExport=s.stepsSinceExport;
+    if(typeof s.backupReminderOff==='boolean') state.backupReminderOff=s.backupReminderOff;
+    if(s.testdata&&typeof s.testdata==='object') Object.keys(s.testdata).forEach(function(k){ var d=s.testdata[k]; if(d&&typeof d==='object') state.testdata[k]={associate:d.associate||undefined,email:d.email||undefined}; });
+    /* migrate legacy per-section notes + product notes into the single Additional observations box (no data loss) */
+    var legacy=[];
+    if(s.sectionNotes&&typeof s.sectionNotes==='object') Object.keys(s.sectionNotes).forEach(function(k){ coerceNotes(s.sectionNotes[k],fb).forEach(function(e){ legacy.push('['+fmtTs(e.ts)+'] '+e.text); }); });
+    if(Array.isArray(s.productNotes)) s.productNotes.forEach(function(p){ if(p&&typeof p.text==='string') legacy.push('['+fmtTs(p.ts||fb)+'] '+(p.caseId?'('+p.caseId+') ':'')+p.text); });
+    if(legacy.length) state.observations=(state.observations?state.observations+'\n':'')+legacy.join('\n');
+  }
+  (function load(){ try{ var raw=localStorage.getItem(LSKEY); if(raw) hydrate(JSON.parse(raw)); }catch(e){} })();
+
+  var saveTimer=null;
+  function persist(){
+    state.updatedAt=nowISO();
+    clearTimeout(saveTimer);
+    saveTimer=setTimeout(function(){
+      try{ localStorage.setItem(LSKEY, JSON.stringify(state)); }
+      catch(e){ toast(e && /quota/i.test(e.name||e.message||'') ? 'Browser storage is full — export your progress to keep it safe.' : 'Could not save: '+e.message); }
+    },250);
+  }
+
+  /* ---------------- helpers ---------------- */
+  var allCases=[]; DATA.sections.forEach(function(sec){ sec.cases.forEach(function(c){ allCases.push({sec:sec,c:c}); }); });
+  function res(id){ if(!state.results[id]) state.results[id]={status:null,note:'',shots:[]}; if(!state.results[id].shots) state.results[id].shots=[]; return state.results[id]; }
+  function td(id){ if(!state.testdata[id]) state.testdata[id]={}; return state.testdata[id]; }
+  function envBase(){ if(state.customBase.trim()) return state.customBase.trim().replace(/\/+$/,''); var e=DATA.envs.find(function(x){return x.id===state.envId;})||DATA.envs[0]; return e.base.replace(/\/+$/,''); }
+  function linkFor(label){ if(!DATA.access||!DATA.access.links) return null; var l=DATA.access.links.find(function(x){return x.label===label;}); if(!l) return null; return (l.urlByEnv&&(l.urlByEnv[state.envId]||l.urlByEnv[DATA.envs[0].id]))||l.url||null; }
+  function el(t,c,x){ var n=document.createElement(t); if(c)n.className=c; if(x!=null)n.textContent=x; return n; }
+  function toast(m){ var t=document.getElementById('toast'); t.textContent=m; t.classList.add('show'); setTimeout(function(){t.classList.remove('show');},2600); }
+  function openWindow(url){ var w=window.open(url,'_blank','noopener,noreferrer,width=1200,height=900'); if(!w){ toast('Pop-up blocked — allow pop-ups, or the link opens in a new tab.'); window.open(url,'_blank','noopener'); } }
+  function fmtTs(iso){ try{ return new Date(iso).toLocaleString(); }catch(e){ return iso; } }
+
+  function copyText(v){
+    if(navigator.clipboard&&navigator.clipboard.writeText){ navigator.clipboard.writeText(v).then(function(){toast('Copied');},function(){fallbackCopy(v);}); }
+    else fallbackCopy(v);
+  }
+  function fallbackCopy(v){ var ta=document.createElement('textarea'); ta.value=v; ta.style.position='fixed'; ta.style.left='-9999px'; document.body.appendChild(ta); ta.select(); try{ document.execCommand('copy'); toast('Copied'); }catch(e){ toast('Copy failed — select and copy manually'); } ta.remove(); }
+  function copyChip(label,value,onRegen){
+    var c=el('span','chip'); if(label){ var l=el('span','clab',label); c.appendChild(l); }
+    c.appendChild(document.createTextNode(value));
+    var cp=el('button',null,'⧉'); cp.title='Copy'; cp.addEventListener('click',function(){copyText(value);}); c.appendChild(cp);
+    if(onRegen){ var rg=el('button',null,'↻'); rg.title='New value'; rg.addEventListener('click',onRegen); c.appendChild(rg); }
+    return c;
+  }
+
+  function rich(target,text){
+    var s=String(text).split('{BASE}').join(envBase());
+    var re=/(https?:\/\/[^\s,;)"']+)|`([^`]+)`/g,last=0,m;
+    while((m=re.exec(s))){
+      if(m.index>last) target.appendChild(document.createTextNode(s.slice(last,m.index)));
+      if(m[1]){ var a=el('a',null,m[1]); a.href=m[1]; a.addEventListener('click',function(ev){ev.preventDefault();openWindow(this.href);}); target.appendChild(a); }
+      else target.appendChild(el('code',null,m[2]));
+      last=re.lastIndex;
+    }
+    if(last<s.length) target.appendChild(document.createTextNode(s.slice(last)));
+  }
+
+  /* ---------------- header ---------------- */
+  var h1=document.getElementById('apptitle');
+  h1.appendChild(document.createTextNode(DATA.title));
+  h1.appendChild(el('small',null,'Suite '+DATA.version+' · '+allCases.length+' cases'));
+  document.title=DATA.title;
+
+  var envsel=document.getElementById('envsel'), envbase=document.getElementById('envbase');
+  DATA.envs.forEach(function(e){ var o=el('option',null,e.label); o.value=e.id; envsel.appendChild(o); });
+  var co=el('option',null,'Custom…'); co.value='__custom__'; envsel.appendChild(co);
+  function syncEnvUI(){
+    envsel.value=state.customBase.trim()?'__custom__':state.envId;
+    envbase.value=state.customBase.trim()||(DATA.envs.find(function(x){return x.id===state.envId;})||DATA.envs[0]).base;
+    envbase.readOnly=!state.customBase.trim()&&envsel.value!=='__custom__';
+  }
+  envsel.addEventListener('change',function(){
+    if(envsel.value==='__custom__'){ state.customBase=envbase.value; envbase.readOnly=false; envbase.focus(); }
+    else { state.envId=envsel.value; state.customBase=''; }
+    persist(); syncEnvUI(); render();
+  });
+  envbase.addEventListener('input',function(){ if(envsel.value==='__custom__'){ state.customBase=envbase.value; persist(); } });
+  envbase.addEventListener('change',render);
+
+  document.getElementById('btn-evidence').addEventListener('click',function(){ state.showEvidence=!state.showEvidence; persist(); render(); });
+  document.getElementById('btn-summary').addEventListener('click',function(){ view.mode='summary'; render(); });
+  document.getElementById('btn-creds').addEventListener('click',showCredsModal);
+  document.getElementById('btn-profile').addEventListener('click',showProfileModal);
+
+  /* ---------------- export / import / merge ---------------- */
+  document.getElementById('btn-export').addEventListener('click',function(){
+    state.updatedAt=nowISO();
+    var name=DATA.appId+'_progress_'+state.updatedAt.slice(0,19).replace(/[:T]/g,'-')+'.json';
+    var blob=new Blob([JSON.stringify(state,null,2)],{type:'application/json'});
+    var a=document.createElement('a'); a.href=URL.createObjectURL(blob); a.download=name; document.body.appendChild(a); a.click(); a.remove();
+    setTimeout(function(){URL.revokeObjectURL(a.href);},2000);
+    state.stepsSinceExport=0; persist(); toast('Exported '+name);
+    if(view.mode==='case') render();
+  });
+  document.getElementById('btn-import').addEventListener('click',function(){ document.getElementById('importfile').click(); });
+  document.getElementById('importfile').addEventListener('change',function(ev){
+    var f=ev.target.files[0]; ev.target.value=''; if(!f) return;
+    var rd=new FileReader();
+    rd.onload=function(){ try{ var s=JSON.parse(rd.result); if(!s||s.appId!==DATA.appId){ toast('That file belongs to a different suite ('+(s&&s.appId||'unknown')+').'); return; } if(!confirm('Import REPLACES the progress stored in this browser. Continue?')) return; localStorage.setItem(LSKEY,JSON.stringify(s)); location.reload(); }catch(e){ toast('Invalid file: '+e.message); } };
+    rd.readAsText(f);
+  });
+  document.getElementById('btn-merge').addEventListener('click',function(){ document.getElementById('mergefile').click(); });
+  document.getElementById('mergefile').addEventListener('change',function(ev){
+    var f=ev.target.files[0]; ev.target.value=''; if(!f) return;
+    var rd=new FileReader();
+    rd.onload=function(){
+      try{
+        var s=JSON.parse(rd.result); if(!s||s.appId!==DATA.appId){ toast('That file belongs to a different suite.'); return; }
+        var n=0;
+        if(s.results&&typeof s.results==='object') Object.keys(s.results).forEach(function(k){
+          var inc=s.results[k]; if(!inc||!inc.resolution||typeof inc.resolution.text!=='string') return;
+          var r=res(k); r.resolution={status:inc.resolution.status||'fixed',text:inc.resolution.text,ts:inc.resolution.ts||nowISO()};
+          if(r.status==='fail'||r.status==='na') r.retest=true;
+          n++;
+        });
+        persist(); toast('Merged '+n+' resolution(s). See the "Needs retest" filter.'); render();
+      }catch(e){ toast('Invalid file: '+e.message); }
+    };
+    rd.readAsText(f);
+  });
+
+  /* ---------------- modals ---------------- */
+  var modalBg=document.getElementById('modal-bg'), modal=document.getElementById('modal');
+  modalBg.addEventListener('click',function(e){ if(e.target===modalBg) closeModal(); });
+  document.addEventListener('keydown',function(e){ if(e.key==='Escape') closeModal(); });
+  function closeModal(){ modalBg.classList.remove('show'); modal.textContent=''; }
+  function openModal(build){ modal.textContent=''; var x=el('button','x','×'); x.addEventListener('click',closeModal); modal.appendChild(x); build(modal); modalBg.classList.add('show'); }
+
+  function credsContent(host){
+    host.appendChild(el('h3',null,'Access & credentials'));
+    if(!DATA.access){ host.appendChild(el('p',null,'This suite needs no special logins.')); return; }
+    if(DATA.access.note){ var p=el('p'); p.style.cssText='color:var(--ink-soft);margin-bottom:10px'; rich(p,DATA.access.note); host.appendChild(p); }
+    if(DATA.access.credentials&&DATA.access.credentials.length){
+      var t=el('table','credtable'); var hr=el('tr'); ['Role','Email','Password',''].forEach(function(h){hr.appendChild(el('th',null,h));}); t.appendChild(hr);
+      DATA.access.credentials.forEach(function(c){
+        var tr=el('tr');
+        tr.appendChild(el('td',null,c.role));
+        var te=el('td'); te.appendChild(el('code',null,c.email)); tr.appendChild(te);
+        var tp=el('td'); tp.appendChild(el('code',null,c.password)); tr.appendChild(tp);
+        var ta=el('td'); var b=el('button','minibtn','Copy login'); b.addEventListener('click',function(){copyText(c.email+' / '+c.password);}); ta.appendChild(b); tr.appendChild(ta);
+        t.appendChild(tr);
+      });
+      host.appendChild(t);
+    }
+    if(DATA.access.links&&DATA.access.links.length){
+      var lr=el('div','linkrow');
+      DATA.access.links.forEach(function(l){ var url=linkFor(l.label); if(!url) return; var b=el('button','minibtn','Open '+l.label+' ↗'); b.addEventListener('click',function(){openWindow(url);}); lr.appendChild(b); });
+      host.appendChild(lr);
+    }
+    var sec=el('p'); sec.style.cssText='font-size:12px;color:var(--ink-soft);margin-top:12px'; sec.textContent='These are shared QA accounts on the test environment. Do not use real customer data.'; host.appendChild(sec);
+  }
+  function showCredsModal(){ openModal(credsContent); }
+
+  function profileContent(host){
+    host.appendChild(el('h3',null,'Tester profile'));
+    var f1=el('div','field'); f1.appendChild(el('label',null,'Your name')); var i1=el('input'); i1.type='text'; i1.value=state.tester; i1.addEventListener('input',function(){state.tester=i1.value;persist();}); f1.appendChild(i1); host.appendChild(f1);
+    var f2=el('div','field'); f2.appendChild(el('label',null,'Email to return results to (your real inbox)')); var i2=el('input'); i2.type='email'; i2.value=state.testerEmail; i2.placeholder='e.g. abarres@raptns.com'; i2.addEventListener('input',function(){state.testerEmail=i2.value;persist();}); f2.appendChild(i2); host.appendChild(f2);
+    var f3=el('div','field'); f3.appendChild(el('label',null,'Are you comfortable using browser developer tools?'));
+    [['Yes',true],['No',false]].forEach(function(pair){
+      var lab=el('label','radio'); var r=el('input'); r.type='radio'; r.name='tech'; r.checked=state.isTechnical===pair[1];
+      r.addEventListener('change',function(){ state.isTechnical=pair[1]; persist(); render(); });
+      lab.appendChild(r); lab.appendChild(document.createTextNode(pair[0])); f3.appendChild(lab);
+    });
+    host.appendChild(f3);
+  }
+  function showProfileModal(){ openModal(profileContent); }
+
+  /* ---------------- image compress ---------------- */
+  function compressImage(file, cb){
+    var img=new Image(), url=URL.createObjectURL(file);
+    img.onload=function(){
+      var mx=1400, w=img.width, h=img.height, sc=Math.min(1, mx/Math.max(w,h));
+      var cv=document.createElement('canvas'); cv.width=Math.round(w*sc); cv.height=Math.round(h*sc);
+      cv.getContext('2d').drawImage(img,0,0,cv.width,cv.height);
+      URL.revokeObjectURL(url);
+      try{ cb(cv.toDataURL('image/jpeg',0.7)); }catch(e){ cb(null); }
+    };
+    img.onerror=function(){ URL.revokeObjectURL(url); cb(null); };
+    img.src=url;
+  }
+  function totalImgBytes(){ var t=0; Object.keys(state.results).forEach(function(k){ (state.results[k].shots||[]).forEach(function(s){ t+=s.dataUrl.length; }); }); return t; }
+  function addShot(id,file){
+    if(!file||file.type.indexOf('image/')!==0){ toast('Only images can be attached.'); return; }
+    compressImage(file,function(dataUrl){
+      if(!dataUrl){ toast('Could not read that image.'); return; }
+      if(dataUrl.length>IMG_MAX_BYTES){ toast('That image is too large even after compression — crop it and retry.'); return; }
+      res(id).shots.push({id:rid(),ts:nowISO(),name:file.name||'screenshot',dataUrl:dataUrl});
+      if(totalImgBytes()>TOTAL_IMG_WARN) toast('Storage is filling up — export your progress to keep screenshots safe.');
+      persist(); render();
+    });
+  }
+
+  /* ---------------- progress ---------------- */
+  function counts(){ var p=0,f=0,n=0,rt=0; allCases.forEach(function(x){ var r=state.results[x.c.id]; if(r&&r.retest&&(r.status==='fail'||r.status==='na')) rt++; if(!r||!r.status) return; if(r.status==='pass')p++; else if(r.status==='fail')f++; else n++; }); return {pass:p,fail:f,na:n,retest:rt,done:p+f+n,total:allCases.length}; }
+  function updateProgress(){ var c=counts(); document.querySelector('#progressbar>div').style.width=(c.total?100*c.done/c.total:0)+'%'; document.getElementById('btn-evidence').classList.toggle('on',state.showEvidence); }
+
+  /* ---------------- navigation ---------------- */
+  var view={mode:'intro',idx:0,retestOnly:false};
+  var nav=document.getElementById('nav');
+  function isTech(c){ return !!c.tech; }
+  function buildNav(){
+    nav.textContent='';
+    var ib=el('button','navcase'+(view.mode==='intro'?' current':'')); ib.style.cssText='padding:10px 12px;font-weight:700'; ib.appendChild(el('span','cid','▸')); ib.appendChild(el('span',null,'Before you start'));
+    ib.addEventListener('click',function(){ view.mode='intro'; render(); });
+    nav.appendChild(ib);
+    DATA.sections.forEach(function(sec){
+      var visCases=sec.cases.filter(function(c){ return !view.retestOnly || (function(){var r=state.results[c.id];return r&&r.retest&&(r.status==='fail'||r.status==='na');})(); });
+      if(!visCases.length) return;
+      var wrap=el('div','navsec');
+      var head=el('button'); head.appendChild(el('span','chev','▶')); head.appendChild(el('span',null,sec.title));
+      var done=sec.cases.filter(function(c){var r=state.results[c.id];return r&&r.status;}).length;
+      head.appendChild(el('span','cnt',done+'/'+sec.cases.length));
+      head.addEventListener('click',function(){ wrap.classList.toggle('open'); });
+      wrap.appendChild(head);
+      var list=el('div','navcases');
+      visCases.forEach(function(c){
+        var gi=allCases.findIndex(function(x){return x.c.id===c.id;});
+        var b=el('button','navcase'+(view.mode==='case'&&view.idx===gi?' current':''));
+        var r=state.results[c.id];
+        b.appendChild(el('span','dot'+(r&&r.status?' '+r.status:'')));
+        b.appendChild(el('span','cid',c.id));
+        b.appendChild(el('span',null,c.title));
+        var mk=''; if(isTech(c)) mk+='⚙'; if(r&&r.retest&&(r.status==='fail'||r.status==='na')) mk+='⟳';
+        if(mk) b.appendChild(el('span','mk',mk));
+        b.addEventListener('click',function(){ view.mode='case'; view.idx=gi; render(); });
+        list.appendChild(b);
+      });
+      wrap.appendChild(list);
+      if(view.retestOnly || (view.mode==='case'&&allCases[view.idx]&&allCases[view.idx].sec.id===sec.id)) wrap.classList.add('open');
+      nav.appendChild(wrap);
+    });
+  }
+
+  /* ---------------- views ---------------- */
+  var content=document.getElementById('content');
+
+  function profileComplete(){ return state.tester.trim() && emailValid(state.testerEmail) && (state.isTechnical===true||state.isTechnical===false); }
+
+  function renderIntro(){
+    var wrap=el('div','intro');
+    wrap.appendChild(el('div','crumb','Before you start'));
+
+    if(!profileComplete()){
+      var pc=el('div','panel accent');
+      pc.appendChild(el('h2',null,'Before you begin'));
+      var pp=el('p',null,'Tell us who you are. Your email is used to make fresh test addresses and to send you back the results later. Nothing is uploaded — it stays in this browser.');
+      pp.style.color='var(--ink-soft)'; pc.appendChild(pp);
+      profileContent2(pc);
+      wrap.appendChild(pc);
+    }
+
+    var card=el('div','card');
+    card.appendChild(el('h2',null,'How this works'));
+    ['You will walk through '+allCases.length+' test cases, one at a time. Do exactly what each step says, then press Pass if the app behaved as the Expected result describes, Fail if it did not, or N/A if you could not run the case (say why in the note).',
+     'Everything you type is saved automatically in THIS browser. Use "Export" often: it downloads a backup you can re-import with "Import" on any machine.',
+     'The Environment selector controls the URLs shown in the steps. Default is the live site.',
+     'There is one "Additional observations" box, shared across the whole run and always visible under each case, for anything you notice — about the product OR about this testing tool itself.'
+    ].forEach(function(t){ card.appendChild(el('p',null,t)); });
+    if(DATA.intro&&DATA.intro.length){
+      card.appendChild(el('div','lbl','Notes for this suite'));
+      var ul=el('ul'); DATA.intro.forEach(function(t){ var li=el('li'); rich(li,t); ul.appendChild(li); }); card.appendChild(ul);
+    }
+    wrap.appendChild(card);
+
+    if(DATA.access){ var ac=el('div','panel'); credsContent(ac); wrap.appendChild(ac); }
+
+    var start=el('div','wiznav');
+    var b=el('button','next','Start testing →');
+    b.addEventListener('click',function(){ if(!profileComplete()){ toast('Please fill your name, a valid email, and the technical question.'); return; } view.mode='case'; view.idx=0; render(); });
+    start.appendChild(b);
+    wrap.appendChild(start);
+    content.appendChild(wrap);
+  }
+  function profileContent2(host){
+    var f1=el('div','field'); f1.appendChild(el('label',null,'Your name')); var i1=el('input'); i1.type='text'; i1.value=state.tester; i1.placeholder='e.g. Adrian'; i1.addEventListener('input',function(){state.tester=i1.value;persist();}); f1.appendChild(i1); host.appendChild(f1);
+    var f2=el('div','field'); f2.appendChild(el('label',null,'Email to return results to (your real inbox)')); var i2=el('input'); i2.type='email'; i2.value=state.testerEmail; i2.placeholder='e.g. abarres@raptns.com'; i2.addEventListener('input',function(){state.testerEmail=i2.value;persist();updateProfileNav();}); f2.appendChild(i2); host.appendChild(f2);
+    var f3=el('div','field'); f3.appendChild(el('label',null,'Are you comfortable using browser developer tools (F12)?'));
+    [['Yes',true],['No',false]].forEach(function(pair){ var lab=el('label','radio'); var r=el('input'); r.type='radio'; r.name='techp'; r.checked=state.isTechnical===pair[1]; r.addEventListener('change',function(){state.isTechnical=pair[1];persist();render();}); lab.appendChild(r); lab.appendChild(document.createTextNode(pair[0])); f3.appendChild(lab); });
+    host.appendChild(f3);
+  }
+  function updateProfileNav(){}
+
+  function renderCase(){
+    var x=allCases[view.idx], sec=x.sec, c=x.c, r=res(c.id);
+
+    /* backup reminder (non-blocking): every BACKUP_EVERY advances, unless dismissed */
+    if(!state.backupReminderOff && state.stepsSinceExport>0 && state.stepsSinceExport % BACKUP_EVERY===0){
+      var rem=el('div','backup-reminder');
+      rem.appendChild(el('span','bm-txt','Backup reminder: '+state.stepsSinceExport+' steps since your last export. Export a copy so nothing you typed can get lost.'));
+      var rrow=el('div','bm-row');
+      var xb=el('button','minibtn','⬇ Export now'); xb.addEventListener('click',function(){ document.getElementById('btn-export').click(); }); rrow.appendChild(xb);
+      var lab=el('label','bm-off'); var cbx=el('input'); cbx.type='checkbox'; cbx.addEventListener('change',function(){ state.backupReminderOff=cbx.checked; persist(); render(); }); lab.appendChild(cbx); lab.appendChild(document.createTextNode(' Don’t remind me again')); rrow.appendChild(lab);
+      rem.appendChild(rrow);
+      content.appendChild(rem);
+    }
+
+    content.appendChild(el('div','crumb','Section: '+sec.title+' · Case '+(view.idx+1)+' of '+allCases.length));
+    var card=el('div','card');
+    var top=el('div','case-top');
+    top.appendChild(el('span','case-id',c.id));
+    top.appendChild(el('span','tag '+c.kind,c.kind));
+    if(c.role) top.appendChild(el('span','tag role','Role: '+c.role));
+    if(isTech(c)) top.appendChild(el('span','tag tech','Technical'));
+    card.appendChild(top);
+    card.appendChild(el('h2',null,c.title));
+
+    /* developer resolution (TA-13) */
+    if(r.resolution){
+      var rk=r.resolution.status||'fixed';
+      var rb=el('div','reso'+(rk==='wontfix'?' wontfix':rk==='needinfo'?' needinfo':''));
+      var line=el('div'); var pill=el('span','rpill '+rk, rk==='wontfix'?'Won\'t fix':rk==='needinfo'?'Need info':'Fixed'); line.appendChild(pill); line.appendChild(el('b',null,'Developer resolution')); rb.appendChild(line);
+      var rt=el('p'); rt.style.margin='6px 0'; rich(rt,r.resolution.text); rb.appendChild(rt);
+      if(r.retest&&(r.status==='fail'||r.status==='na')){
+        var reb=el('button','minibtn','Re-test this case');
+        reb.addEventListener('click',function(){
+          if(r.note){ state.observations=(state.observations?state.observations+'\n':'')+'['+fmtTs(nowISO())+'] ('+c.id+') Previous result: '+(r.status||'').toUpperCase()+' — '+r.note; }
+          r.status=null; r.retest=false; persist(); render();
+        });
+        rb.appendChild(reb);
+      }
+      card.appendChild(rb);
+    }
+
+    /* technical skip banner (TA-2) */
+    if(isTech(c) && state.isTechnical===false){
+      var tb=el('div','tech-banner');
+      tb.appendChild(el('p',null,'This case needs browser developer tools. You marked yourself as non-technical, so you can skip it.'));
+      var row=el('div','row');
+      var skip=el('button','minibtn','Mark N/A (skip)'); skip.addEventListener('click',function(){ r.status='na'; if(!r.note) r.note='Skipped: technical case, tester is non-technical.'; persist(); goNext(); });
+      var showa=el('button','minibtn','Show me anyway'); showa.addEventListener('click',function(){ tb.style.display='none'; });
+      row.appendChild(skip); row.appendChild(showa); tb.appendChild(row);
+      card.appendChild(tb);
+    }
+
+    /* open-in-window button (TA-9) */
+    if(c.openInWindow){ var url=linkFor(c.openInWindow); if(url){ var ow=el('button','openwin','Open '+c.openInWindow+' in a new window ↗'); ow.addEventListener('click',function(){openWindow(url);}); card.appendChild(ow); } }
+
+    card.appendChild(el('div','lbl','Do this'));
+    var ol=el('ol','steps'); c.steps.forEach(function(s){ var li=el('li'); rich(li,s); ol.appendChild(li); }); card.appendChild(ol);
+
+    /* test data chips (TA-5) */
+    if(Array.isArray(c.needs)&&c.needs.length){
+      var db=el('div','datablock'); db.appendChild(el('div','lbl','Test data for this case (tap to copy)'));
+      var row2=el('div','chiprow'); var d=td(c.id);
+      if(c.needs.indexOf('associate')>=0){
+        if(!d.associate) d.associate=genAssociate(state.tester);
+        row2.appendChild(copyChip('Associate #',d.associate,function(){ d.associate=genAssociate(state.tester); persist(); render(); }));
+      }
+      var showEmailHint=false;
+      if(c.needs.indexOf('email')>=0){
+        if(!d.email){ d.email=genEmail(state.testerEmail); }
+        if(d.email){ row2.appendChild(copyChip('Customer email',d.email,function(){ d.email=genEmail(state.testerEmail); persist(); render(); })); showEmailHint=true; }
+        else { var warn=el('span','datahint'); warn.textContent='Set a valid return email in your Profile to generate test emails.'; row2.appendChild(warn); }
+      }
+      db.appendChild(row2);
+      if(showEmailHint){
+        var hint=el('div','datahint');
+        hint.appendChild(document.createTextNode('The part after “+” is just a label. This email still arrives in your normal inbox ('));
+        hint.appendChild(el('b',null,emailBase()));
+        hint.appendChild(document.createTextNode('); it just gives each test a fresh-looking address without creating a new mailbox.'));
+        db.appendChild(hint);
+      }
+      persist(); card.appendChild(db);
+    }
+
+    card.appendChild(el('div','lbl','Expected result'));
+    var ex=el('div','expected'); rich(ex,c.expected); card.appendChild(ex);
+    if(c.why){ var wy=el('div','why'); wy.appendChild(el('b',null,'Why this matters: ')); rich(wy,c.why); wy.querySelector('b').style.fontStyle='normal'; card.appendChild(wy); }
+
+    /* verdict */
+    card.appendChild(el('div','lbl','Your verdict'));
+    var vd=el('div','verdict');
+    [['pass','✔ Pass'],['fail','✘ Fail'],['na','— N/A']].forEach(function(pair){
+      var b=el('button','vbtn '+pair[0]+(r.status===pair[0]?' on':''),pair[1]);
+      b.addEventListener('click',function(){ r.status=(r.status===pair[0])?null:pair[0]; persist(); render(); });
+      vd.appendChild(b);
+    });
+    card.appendChild(vd);
+
+    card.appendChild(el('div','lbl','Note (what you saw, error text, etc.) — you can paste a screenshot here'));
+    var ta=el('textarea'); ta.value=r.note; ta.placeholder='Optional for Pass, please fill for Fail / N/A. Paste an image to attach it.';
+    ta.addEventListener('input',function(){ r.note=ta.value; persist(); });
+    ta.addEventListener('paste',function(ev){ var items=(ev.clipboardData||{}).items||[]; for(var i=0;i<items.length;i++){ if(items[i].type&&items[i].type.indexOf('image/')===0){ var f=items[i].getAsFile(); if(f){ ev.preventDefault(); addShot(c.id,f); } } } });
+    card.appendChild(ta);
+
+    /* screenshots (TA-8) */
+    var arow=el('div','attachrow');
+    var fl=el('input'); fl.type='file'; fl.accept='image/*'; fl.style.display='none'; fl.addEventListener('change',function(){ if(fl.files[0]) addShot(c.id,fl.files[0]); fl.value=''; });
+    var ab=el('button','minibtn','📎 Attach screenshot'); ab.addEventListener('click',function(){ fl.click(); });
+    arow.appendChild(ab); arow.appendChild(fl); arow.appendChild(el('span','hint','…or paste an image into the note above.'));
+    card.appendChild(arow);
+    if(r.shots&&r.shots.length){
+      var sh=el('div','shots');
+      r.shots.forEach(function(s){ var d=el('div','shot'); var im=el('img'); im.src=s.dataUrl; im.addEventListener('click',function(){ openModal(function(host){ host.appendChild(el('h3',null,s.name||'Screenshot')); var big=el('div','imgmodal'); var i2=el('img'); i2.src=s.dataUrl; big.appendChild(i2); host.appendChild(big); }); }); d.appendChild(im); var rm=el('button',null,'×'); rm.addEventListener('click',function(){ if(confirm('Remove this screenshot?')){ r.shots=r.shots.filter(function(z){return z.id!==s.id;}); persist(); render(); } }); d.appendChild(rm); sh.appendChild(d); });
+      card.appendChild(sh);
+    }
+
+    /* evidence (TA-1, hidden by default) */
+    if(c.source && state.showEvidence){ var src=el('div','source'); src.appendChild(el('b',null,'Evidence (developers): ')); src.appendChild(document.createTextNode(c.source)); card.appendChild(src); }
+
+    content.appendChild(card);
+
+    var wn=el('div','wiznav');
+    var prev=el('button',null,'← Back');
+    prev.addEventListener('click',function(){ if(view.idx>0){view.idx--;render();} else {view.mode='intro';render();} });
+    wn.appendChild(prev);
+    var saveMsg='Progress is saved automatically in this browser.';
+    if(state.stepsSinceExport>0) saveMsg+=' '+state.stepsSinceExport+' step'+(state.stepsSinceExport===1?'':'s')+' since your last export.';
+    wn.appendChild(el('span','savehint',saveMsg));
+    var next=el('button','next', view.idx<allCases.length-1?'Next case →':'Finish → Summary');
+    next.addEventListener('click',goNext);
+    wn.appendChild(next);
+    content.appendChild(wn);
+
+    /* additional observations — one shared box, always visible, kept across the whole run */
+    var ob=el('div','obsbox');
+    ob.appendChild(el('div','lbl','Additional observations'));
+    var oh=el('p'); oh.style.cssText='font-size:12px;color:var(--ink-soft);margin-bottom:8px';
+    oh.textContent='See a problem with this task? Your Pass / Fail / N/A above already covers it. This shared notepad is for anything else you notice as you go — about the product OR about this testing tool itself (for example, if it fails to save something). Write freely; it saves automatically and stays here on every step.';
+    ob.appendChild(oh);
+    var ota=el('textarea','obsta'); ota.value=state.observations||''; ota.rows=6; ota.placeholder='Type anything you notice here. It is kept for the whole run.';
+    ota.addEventListener('input',function(){ state.observations=ota.value; persist(); });
+    ob.appendChild(ota);
+    content.appendChild(ob);
+  }
+  function goNext(){
+    state.stepsSinceExport=(state.stepsSinceExport||0)+1;
+    if(view.idx<allCases.length-1){view.idx++;} else {view.mode='summary';}
+    persist(); render();
+  }
+
+  function renderSummary(){
+    var c=counts();
+    content.appendChild(el('div','crumb','Summary'));
+    var tiles=el('div','sum-tiles');
+    [['Total',c.total],['Done',c.done],['Pass',c.pass],['Fail',c.fail],['N/A',c.na],['Pending',c.total-c.done],['Needs retest',c.retest]].forEach(function(t){ var d=el('div','tile'); d.appendChild(el('b',null,String(t[1]))); d.appendChild(el('span',null,t[0])); tiles.appendChild(d); });
+    content.appendChild(tiles);
+
+    if(c.retest){
+      var rf=el('div','wiznav'); rf.style.marginTop='0';
+      var rb=el('button',state.showRetestBtn?'next':'', (view.retestOnly?'Show all cases':'Filter: Needs retest only'));
+      rb.addEventListener('click',function(){ view.retestOnly=!view.retestOnly; if(view.retestOnly){ var first=allCases.find(function(x){var r=state.results[x.c.id];return r&&r.retest&&(r.status==='fail'||r.status==='na');}); if(first){ view.mode='case'; view.idx=allCases.indexOf(first); } } render(); });
+      rf.appendChild(rb); content.appendChild(rf);
+    }
+
+    var tbl=el('table','sum'); var thead=el('thead'); var trh=el('tr'); ['Case','Title','Status','Note'].forEach(function(h){trh.appendChild(el('th',null,h));}); thead.appendChild(trh); tbl.appendChild(thead);
+    var tb=el('tbody');
+    DATA.sections.forEach(function(sec){
+      var trs=el('tr'); var tds=el('td',null,''); tds.colSpan=4; tds.style.cssText='background:#f8f5ee;font-weight:700'; tds.textContent=sec.title; trs.appendChild(tds); tb.appendChild(trs);
+      sec.cases.forEach(function(cse){
+        var r=state.results[cse.id], st=r&&r.status?r.status:'pending';
+        var tr=el('tr'); var tdid=el('td'); tdid.appendChild(el('code',null,cse.id)); if(r&&r.retest)tdid.appendChild(document.createTextNode(' ⟳')); tr.appendChild(tdid);
+        tr.appendChild(el('td',null,cse.title));
+        tr.appendChild(el('td','st-'+st, st==='pending'?'—':st.toUpperCase()));
+        var tdn=el('td',null,(r&&r.note)||''); if(r&&r.shots&&r.shots.length) tdn.appendChild(el('span',null,' 📎'+r.shots.length)); tr.appendChild(tdn);
+        tb.appendChild(tr);
+      });
+    });
+    tbl.appendChild(tb); content.appendChild(tbl);
+
+    if(state.observations && state.observations.trim()){
+      content.appendChild(el('div','lbl','Additional observations from the tester'));
+      var obx=el('div','obsbox'); var obp=el('div'); obp.style.whiteSpace='pre-wrap'; obp.textContent=state.observations; obx.appendChild(obp); content.appendChild(obx);
+    }
+
+    var wn=el('div','wiznav');
+    var back=el('button',null,'← Back to cases'); back.addEventListener('click',function(){ view.mode='case'; render(); }); wn.appendChild(back);
+    var pr=el('button',null,'Print / Save as PDF'); pr.addEventListener('click',function(){ window.print(); }); wn.appendChild(pr);
+    content.appendChild(wn);
+  }
+
+  function render(){
+    content.textContent='';
+    buildNav(); syncEnvUI(); updateProgress();
+    if(view.mode==='intro') renderIntro();
+    else if(view.mode==='summary') renderSummary();
+    else renderCase();
+    content.scrollTop=0;
+  }
+  render();
+})();
+</script>
+</body>
+</html>

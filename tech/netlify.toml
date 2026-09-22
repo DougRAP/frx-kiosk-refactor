@@ -1,0 +1,58 @@
+# FurnitureRx — TECH version (el técnico en casa del cliente: care kits + Repair Membership).
+# Front ESTÁTICO y AUTOCONTENIDO: esta carpeta = todo lo que necesita. Sin build, sin npm,
+# sin Functions propias: el backend es CENTRAL y /api/* se PROXEA a él → UN solo webhook de
+# Stripe y UN solo set de secretos para todos los fronts (mismo patrón que kiosk/).
+#
+# Deploy como site PROPIO en Netlify (separado del d2c y del kiosk):
+#   Add new site → Import from Git (este repo) → Build settings:
+#     Base directory:    tech
+#     Build command:     (vacío — es estático)
+#     Publish directory: .            (esta carpeta)
+#   Luego: Domain management → agregá tech.furniturerx.net (o el dominio que Doug decida).
+# IMPORTANTE: añadir el ORIGIN del site tech a ALLOWED_ORIGINS del backend central
+# (checkout devuelve success/cancel al origin del front). Ver DEPLOY.md.
+
+[build]
+  publish = "."
+
+# ── SEC-1 (auditoría 28-jul, hallazgo 1): igual que el kiosk — esta carpeta se publica ENTERA
+#    (publish = ".") y contiene un .env con los secretos del backend central. `force = true` hace que
+#    la regla GANE sobre el archivo estático → /.env nunca devuelve su contenido, exista o no.
+#    Quirúrgico sobre .env: /.well-known/ debe seguir accesible (Netlify lo usa para HTTPS).
+#    Candado permanente: tools/tests/sec1-dotfiles.test.mjs + gate G17. Spec: misc/spec-sec1-dotfiles.md.
+[[redirects]]
+  from = "/.env"
+  to = "/index.html"
+  status = 404
+  force = true
+
+[[redirects]]
+  from = "/.env*"
+  to = "/index.html"
+  status = 404
+  force = true
+
+# /api/* → BACKEND central. status=200 = proxy server-side → el browser lo ve same-origin (sin CORS).
+[[redirects]]
+  from = "/api/*"
+  to = "https://furniturerx.netlify.app/.netlify/functions/:splat"
+  status = 200
+  force = true
+
+# /p/<code> (URL corta tecleable del pago, la muestra el drawer bajo el QR) → mismo backend central.
+[[redirects]]
+  from = "/p/*"
+  to = "https://furniturerx.netlify.app/.netlify/functions/pay-redirect?code=:splat"
+  status = 200
+  force = true
+
+# ── Security response headers (mismo hardening que el kiosk).
+[[headers]]
+  for = "/*"
+  [headers.values]
+    X-Frame-Options = "DENY"
+    X-Content-Type-Options = "nosniff"
+    Referrer-Policy = "strict-origin-when-cross-origin"
+    Strict-Transport-Security = "max-age=31536000"
+    Permissions-Policy = "geolocation=(), microphone=(), browsing-topics=()"
+    Content-Security-Policy = "default-src 'self'; base-uri 'self'; object-src 'none'; frame-ancestors 'none'; form-action 'self'; img-src 'self' data: blob: https://*.supabase.co; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; script-src 'self' 'unsafe-inline'; connect-src 'self' https://*.supabase.co; upgrade-insecure-requests"

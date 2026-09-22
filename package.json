@@ -1,0 +1,26 @@
+{
+  "name": "furniturerx-functions",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Netlify Functions for Furniture-Rx (checkout + Stripe webhook). The site itself is a single static index.html.",
+  "license": "UNLICENSED",
+  "scripts": {
+    "build": "node scripts/build.mjs",
+    "gate": "node tools/gate/gate.mjs",
+    "gate:baseline": "npm run build && node tools/gate/norm-hash.mjs dist/index.html > tools/gate/baseline.d2c.sha256",
+    "test": "node tools/tests/run.mjs",
+    "test:e2e": "node tools/tests/e2e-kiosk.mjs && node tools/tests/e2e-account.mjs && node tools/tests/e2e-d2c.mjs && node tools/tests/e2e-tech.mjs && node tools/tests/e2e-subportal.mjs && node tools/tests/e2e-circuit.mjs && node tools/tests/e2e-responsive.mjs && node tools/tests/e2e-stripe-onboard.mjs && node tools/tests/e2e-resources.mjs && node tools/tests/e2e-kit-orders.mjs",
+    "smoke:live": "node tools/smoke-circuit-live.mjs",
+    "smoke:global": "node tools/smoke-global-live.mjs",
+    "fullrun:live": "node tools/full-run-live.mjs",
+    "seed:demo-afc": "node tools/seed-demo-afc.mjs"
+  },
+  "dependencies": {
+    "@anthropic-ai/sdk": "^0.71.0",
+    "stripe": "17.7.0"
+  },
+  "devDependencies": {
+    "jsdom": "^23.2.0",
+    "playwright-core": "^1.61.1"
+  }
+}

@@ -1,0 +1,72 @@
+# Furniture-Rx — KIOSK in-store. Front ESTÁTICO y AUTOCONTENIDO: esta carpeta = todo lo que necesita.
+# Doug edita index.html directamente. Sin build, sin npm, sin Functions propias: el backend es CENTRAL
+# y /api/* se PROXEA a él → UN solo webhook de Stripe y UN solo set de secretos para todos los fronts.
+#
+# Deploy como site PROPIO en Netlify (separado del d2c):
+#   Add new site → Import from Git (este repo) → Build settings:
+#     Base directory:    kiosk
+#     Build command:     (vacío — es estático)
+#     Publish directory: .            (esta carpeta)
+#   Luego: Domain management → agregá kiosk.furniturerx.net (o el dominio del kiosk).
+# Ver DEPLOY.md.
+
+[build]
+  publish = "."
+
+# ── SEC-1 (auditoría 28-jul, hallazgo 1): esta carpeta se publica ENTERA (publish = ".") y contiene un
+#    .env con los secretos del backend central. Hoy no llega al deploy (está en .gitignore y el site
+#    despliega desde Git), pero un `netlify deploy` manual desde acá lo publicaría en /.env.
+#    `force = true` hace que esta regla GANE sobre el archivo estático → el contenido NUNCA se sirve,
+#    exista o no el archivo. El 404 se responde con index.html (siempre presente en esta carpeta).
+#    Quirúrgico sobre .env: /.well-known/ debe seguir accesible (Netlify lo usa para HTTPS).
+#    Recordatorio: esta carpeta NO necesita secretos (ver DEPLOY.md) — el backend es central.
+#    Candado permanente: tools/tests/sec1-dotfiles.test.mjs + gate G17. Spec: misc/spec-sec1-dotfiles.md.
+[[redirects]]
+  from = "/.env"
+  to = "/index.html"
+  status = 404
+  force = true
+
+[[redirects]]
+  from = "/.env*"
+  to = "/index.html"
+  status = 404
+  force = true
+
+# /api/* → BACKEND central. status=200 = proxy server-side → el browser lo ve same-origin (sin CORS).
+# CAMBIÁ el host si el backend se muda a un dominio propio (p.ej. https://api.furniturerx.net). Hoy el
+# backend vive en el site principal. El webhook de Stripe NO pasa por aquí (Stripe apunta directo al backend).
+[[redirects]]
+  from = "/api/*"
+  to = "https://furniturerx.netlify.app/.netlify/functions/:splat"
+  status = 200
+  force = true
+
+# KIOSK-16: /p/<code> (URL corta tecleable del pago, la muestra el drawer bajo el QR) → mismo
+# backend central que /api/*. Así el cliente teclea el MISMO dominio del kiosk que tiene delante.
+[[redirects]]
+  from = "/p/*"
+  to = "https://furniturerx.netlify.app/.netlify/functions/pay-redirect?code=:splat"
+  status = 200
+  force = true
+
+# KIOSK-22: /s/<code> (sales-mode URL + QR del dealer) → backend central; 302 al kiosk en modo venta.
+[[redirects]]
+  from = "/s/*"
+  to = "https://furniturerx.netlify.app/.netlify/functions/sales-mode-redirect?code=:splat"
+  status = 200
+  force = true
+
+# ── Security response headers (audit 2026-07-02). Kiosk shows the receipt preview + the ?h=<token> phone
+#    handoff, so it handles PII/receipts too: harden clickjacking, Referrer leak of the token, MIME
+#    sniffing, transport, and add a CSP. Only external resources: Google Fonts + Supabase Storage (<img>);
+#    qrcode.min.js is same-origin and eval-free; /api is a same-origin proxy. No iframes/CDNs/analytics.
+[[headers]]
+  for = "/*"
+  [headers.values]
+    X-Frame-Options = "DENY"
+    X-Content-Type-Options = "nosniff"
+    Referrer-Policy = "strict-origin-when-cross-origin"
+    Strict-Transport-Security = "max-age=31536000"
+    Permissions-Policy = "geolocation=(), microphone=(), browsing-topics=()"
+    Content-Security-Policy = "default-src 'self'; base-uri 'self'; object-src 'none'; frame-ancestors 'none'; form-action 'self'; img-src 'self' data: blob: https://*.supabase.co; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; script-src 'self' 'unsafe-inline'; connect-src 'self' https://*.supabase.co; upgrade-insecure-requests"

@@ -1,0 +1,17 @@
+misc
+docs
+dist
+supabase/.temp
+index - refactor - v2.html
+
+# Local Netlify folder
+.netlify
+
+# Local env vars (service_role key, etc.) — NEVER commit
+.env
+
+# Node deps for Netlify Functions (lockfile IS committed, node_modules is not)
+node_modules
+
+# Artefactos locales del seed de dealers (contraseñas). NEVER commit
+secrets

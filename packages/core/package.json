@@ -1,0 +1,14 @@
+{
+  "name": "@furnfx/core",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Furniture-Rx shared core — design system (y próximamente cart/checkout/pricing/constants). Fuente única consumida por las variantes (d2c/kiosk/tech) en build; reutilizable por otros proyectos.",
+  "type": "module",
+  "exports": {
+    "./styles/core.css": "./styles/core.css"
+  },
+  "files": [
+    "styles",
+    "js"
+  ]
+}

@@ -1,0 +1,63 @@
+# FurnitureRx — Subscription Portal (app autenticada sobre la familia FurnitureRx).
+# Front ESTÁTICO y AUTOCONTENIDO (mismo patrón que kiosk/ y tech/): sin build, sin Functions
+# propias. El backend es CENTRAL y /api/* se PROXEA a él → UN webhook de Stripe y UN set de
+# secretos para todos los fronts.
+#
+# Deploy como site PROPIO en Netlify (separado de d2c/kiosk/tech):
+#   Add new site → Import from Git (este repo) → Build settings:
+#     Base directory:    portal
+#     Build command:     (vacío — es estático)
+#     Publish directory: .
+#   Luego: Domain management → portal.furniturerx.net.
+# IMPORTANTE: añadir el ORIGIN del portal (portalrx.netlify.app + portal.furniturerx.net) a
+# ALLOWED_ORIGINS del backend central. Ver DEPLOY.md.
+
+[build]
+  publish = "."
+
+# ── SEC-1 (auditoría 28-jul, hallazgo 1): esta carpeta HOY no tiene .env, y esta regla es justamente
+#    para que eso siga siendo indiferente: se publica entera (publish = "."), así que si mañana alguien
+#    deja uno acá, /.env seguiría sin servir su contenido (`force = true` gana sobre el archivo).
+#    Quirúrgico sobre .env: /.well-known/ debe seguir accesible (Netlify lo usa para HTTPS).
+#    Candado permanente: tools/tests/sec1-dotfiles.test.mjs + gate G17. Spec: misc/spec-sec1-dotfiles.md.
+[[redirects]]
+  from = "/.env"
+  to = "/index.html"
+  status = 404
+  force = true
+
+[[redirects]]
+  from = "/.env*"
+  to = "/index.html"
+  status = 404
+  force = true
+
+# /api/* → BACKEND central (proxy same-origin, sin CORS).
+[[redirects]]
+  from = "/api/*"
+  to = "https://furniturerx.netlify.app/.netlify/functions/:splat"
+  status = 200
+  force = true
+
+# DEAL-5: /stripeOnboarding/<code> — el link durable que se manda al dealer para conectar su cuenta
+# bancaria. Vive en ESTE dominio (es el que se reparte por email) pero lo resuelve el backend central,
+# igual que /api/*. El resolver acuña el Account Link de Stripe al hacer click, porque el de Stripe
+# caduca en minutos y es de un solo uso.
+[[redirects]]
+  from = "/stripeOnboarding/*"
+  to = "https://furniturerx.netlify.app/.netlify/functions/stripe-onboarding-redirect?code=:splat"
+  status = 200
+  force = true
+
+# ── Security response headers. CSP PROPIA del portal (no la kiosk-strict): el portal solo habla
+# con su backend same-origin vía el proxy /api/* (connect-src 'self') y abre el dashboard de Stripe
+# en pestaña nueva (navegación, no fetch). Sin datos a terceros.
+[[headers]]
+  for = "/*"
+  [headers.values]
+    X-Frame-Options = "DENY"
+    X-Content-Type-Options = "nosniff"
+    Referrer-Policy = "strict-origin-when-cross-origin"
+    Strict-Transport-Security = "max-age=31536000"
+    Permissions-Policy = "geolocation=(), microphone=(), browsing-topics=()"
+    Content-Security-Policy = "default-src 'self'; base-uri 'self'; object-src 'none'; frame-ancestors 'none'; form-action 'self'; img-src 'self' data:; style-src 'self' 'unsafe-inline'; font-src 'self'; script-src 'self' 'unsafe-inline'; connect-src 'self' https://*.supabase.co; upgrade-insecure-requests"

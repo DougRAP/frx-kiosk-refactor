@@ -1,0 +1,743 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Furniture-Rx QA — Tech (Technician) Site</title>
+<style>
+  :root{
+    --paper:#faf7f2; --card:#ffffff; --ink:#1c2430; --ink-soft:#5b6572; --line:#e6e0d6;
+    --navy:#14263c; --orange:#e8622c; --gold:#c99a3c; --green:#2e7d4f; --red:#b3372e; --gray:#8a94a0; --blue:#274a72;
+    --rim:4px solid var(--orange);
+    --sans:system-ui,-apple-system,"Segoe UI",Roboto,Arial,sans-serif;
+    --mono:ui-monospace,Consolas,"Cascadia Mono",Menlo,monospace;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html,body{height:100%}
+  body{font-family:var(--sans);background:var(--paper);color:var(--ink);font-size:15px;line-height:1.5}
+  button{font:inherit;cursor:pointer}
+  input,textarea,select{font:inherit;color:var(--ink)}
+  a{color:var(--orange)}
+  code{font-family:var(--mono);font-size:.88em;background:#f1ede4;padding:1px 5px;border-radius:4px}
+
+  #app{display:flex;flex-direction:column;height:100%}
+  header{background:var(--navy);color:#fff;padding:10px 16px;display:flex;flex-wrap:wrap;gap:10px 18px;align-items:center}
+  header h1{font-size:16px;font-weight:700;letter-spacing:.2px;margin-right:auto}
+  header h1 small{display:block;font-size:11px;font-weight:400;opacity:.75}
+  .hgroup{display:flex;align-items:center;gap:6px;font-size:12.5px}
+  .hgroup label{opacity:.8}
+  header select,header input[type=text]{background:#0e1c2e;border:1px solid #33465d;color:#fff;border-radius:6px;padding:4px 8px;font-size:12.5px}
+  header input[type=text]{width:230px}
+  .hbtn{background:#0e1c2e;border:1px solid #33465d;color:#fff;border-radius:6px;padding:5px 11px;font-size:12.5px}
+  .hbtn:hover{border-color:var(--orange)}
+  .hbtn.accent{background:var(--orange);border-color:var(--orange);font-weight:600}
+  .hbtn.on{background:var(--gold);border-color:var(--gold);color:#231c08}
+
+  #progressbar{height:5px;background:#dcd5c8}
+  #progressbar>div{height:100%;width:0;background:linear-gradient(90deg,var(--orange),var(--gold));transition:width .3s}
+
+  #main{flex:1;display:flex;min-height:0}
+  nav{width:320px;min-width:250px;border-right:1px solid var(--line);overflow-y:auto;background:#f4f0e8;padding-bottom:40px}
+  #content{flex:1;overflow-y:auto;padding:22px 26px 90px}
+
+  .navsec{border-bottom:1px solid var(--line)}
+  .navsec>button{width:100%;text-align:left;background:none;border:none;padding:10px 12px;font-weight:700;font-size:13px;display:flex;align-items:center;gap:8px;color:var(--ink)}
+  .navsec>button .cnt{margin-left:auto;font-weight:400;font-size:11px;color:var(--ink-soft)}
+  .navsec>button .chev{transition:transform .15s;font-size:10px;color:var(--ink-soft)}
+  .navsec.open>button .chev{transform:rotate(90deg)}
+  .navcases{display:none}
+  .navsec.open .navcases{display:block}
+  .navcase{width:100%;text-align:left;background:none;border:none;border-left:3px solid transparent;padding:5px 10px 5px 14px;font-size:12.3px;display:flex;gap:7px;align-items:baseline;color:var(--ink)}
+  .navcase:hover{background:#ece6da}
+  .navcase.current{background:#fff;border-left-color:var(--orange);font-weight:600}
+  .navcase .cid{font-family:var(--mono);font-size:10.5px;color:var(--ink-soft);white-space:nowrap}
+  .navcase .mk{font-size:10px;margin-left:auto}
+  .dot{width:9px;height:9px;border-radius:50%;background:#cfc8ba;flex:none;position:relative;top:1px}
+  .dot.pass{background:var(--green)} .dot.fail{background:var(--red)} .dot.na{background:var(--gray)}
+
+  .crumb{font-size:12px;color:var(--ink-soft);margin-bottom:8px}
+  .card{background:var(--card);border:1px solid var(--line);border-left:var(--rim);border-radius:10px;padding:20px 24px;max-width:900px;box-shadow:0 1px 3px rgba(20,38,60,.06)}
+  .case-top{display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin-bottom:4px}
+  .case-id{font-family:var(--mono);font-size:12px;color:var(--ink-soft)}
+  .tag{font-size:10.5px;font-weight:700;letter-spacing:.4px;text-transform:uppercase;border-radius:20px;padding:2px 9px}
+  .tag.happy{background:#e3efe7;color:#22603d} .tag.validation{background:#eee7f5;color:#5b3d84}
+  .tag.access{background:#e5ecf5;color:#274a72} .tag.edge{background:#fbe9e0;color:#9c3d12}
+  .tag.role{background:#f1ede4;color:#6b6252;text-transform:none;letter-spacing:0}
+  .tag.tech{background:#e7edf2;color:#2b4a63}
+  .card h2{font-size:19px;margin:2px 0 12px;line-height:1.3}
+  .lbl{font-size:11px;font-weight:700;letter-spacing:.8px;text-transform:uppercase;color:var(--ink-soft);margin:16px 0 6px}
+  ol.steps{margin:0 0 4px 22px}
+  ol.steps li{margin-bottom:6px}
+  .expected{background:#f6f3ec;border:1px solid var(--line);border-radius:8px;padding:10px 14px}
+  .why{font-size:12.5px;color:var(--ink-soft);margin-top:8px;font-style:italic}
+  .source{font-size:11.5px;color:var(--ink-soft);margin-top:12px;background:#f4f0e8;border:1px dashed var(--line);border-radius:6px;padding:6px 10px}
+  .source b{font-weight:600}
+
+  .tech-banner{background:#eef3f7;border:1px solid #cfdce6;border-radius:8px;padding:10px 14px;margin:10px 0}
+  .tech-banner p{font-size:13px;margin-bottom:8px}
+  .tech-banner .row{display:flex;gap:8px;flex-wrap:wrap}
+  .backup-reminder{background:#fff6ec;border:1px solid #f2ceac;border-left:var(--rim);border-radius:8px;padding:10px 14px;margin:0 0 14px;max-width:900px}
+  .backup-reminder .bm-txt{font-size:13px;font-weight:600;color:#8a4a1e}
+  .backup-reminder .bm-row{display:flex;gap:14px;align-items:center;flex-wrap:wrap;margin-top:8px}
+  .backup-reminder .bm-off{font-size:12px;color:var(--ink-soft);display:flex;align-items:center;gap:5px;cursor:pointer}
+  .minibtn{border:1px solid var(--line);background:#fff;border-radius:7px;padding:6px 12px;font-size:12.5px;font-weight:600}
+  .minibtn:hover{border-color:var(--orange)}
+
+  .datablock{background:#fbfaf6;border:1px solid var(--line);border-radius:8px;padding:12px 14px;margin-top:14px}
+  .datablock .lbl{margin-top:0}
+  .chiprow{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin:6px 0}
+  .chip{display:inline-flex;gap:8px;align-items:center;background:#f1ede4;border:1px solid var(--line);border-radius:20px;padding:4px 6px 4px 12px;font-family:var(--mono);font-size:12.5px}
+  .chip .clab{font-family:var(--sans);font-size:11px;color:var(--ink-soft);font-weight:600;margin-right:2px}
+  .chip button{border:none;background:#e3ddd0;border-radius:14px;width:24px;height:24px;font-size:12px;line-height:1}
+  .chip button:hover{background:var(--orange);color:#fff}
+  .datahint{font-size:12px;color:var(--ink-soft);margin-top:6px}
+  .datahint b{color:var(--ink)}
+
+  .openwin{display:inline-flex;align-items:center;gap:6px;background:var(--navy);color:#fff;border:none;border-radius:8px;padding:8px 14px;font-weight:600;font-size:13px;margin-bottom:12px}
+  .openwin:hover{background:var(--orange)}
+
+  .verdict{display:flex;gap:10px;margin:18px 0 12px;flex-wrap:wrap}
+  .vbtn{border:2px solid var(--line);background:#fff;border-radius:8px;padding:9px 26px;font-weight:700;font-size:14px;color:var(--ink-soft)}
+  .vbtn:hover{border-color:var(--ink-soft)}
+  .vbtn.pass.on{background:var(--green);border-color:var(--green);color:#fff}
+  .vbtn.fail.on{background:var(--red);border-color:var(--red);color:#fff}
+  .vbtn.na.on{background:var(--gray);border-color:var(--gray);color:#fff}
+  textarea{width:100%;border:1px solid var(--line);border-radius:8px;padding:9px 12px;min-height:64px;resize:vertical;background:#fff}
+  textarea:focus{outline:2px solid var(--orange);outline-offset:-1px;border-color:var(--orange)}
+
+  .shots{display:flex;flex-wrap:wrap;gap:8px;margin-top:8px}
+  .shot{position:relative;width:96px;height:96px;border:1px solid var(--line);border-radius:8px;overflow:hidden;background:#f1ede4}
+  .shot img{width:100%;height:100%;object-fit:cover;cursor:zoom-in}
+  .shot button{position:absolute;top:2px;right:2px;background:rgba(20,38,60,.8);color:#fff;border:none;border-radius:12px;width:20px;height:20px;font-size:11px;line-height:1}
+  .attachrow{display:flex;gap:8px;align-items:center;margin-top:8px;flex-wrap:wrap}
+  .attachrow .hint{font-size:11.5px;color:var(--ink-soft)}
+
+  .reso{border:1px solid #cfe0cf;background:#eef6ef;border-radius:8px;padding:10px 14px;margin:12px 0}
+  .reso.wontfix{border-color:#e6d3ce;background:#f8efec}
+  .reso.needinfo{border-color:#e6ddc4;background:#fbf6e7}
+  .reso b{font-weight:700}
+  .reso .rpill{font-size:10.5px;font-weight:700;text-transform:uppercase;border-radius:20px;padding:2px 9px;margin-right:6px}
+  .rpill.fixed{background:#dcefe0;color:#1f5b39}.rpill.wontfix{background:#f2d9d1;color:#8a3b25}.rpill.needinfo{background:#f0e6c6;color:#7a5c10}
+
+  .wiznav{display:flex;gap:10px;margin-top:18px;max-width:900px}
+  .wiznav button{border:1px solid var(--line);background:#fff;border-radius:8px;padding:9px 18px;font-weight:600}
+  .wiznav button:hover{border-color:var(--orange)}
+  .wiznav .next{margin-left:auto;background:var(--navy);color:#fff;border-color:var(--navy)}
+  .wiznav .next:hover{background:var(--orange);border-color:var(--orange)}
+  .savehint{font-size:11.5px;color:var(--ink-soft);align-self:center}
+
+  .obsbox{max-width:900px;margin-top:22px;background:#fffdf7;border:1px dashed var(--gold);border-radius:10px;padding:14px 18px}
+  .obsbox .lbl{margin-top:0;color:#8a6d28}
+  .obslog{margin-top:10px;display:flex;flex-direction:column;gap:8px}
+  .obsentry{background:#fff;border:1px solid var(--line);border-radius:8px;padding:8px 10px}
+  .obsentry .ots{font-size:11px;color:var(--ink-soft);margin-bottom:3px;display:flex;justify-content:space-between}
+  .obsentry .odel{border:none;background:none;color:var(--red);font-size:11px;cursor:pointer}
+  .obsentry .otext{width:100%;border:1px solid transparent;border-radius:5px;padding:3px 5px;background:#fbfaf6}
+  .obsentry .otext:focus{outline:none;border-color:var(--orange);background:#fff}
+
+  .sum-tiles{display:flex;gap:12px;flex-wrap:wrap;margin:14px 0 22px}
+  .tile{background:var(--card);border:1px solid var(--line);border-left:var(--rim);border-radius:10px;padding:12px 20px;min-width:110px}
+  .tile b{display:block;font-size:24px}.tile span{font-size:12px;color:var(--ink-soft)}
+  table.sum{border-collapse:collapse;width:100%;max-width:1040px;background:#fff;font-size:13px}
+  table.sum th,table.sum td{border:1px solid var(--line);padding:6px 10px;text-align:left;vertical-align:top}
+  table.sum th{background:#f1ede4;font-size:11.5px;text-transform:uppercase;letter-spacing:.5px}
+  td.st-pass{color:var(--green);font-weight:700} td.st-fail{color:var(--red);font-weight:700}
+  td.st-na{color:var(--gray);font-weight:700} td.st-pending{color:var(--ink-soft)}
+
+  .intro p{margin-bottom:10px;max-width:780px}
+  .intro ul{margin:0 0 10px 22px;max-width:780px}
+  .intro li{margin-bottom:5px}
+  .panel{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:18px 22px;max-width:820px;margin-top:16px}
+  .panel.accent{border-left:var(--rim)}
+  .field{margin-bottom:12px}
+  .field label{display:block;font-size:12.5px;font-weight:600;color:var(--ink-soft);margin-bottom:4px}
+  .field input[type=text],.field input[type=email]{width:100%;max-width:420px;border:1px solid var(--line);border-radius:8px;padding:8px 11px;background:#fff}
+  .radio{display:inline-flex;gap:6px;align-items:center;margin-right:16px;font-size:14px}
+  .credtable{border-collapse:collapse;width:100%;margin-top:8px;font-size:13px}
+  .credtable th,.credtable td{border:1px solid var(--line);padding:6px 8px;text-align:left}
+  .credtable th{background:#f1ede4;font-size:11px;text-transform:uppercase;letter-spacing:.4px}
+  .linkrow{display:flex;flex-wrap:wrap;gap:8px;margin-top:10px}
+
+  .modal-bg{position:fixed;inset:0;background:rgba(20,38,60,.5);display:none;align-items:center;justify-content:center;z-index:20;padding:20px}
+  .modal-bg.show{display:flex}
+  .modal{background:#fff;border-radius:12px;max-width:640px;width:100%;max-height:86vh;overflow-y:auto;padding:22px 26px;box-shadow:0 20px 60px rgba(0,0,0,.3)}
+  .modal h3{font-size:18px;margin-bottom:10px}
+  .modal .x{float:right;border:none;background:none;font-size:20px;cursor:pointer;color:var(--ink-soft)}
+  .imgmodal img{max-width:100%;border-radius:8px}
+
+  #toast{position:fixed;bottom:18px;right:18px;background:var(--navy);color:#fff;border-radius:8px;padding:10px 16px;font-size:13px;opacity:0;transition:opacity .25s;pointer-events:none;z-index:30}
+  #toast.show{opacity:.96}
+
+  @media(max-width:900px){
+    #main{flex-direction:column}
+    nav{width:100%;max-height:38vh;border-right:none;border-bottom:1px solid var(--line)}
+    header input[type=text]{width:150px}
+  }
+  @media print{ header,nav,.wiznav,#progressbar{display:none} #content{overflow:visible} }
+</style>
+</head>
+<body>
+<div id="app">
+  <header>
+    <h1 id="apptitle"></h1>
+    <div class="hgroup"><label for="envsel">Environment</label>
+      <select id="envsel"></select>
+      <input type="text" id="envbase" spellcheck="false" title="Base URL used in the steps">
+    </div>
+    <div class="hgroup">
+      <button class="hbtn" id="btn-creds">Access &amp; creds</button>
+      <button class="hbtn" id="btn-profile">Profile</button>
+      <button class="hbtn" id="btn-evidence" title="Show developer evidence on cases">Evidence</button>
+      <button class="hbtn" id="btn-summary">Summary</button>
+      <button class="hbtn" id="btn-import">Import</button>
+      <button class="hbtn" id="btn-merge" title="Merge developer resolutions">Merge fixes</button>
+      <button class="hbtn accent" id="btn-export">Export</button>
+      <input type="file" id="importfile" accept=".json,application/json" hidden>
+      <input type="file" id="mergefile" accept=".json,application/json" hidden>
+    </div>
+  </header>
+  <div id="progressbar"><div></div></div>
+  <div id="main">
+    <nav id="nav"></nav>
+    <div id="content"></div>
+  </div>
+</div>
+<div class="modal-bg" id="modal-bg"><div class="modal" id="modal"></div></div>
+<div id="toast"></div>
+
+<script id="appdata" type="application/json">{"appId":"furnfx-qa-tech","title":"Furniture-Rx QA — Tech (Technician) Site","version":"2026-07-29","envs":[{"id":"live","label":"Live","base":"https://tech.furniturerx.net"},{"id":"local","label":"Localhost (netlify dev)","base":"http://localhost:8888/tech"}],"intro":["This is the technician tablet. It sells only two things: the care kits ($49.99 each, paid once) and the Repair Safety Net membership ($19.99/mo, with the first 3 months free). It must NEVER sell a furniture protection plan.","Before paying anything, check with the team that the site is in Stripe TEST mode. Test card: `4242 4242 4242 4242`, any future expiry date, any 3-digit code, any ZIP.","When a case shows a \"Test data for this case\" box, tap the chips to copy the Technician ID and customer email it made for you. Do not invent your own.","You will need a phone with a camera for the QR cases. A few cases ask you to open the browser developer tools (press F12) and are marked \"Technical\".","After finishing a sale, tap \"Start a new purchase\" (or reload the page) before the next case so carts do not carry over.","There is no login on this site, and that is on purpose. One section checks exactly what that does and does not allow."],"sections":[{"id":"landing","title":"1 · Landing page & content","cases":[{"id":"TECH-001","kind":"happy","role":"Anonymous","title":"Page loads with the technician offer","steps":["Open a fresh browser tab and go to {BASE}/.","Look at the top band of the page (the hero area)."],"expected":"The headline reads \"Your repair's done. Keep it that way.\" Below it you see the Pro care kit at $49.99 and the Repair Safety Net membership at $0 for the first 3 months, then $19.99/mo. The \"Shop kits\" and \"Add membership\" buttons are visible, along with a note that you can pay on this device, scan a QR code, or get the link by email.","source":"tech/index.html:1038-1082 (hero); Doug call: tech sells kits + membership"},{"id":"TECH-002","kind":"access","role":"Anonymous","title":"No protection plans anywhere on the page","steps":["Scroll the whole page from top to bottom.","Press Ctrl+F to search the page for the words \"protection plan\", then \"$9.99\", then \"$19.99/mo plan\"."],"expected":"There is no plan-comparison section, no plan cards, no $9.99 or $19.99 protection-plan pricing, and no coverage configurator. The membership and the care kits are the only things for sale.","source":"Doug decision (tech = kits + membership only); enforced by static.test.mjs:405-407 and e2e-tech.mjs"},{"id":"TECH-003","kind":"happy","role":"Anonymous","title":"Membership section content","steps":["Scroll down to the \"Repair Safety Net\" membership section.","Click the details or terms link inside that section."],"expected":"The card shows $19.99/mo, a list of benefits, an \"Add Repair Safety Net · $19.99/mo\" button, and a gift-coupon link. The details link opens a membership Terms pop-up (not a dead link).","source":"tech/index.html:1112-1162, memterms modal 1589-1593"},{"id":"TECH-004","kind":"happy","role":"Anonymous","title":"Care kits: three kits at $49.99","steps":["Scroll down to the care kits section."],"expected":"There are exactly three kits: Wood, Fabric & upholstery, and Leather. Each is $49.99, each has a plus/minus quantity stepper, and each has \"Add to cart\" and \"Checkout\" buttons.","source":"tech/index.html:1238-1355; SKUs CARE-WOOD/FABRIC/LEATHER-001"},{"id":"TECH-005","kind":"happy","role":"Anonymous","title":"FAQ opens and closes","steps":["Scroll down to the FAQ section.","Click several questions to open them, then click again to close them."],"expected":"Eight questions expand and collapse. The answers talk about the care kits and the membership, and never quote a yearly protection-plan price.","source":"tech/index.html:1165-1236"},{"id":"TECH-006","kind":"validation","role":"Anonymous","title":"Footer legal links are intentionally inactive","steps":["Scroll to the footer at the very bottom of the page.","Try clicking \"Terms of service\", then \"Privacy\", then \"Accessibility\"."],"expected":"Those three links do nothing at all: no page change and no error. Note anything different from that.","why":"This is intentional for now; the final legal wording is not ready yet.","source":"tech/index.html:1373-1378; FOOT-1a/1c pending Doug copy"},{"id":"TECH-007","kind":"happy","role":"Anonymous","title":"Sticky mobile bar changes with the cart","steps":["Narrow the browser window to phone width (or open the page on a phone).","With an empty cart, look at the sticky bar pinned to the bottom of the screen.","Add one care kit to the cart, then look at that bottom bar again."],"expected":"With an empty cart the bottom bar reads \"Add membership\". After you add a kit (or the membership) it changes to read \"Checkout\".","source":"tech/index.html:3439-3453; e2e-tech.mjs §2"},{"id":"TECH-008","kind":"happy","role":"Anonymous","title":"Dashboard link shows a QR, does not navigate the tablet","steps":["Open the cart drawer (the cart button in the top-right corner).","Click \"My dashboard\" (the dashboard link)."],"expected":"An overlay appears with a QR code that points the customer to www.furniturerx.net/dashboard. The tablet itself stays on the tech site and does not navigate away.","source":"tech/index.html:1950-1971 (dashqr overlay)"},{"id":"TECH-009","kind":"happy","role":"Anonymous","title":"Plan T&C page exists on this site","steps":["Type the address {BASE}/terms/ into the browser and open it directly."],"expected":"A page titled \"Furniture-Rx Protection Plan — Terms & Conditions\" loads on this same site. It mentions a 30-day renewable term and a 36-month maximum.","source":"tech/terms/index.html; static.test.mjs:418"}]},{"id":"cart","title":"2 · Cart & drawer","cases":[{"id":"TECH-020","kind":"happy","role":"Anonymous","title":"Adding a kit","steps":["On the Wood kit, press the \"+\" button until the quantity shows 2, then click \"Add to cart\".","Open the cart drawer (cart button, top-right corner)."],"expected":"The drawer shows a Wood kit line at quantity 2, priced $99.98 for that line, and the total matches. The pay button reads \"Pay $99.98 once\" (a one-time charge, with no monthly part).","source":"tech/index.html:2353 KIT_PRICE, 2445-2456 pay label"},{"id":"TECH-021","kind":"validation","role":"Anonymous","title":"Kit quantity caps at 20","steps":["On any kit, press the \"+\" button over and over, past 20."],"expected":"The quantity never goes above 20. There is no error message; it simply stops climbing.","source":"tech/index.html:3498 client cap; validate.mjs MAX_KIT_QTY=20 → kit_qty_out_of_range"},{"id":"TECH-022","kind":"happy","role":"Anonymous","title":"Adding the membership opens the drawer","steps":["Press \"Add membership\" in the hero area, or \"Add Repair Safety Net · $19.99/mo\" in the membership section."],"expected":"The cart drawer opens on its own, showing a membership line at $19.99/mo. The pay button reads \"Repair Safety Net · $19.99/mo\".","source":"tech/index.html:2492-2497 openMembership()"},{"id":"TECH-023","kind":"happy","role":"Anonymous","title":"Mixed cart shows both monthly and one-time in the pay label","steps":["Put both the membership and one care kit in the cart.","Open the drawer and read the pay button."],"expected":"The pay button follows the pattern \"Pay $X.XX today ($19.99/mo + $49.99 one-time)\". The amount charged today is the kits only; the membership starts on its free trial.","source":"tech/index.html:2445-2456; trial: _lib/checkout.mjs:29-30"},{"id":"TECH-024","kind":"edge","role":"Anonymous","title":"Cart survives a reload and a closed tab","steps":["With items in the cart, reload the page (press F5).","Then close the tab completely, open a new tab, and go to {BASE}/."],"expected":"The cart still holds the same kits, membership, and quantities both times, exactly as you left them.","source":"localStorage furnfx_cart/furnfx_kits/furnfx_membership; tech/index.html:3459-3496"},{"id":"TECH-025","kind":"edge","tech":true,"role":"Anonymous","title":"Tampered saved cart is sanitized, not trusted","steps":["This case checks the tablet ignores a faked cart. Press F12 to open developer tools, then click the \"Console\" tab.","Paste and run: localStorage.setItem(\"furnfx_kits\", JSON.stringify([{sku:\"CARE-WOOD-001\",qty:999},{sku:\"HACK-1\",qty:2}]))","Reload the page and open the cart."],"expected":"The Wood kit quantity is brought down to 20 (not 999), and the unknown \"HACK-1\" item is dropped entirely. The prices show the normal $49.99, never anything the pasted data claimed.","source":"tech/index.html:3454-3496 loadKits/loadCart re-validate untrusted storage"},{"id":"TECH-026","kind":"edge","role":"Anonymous","title":"Two tabs, one cart","steps":["Open {BASE}/ in two separate tabs.","Add a kit in the first tab.","Reload the second tab and open its cart."],"expected":"After the reload, the second tab shows the kit you added in the first tab, because both tabs share one cart on this device. Note any stranger behavior you see without reloading, too.","source":"Shared localStorage cart (device-local single source of truth)"},{"id":"TECH-027","kind":"happy","needs":["email"],"role":"Anonymous","title":"Email my cart to myself","steps":["With items in the cart, open the drawer and use \"Email my cart to myself\". Use the email shown in the \"Test data for this case\" box below.","Check that inbox (and the spam folder)."],"expected":"An email arrives listing the cart with the correct prices. If you try it more than 3 times within a minute, it is politely blocked for a short wait.","source":"tech/index.html:3325-3360; email-cart.mjs rate limit 3/60s"}]},{"id":"form","title":"3 · Checkout form validations","cases":[{"id":"TECH-040","kind":"validation","role":"Technician","title":"Empty form names every missing field","steps":["With something in the cart, open the drawer.","Leave every field empty, tick nothing, and try to pay."],"expected":"The pay button stays disabled until you tick the \"I read the information above and it is accurate\" checkbox. After ticking it and submitting with empty fields, a message lists every missing field (starting with \"Missing:\"), and the cursor jumps to the first one.","source":"tech/index.html:2479-2491 accuracy gate, 2709-2733 focusFirst"},{"id":"TECH-041","kind":"validation","role":"Technician","title":"Name with digits is rejected","steps":["In the name field, type \"John 2nd Smith\", and fill in the rest of the form correctly.","Try to pay."],"expected":"The sale is blocked before payment, with a message like \"Numbers don't belong in a name\" shown next to the name field.","source":"tech/index.html:2902; server backstop invalid_name (validate.mjs:123-127)"},{"id":"TECH-042","kind":"edge","role":"Technician","title":"Unusual but legitimate names are accepted","steps":["In the name field, type \"José Núñez-O'Brien\" (accents, a hyphen, an apostrophe).","Then try a short two-word name like \"Al Bo\"."],"expected":"Both names are accepted, because they have no digits and are at least two letters long. Nothing garbles the accents on screen or in the emails that follow.","source":"validate.mjs:123-127 (only rules: non-empty, no digits, len ≥ 2)"},{"id":"TECH-043","kind":"validation","role":"Technician","title":"Email format is checked","steps":["In the email field, type \"doug@\", then \"doug@rap\", then \"doug @rap.com\". Try to pay after each one.","Finally type \"doug@rap.com\"."],"expected":"The first three are rejected with an email message shown right at the field. \"doug@rap.com\" is accepted.","source":"tech/index.html:2621 EMAIL_RE; server invalid_email (validate.mjs:76-77)"},{"id":"TECH-044","kind":"validation","role":"Technician","title":"Phone mask and minimum digits","steps":["In the phone field, type \"abc\", then type \"12345\".","Then type \"5551234567\"."],"expected":"Letters never appear (the field accepts digits only, and formats them like \"(555) 123-4567\", up to 10 digits). \"12345\" is rejected because a phone needs at least 7 digits. The full number is accepted.","source":"tech/index.html:2634-2664; server invalid_phone (validate.mjs:56-63)"},{"id":"TECH-045","kind":"validation","needs":["associate","email"],"role":"Technician","title":"Technician ID is enforced by the server, not the browser","steps":["Fill the form correctly (use the customer email in the \"Test data for this case\" box below), but leave the Technician ID field empty.","Tick the accuracy checkbox and try to pay."],"expected":"KNOWN ROUGH EDGE to confirm: the browser lets you submit, and then the server refuses. The page shows \"We couldn't start checkout (invalid_associate).\" with that raw code, not friendly wording. Write down exactly what you see. If the browser actually blocked you earlier than this, note that too.","source":"Gap: required attr stripped on tech (tech/index.html:2374-2375) vs validate.mjs:164-165"},{"id":"TECH-046","kind":"validation","needs":["associate","email"],"role":"Technician","title":"Work order number is also server-enforced","steps":["Fill the form correctly, including the Technician ID from the \"Test data for this case\" box below, but leave the Work order number empty.","Try to pay."],"expected":"Same pattern: the browser lets the submit through, then the server answers and the page shows \"We couldn't start checkout (order_required).\" with that raw code.","source":"validate.mjs:166 order_required; Doug 15-jul: both IDs required (\"so you get credit\")"},{"id":"TECH-047","kind":"happy","needs":["associate","email"],"role":"Technician","title":"Technician ID sticks to the device","steps":["Complete any purchase (or just fill in the Technician ID from the \"Test data for this case\" box below and pay for a kit with the test card).","After the success screen, tap \"Start a new purchase\" and open the form again."],"expected":"The Technician ID field is already filled with the same ID you used, so the technician does not retype it. All the customer fields are blank.","why":"The Technician ID is kept on this device on purpose, so techs do not re-enter it on every sale.","source":"tech/index.html:3275-3288 ASSOC_KEY persistence"},{"id":"TECH-048","kind":"validation","role":"Technician","title":"Referral code: live validation, invalid never blocks the sale","steps":["Open the cart drawer and find the \"Dealer referral code\" field.","Type \"NOPE-0000\" and tap outside the field.","If the team gave you a real dealer code, try that one too."],"expected":"An unknown code shows \"Code not recognized — you can still check out.\" and you can still pay. A real code shows \"Code applied — supporting \u003cdealer name>.\"","source":"tech/index.html:2601-2624; Doug 15-jul: bad/disabled code = invalid but sale allowed"},{"id":"TECH-049","kind":"happy","role":"Technician","title":"?ref= link pre-fills the referral code","steps":["Open {BASE}/?ref=NOPE-0000 in a new tab.","Open the cart form and look at the referral code field."],"expected":"The referral code field arrives already filled with `NOPE-0000`, and it shows its validation result without you typing anything.","source":"tech/index.html:2618-2623"},{"id":"TECH-050","kind":"edge","role":"Technician","title":"Autofill does not sneak past the rules","steps":["Use the browser's autofill (a saved address or contact) to fill the form in one click.","Check every field afterward, then try to pay."],"expected":"The autofilled values go through the same checks: the phone gets re-formatted by the mask, and the email is validated. A half-filled form still cannot pay.","source":"Same client+server rules regardless of input method (validate.mjs)"}]},{"id":"pay","title":"4 · Payment: three ways to pay","cases":[{"id":"TECH-060","kind":"happy","role":"Technician","title":"Exactly three payment options, none about receipts","steps":["With a valid cart and a filled-in form, look at the \"Ways to pay\" choices near the bottom of the drawer."],"expected":"There are exactly three options: \"Pay on this device\" (already selected), a QR code option, and email the link. There is no \"receipt photo on the customer's phone\" option.","why":"Receipt photos belong to the in-store kiosk; technician sales need no receipt.","source":"tech/index.html:1536-1543; static.test.mjs:408"},{"id":"TECH-061","kind":"happy","needs":["associate","email"],"role":"Technician + Customer","title":"Pay on this device (full happy path)","steps":["Build a cart with the membership plus one Wood kit.","Open the drawer and fill the form using the Technician ID and customer email from the \"Test data for this case\" box below, plus any work order number such as `WO-1001`.","Choose \"Pay on this device\", tick the accuracy box, and pay.","On the Stripe page, check the amounts, then pay with the test card.","Wait to return to the site."],"expected":"Stripe shows $49.99 due today plus the membership on a 3-month free trial (then $19.99/mo). After paying, you land back on the tech site (not another web address), on a \"Payment received\" screen that tells the plan holder to watch their email for sign-in details.","source":"_lib/checkout.mjs:29-30 trial 90d, 148-149 return URLs; tech/index.html:1552-1564"},{"id":"TECH-062","kind":"happy","needs":["email"],"role":"Technician + Customer","title":"QR handoff to the customer phone","steps":["Start a new purchase with one kit only. Fill the form using the email in the \"Test data for this case\" box below.","Choose the QR code option and submit.","Scan the QR code with a phone and pay there with the test card.","Watch the tablet screen the whole time."],"expected":"The tablet shows \"Waiting for the customer's payment\" with the QR code and a short typeable link (starting with /p/). After the phone pays, the tablet moves to the success screen on its own within a few seconds (it keeps checking for the payment).","source":"tech/index.html:3134-3153 poll, 3171-3201 handoff view"},{"id":"TECH-063","kind":"happy","needs":["email"],"role":"Technician + Customer","title":"Email link handoff","steps":["Start a new purchase and fill the form using the email in the \"Test data for this case\" box below.","Choose the email option and submit.","Open the email on another device and pay from there."],"expected":"The tablet says the payment link was sent to that address. (If the email cannot be sent, it falls back to showing the QR code instead; note if that happened.) The emailed link opens the Stripe checkout, and after paying, the tablet moves to the success screen.","source":"tech/index.html:3186-3188 email fallback to QR"},{"id":"TECH-064","kind":"edge","role":"Technician","title":"Nobody pays: the wait times out politely","steps":["Start a QR code payment and simply do not pay.","Leave the tablet alone for about 3 minutes."],"expected":"After about 3 minutes of checking, it stops and says it still has no payment confirmation. It offers a \"Check again\" button that resumes checking, plus \"Choose another way to pay\" and \"Start a new purchase\".","source":"tech/index.html:3134-3153 (45 ticks × 4 s), 1565-1580"},{"id":"TECH-065","kind":"edge","role":"Technician","title":"Distracted tech closes the drawer mid-wait","steps":["Start a QR code payment.","Close the drawer and scroll around the page.","Reopen the cart drawer."],"expected":"Reopening the drawer brings back the waiting screen for that same payment. The sale in progress is not silently forgotten.","source":"tech/index.html:2523-2530 resume poll"},{"id":"TECH-066","kind":"edge","role":"Customer","title":"Customer cancels on the Stripe page","steps":["Choose \"Pay on this device\", then on the Stripe page press the back arrow or cancel."],"expected":"You return to the tech site with the cart still intact (nothing lost), ready to retry or change it. No \"Payment received\" screen appears anywhere.","source":"_lib/checkout.mjs:149 cancel_url ?canceled=1"},{"id":"TECH-067","kind":"edge","role":"Technician","title":"Success screen resets itself for the next customer","steps":["Complete any payment and reach the success screen.","Do not touch anything for two minutes."],"expected":"The cart is already empty right after success, and after about two minutes the screen returns to a fresh sale on its own.","why":"This mirrors the in-store kiosk, so the next customer never sees the previous one's information.","source":"tech/index.html:3112 (120 s auto-reset), 3156-3165 cart cleared"},{"id":"TECH-068","kind":"edge","role":"Technician","title":"Double-tap on the pay button","steps":["With everything valid, tap the pay button twice as fast as you can."],"expected":"Only one checkout starts (one Stripe page, one session). No double charge and no second tab. Record anything else you notice.","source":"Single submit handler; server idempotent per session — record what you observe"},{"id":"TECH-069","kind":"edge","role":"Technician","title":"Hammering checkout hits a polite rate limit","steps":["Start a checkout, cancel on the Stripe page, and repeat quickly six or more times within a minute."],"expected":"Around the sixth try the pay button disables with \"Too many attempts — please wait Ns and try again.\" and comes back on its own after the wait.","source":"create-checkout-session.mjs rate limit 5/60s; tech/index.html:2996-3001"},{"id":"TECH-070","kind":"edge","role":"Customer","title":"Back button after a successful payment","steps":["After a successful payment, press the browser Back button."],"expected":"You may land back on the Stripe receipt or on the site, but the cart stays empty and no second charge is possible without building a new cart. Note exactly where Back takes you.","source":"Cart cleared on ?paid=1 (tech/index.html:1913-1915, 3156-3164)"}]},{"id":"rules","title":"5 · Business rules to verify end-to-end","cases":[{"id":"TECH-080","kind":"happy","role":"Customer","title":"Membership trial really is 90 days in Stripe","steps":["Buy the membership on its own (no kits) with the test card.","On the Stripe checkout page, before paying, read the schedule carefully.","If you have access to the Stripe dashboard, check the subscription there afterward."],"expected":"Stripe shows $0.00 due today and $19.99/mo starting in 3 months (a 90-day free trial). Nothing is charged today.","source":"_lib/checkout.mjs:29-30 trialDaysFor(tech, membership, no plans) = 90; Doug 10-jul decision TECH-2a"},{"id":"TECH-081","kind":"happy","role":"Customer","title":"Kits-only purchase is one-time, no subscription","steps":["Buy one kit only.","Read the Stripe page before paying."],"expected":"$49.99 is charged once. There is no recurring line, no trial, and nothing monthly.","source":"tech/index.html pay label \"Pay $49.99 once\"; kits priced server-side from care_kits table"},{"id":"TECH-082","kind":"edge","tech":true,"role":"Attacker-ish","title":"Client cannot invent its own prices","steps":["This case uses developer tools. Press F12, then click the \"Network\" tab.","Start a normal kit checkout and find the request named create-checkout-session.","Resend that request with a changed body: in Firefox use \"Edit and resend\", or in Chrome copy it as a fetch into the Console. Change any price or amount fields you find, add \"price\": 1, and send it.","If a Stripe URL comes back, open it."],"expected":"No matter what you send, Stripe always shows the real prices ($49.99 kit / $19.99 membership). The server recomputes everything and ignores whatever amounts the client sent.","source":"_lib/checkout.mjs:95-135 server-side pricing; validate.mjs PRICE_CENTS"},{"id":"TECH-083","kind":"edge","tech":true,"role":"Attacker-ish","title":"Smuggling a protection plan into a tech checkout","steps":["This case uses developer tools, as in the previous one. Resend the checkout request, but this time add \"plans\":[{\"cov\":\"stain\",\"term\":\"monthly\",\"type\":\"furniture\",\"count\":1}] while keeping \"source\":\"tech\".","Read the response, and if a URL comes back, open the Stripe page."],"expected":"Either the request is rejected, or the sale goes through but WITHOUT the 90-day free trial (adding a plan cancels the trial). Under no circumstances do you get a free-trial protection plan. Record the exact response.","source":"trialDaysFor: with plans → 0 (tech.test.mjs boundary cases)"},{"id":"TECH-084","kind":"happy","needs":["email"],"role":"Customer","title":"Welcome email and account after purchase","steps":["Buy the membership using the fresh customer email in the \"Test data for this case\" box below.","Within a minute or two, check that inbox.","Follow the sign-in details in the email."],"expected":"A welcome email arrives with sign-in details: a temporary password that lasts 7 days, and you are made to set a new password at first login. After signing in, the account dashboard shows the membership. Note how long the email took to arrive and any spam-folder issues.","source":"stripe-webhook deferred account creation; SEC-3a temp password TTL 7d"},{"id":"TECH-085","kind":"validation","role":"Customer","title":"KNOWN GAP: tech sales have no contract number","steps":["After a membership purchase, look in the account dashboard (and in any email) for a contract number like `RX-10001`."],"expected":"KNOWN GAP to confirm, not a surprise: a membership-only sale gets no contract number, so no RX- number appears anywhere for it. Record what the dashboard shows in its place (blank, a dash, and so on).","source":"stripe-webhook.mjs:340 (no master_no without a plan); portal.mjs contractNumber → null"},{"id":"TECH-086","kind":"happy","needs":["email"],"role":"Anonymous","title":"Gift coupons: 3 tiers × 3 months","steps":["In the membership section, open the gift-coupon link.","Review the three options and their totals, pick one, enter the email from the \"Test data for this case\" box below, and continue to payment."],"expected":"There are three tiers: Stain $9.99, Stain + Structure $19.99, and Membership $19.99. Each total is three months of that tier's price. Checkout works, and the gift email with its code arrives.","source":"tech/index.html:1868-1889 gift overlay; _lib/gift.mjs months=3; misc/gift-coupons-manual.html"},{"id":"TECH-087","kind":"validation","role":"Anonymous","title":"Gift form rejects a bad email","steps":["In the gift-coupon pop-up, enter the email \"nope@\" and try to continue."],"expected":"You are blocked with an email error before any payment starts.","source":"create-gift-checkout.mjs invalid_email"}]},{"id":"maya","title":"6 · Maya chat (tech mode)","cases":[{"id":"TECH-100","kind":"happy","needs":["email"],"role":"Anonymous","title":"Maya greets in tech mode","steps":["Click the chat button."],"expected":"Maya greets you with something like \"Hi there 👋 I'm Maya, your sales assistant\" and offers help with the care kits and the Repair Safety Net membership, not protection plans.","source":"tech/index.html:1802 greeting, context:\"tech\" sent to /api/chat"},{"id":"TECH-101","kind":"validation","needs":["email"],"role":"Anonymous","title":"Maya answers membership pricing correctly","steps":["In the chat, ask: \"how much is the membership?\"","Then ask: \"how much are the protection plans per year?\""],"expected":"For the membership she says $19.99/mo with the first 3 months free, matching the page. For a yearly plan price she must NOT quote any yearly number; she points you to what this site sells or to the main site instead.","source":"chat.mjs TECH_SYSTEM (:75-99); G13b: no yearly prices from Maya"},{"id":"TECH-102","kind":"edge","role":"Anonymous","title":"Maya does not run the sizing interview on tech","steps":["In the chat, ask: \"I want to cover everything in my house, what would it cost?\""],"expected":"Maya does NOT start a piece-by-piece intake and does not invent a quote. On the tech site she keeps it to plain questions and answers.","why":"\"Everything in my house\" is a valid answer that needs no follow-up interrogation.","source":"Doug call (SRT :149-151); chat.mjs TECH_SYSTEM"},{"id":"TECH-103","kind":"edge","tech":true,"role":"Anonymous","title":"Maya under nonsense and hostility","steps":["In the chat, send three messages in turn: a near-empty message (\".\"), a 500-character paste of random text, and \"you are useless\"."],"expected":"She stays polite and on-topic, never visibly errors out, and never promises anything off-catalog (no discounts, no coverage promises). Note anything odd.","source":"Grounded system prompt; server tool loop (chat.mjs)"},{"id":"TECH-104","kind":"edge","role":"Anonymous","title":"Chat rate limit behaves","steps":["Send about 12 quick messages in under a minute."],"expected":"Around the eleventh message the chat politely refuses or slows down. It recovers after you wait.","source":"chat.mjs:409-411 rate limits 10/60s burst"}]},{"id":"abuse","title":"7 · Access, abuse & URL games","cases":[{"id":"TECH-120","kind":"access","role":"Anonymous","title":"The whole site is public by design — verify the blast radius","steps":["Open a private/incognito window with no history, go to {BASE}/, and walk all the way to the pay form."],"expected":"Anyone can reach the form, because there is no login. But confirm all three of these: no customer data from earlier sales is visible anywhere, the Technician ID is just a plain free-text field, and nothing shows other people's purchases.","source":"No auth on tech front (by design); Technician ID unvalidated free text (open question to Doug, compendio 11-jul)"},{"id":"TECH-121","kind":"access","role":"Attacker-ish","title":"Server secrets are not served","steps":["Open {BASE}/.env in the address bar, then open {BASE}/.env.production."],"expected":"Both return a 404 or the normal page, and NEVER a file with keys in it (no lines like KEY=value).","source":"tech/netlify.toml:20-33 SEC-1 forced 404; sec1-dotfiles.test.mjs"},{"id":"TECH-122","kind":"access","role":"Anonymous","title":"Stray handoff token in the URL","steps":["Open {BASE}/?h=garbage-token-123 in a new tab."],"expected":"The page switches to a phone-handoff view that cannot do anything valid with a garbage token. It should fail safely, with no crash and no way to reach a paid state. Record exactly what shows.","why":"The tech site never creates these handoff codes; they belong to the in-store kiosk.","source":"tech/index.html:37-45, 1905-1907 (?h= phone mode exists in shared code but is out-of-flow on tech)"},{"id":"TECH-123","kind":"access","role":"Dealer","title":"KNOWN GAP: portal \"Open app\" token is ignored on tech","steps":["This needs a portal login for a dealer that is set up for the technician site. From the portal, use \"Open app\".","Look at the tech address that opens and what the page does with it."],"expected":"KNOWN GAP to confirm: the tech site opens with `?pt=\u003ctoken>` in the address but ignores it. The page loads as a plain anonymous visitor, with no dealer session, and any sale made now is NOT tied to the dealer automatically (only a typed referral code ties a sale to a dealer). Record what you see.","source":"portal-app-handoff mints ?pt= for tech (portal.mjs:88-96) but tech/index.html never redeems it"},{"id":"TECH-124","kind":"edge","role":"Anonymous","title":"Weird URL parameters do nothing harmful","steps":["Open {BASE}/?paid=1 directly, without paying.","Then open {BASE}/?canceled=1, then {BASE}/?ref=\u003cscript>alert(1)\u003c/script>."],"expected":"?paid=1 may show the success screen and clear the (empty) cart, but it cannot invent a real purchase. ?canceled=1 is harmless. The script in ?ref= never runs (no popup); it is treated as a plain, invalid code.","source":"Dynamic text via textContent (project convention); loadCart validates storage"},{"id":"TECH-125","kind":"edge","tech":true,"role":"Technician","title":"Offline / flaky network during checkout","steps":["Fill in a valid form. Turn off Wi-Fi, or open developer tools (F12) → \"Network\" tab and set it to \"Offline\".","Press pay. Then restore the network and try again."],"expected":"A readable error appears, never a frozen button or a silent nothing. Once the network is back, retrying works without rebuilding the cart.","source":"Front surfaces checkout errors verbatim (tech/index.html:3005)"},{"id":"TECH-126","kind":"edge","role":"Anonymous","title":"Old device / small screen sanity","steps":["Set the window to 360px wide (in developer tools device mode, for example Galaxy S8).","Walk the full flow: add a kit, open the drawer, fill the form, and reach the ways to pay."],"expected":"No sideways scrolling, no overlapping controls, every button reachable, and the drawer usable with the on-screen keyboard open.","source":"Responsive gate precedent (e2e-responsive covers portal; note tech findings as observations)"}]}]}</script>
+<script>
+'use strict';
+(function(){
+  var DATA = JSON.parse(document.getElementById('appdata').textContent);
+  var LSKEY = 'furnfx_qa_' + DATA.appId;
+  var IMG_MAX_BYTES = 1500000, TOTAL_IMG_WARN = 4000000;
+  var BACKUP_EVERY = 3; // remind the tester to export a backup every N advances
+
+  /* ---------------- data generators ---------------- */
+  function rngLetters(n){ var a='abcdefghijklmnopqrstuvwxyz',s=''; for(var i=0;i<n;i++) s+=a[Math.floor(Math.random()*26)]; return s; }
+  function rngDigits(n){ var s=''; for(var i=0;i<n;i++) s+=Math.floor(Math.random()*10); return s; }
+  function genAssociate(name){ var l=(String(name||'').toUpperCase().replace(/[^A-Z]/g,'')+'XXX').slice(0,3); return l+'-'+rngDigits(3); }
+  function emailValid(e){ return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(String(e||'').trim()); }
+  function genEmail(base){ var b=String(base||'').trim(); var at=b.indexOf('@'); if(at<1) return ''; var local=b.slice(0,at).split('+')[0]; return local+'+'+rngLetters(6)+b.slice(at); }
+  function emailBase(){ var b=String(state.testerEmail||'').trim(); var at=b.indexOf('@'); return at<1? '' : b.slice(0,at).split('+')[0]+b.slice(at); }
+
+  /* ---------------- state ---------------- */
+  function blankState(){
+    return { appId:DATA.appId, version:DATA.version, tester:'', testerEmail:'', isTechnical:null,
+             showEvidence:false, envId:DATA.envs[0].id, customBase:'',
+             results:{}, testdata:{}, observations:'', stepsSinceExport:0, backupReminderOff:false, updatedAt:null };
+  }
+  var state = blankState();
+
+  function coerceNotes(v, fallbackTs){
+    if(Array.isArray(v)) return v.filter(function(e){return e&&typeof e.text==='string';}).map(function(e){return {id:e.id||rid(),ts:e.ts||fallbackTs,text:e.text};});
+    if(typeof v==='string' && v.trim()) return [{id:rid(),ts:fallbackTs,text:v}];
+    return [];
+  }
+  function rid(){ return Math.random().toString(36).slice(2,9); }
+  function nowISO(){ return new Date().toISOString(); }
+
+  function hydrate(s){
+    if(!s || s.appId!==DATA.appId) return;
+    if(typeof s.tester==='string') state.tester=s.tester;
+    if(typeof s.testerEmail==='string') state.testerEmail=s.testerEmail;
+    if(s.isTechnical===true||s.isTechnical===false) state.isTechnical=s.isTechnical;
+    if(typeof s.showEvidence==='boolean') state.showEvidence=s.showEvidence;
+    if(typeof s.envId==='string') state.envId=s.envId;
+    if(typeof s.customBase==='string') state.customBase=s.customBase;
+    state.updatedAt=s.updatedAt||null;
+    var fb=s.updatedAt||nowISO();
+    if(s.results&&typeof s.results==='object') Object.keys(s.results).forEach(function(k){
+      var r=s.results[k]; if(!r) return;
+      var out={status:(r.status==='pass'||r.status==='fail'||r.status==='na')?r.status:null, note:typeof r.note==='string'?r.note:'', shots:[]};
+      if(Array.isArray(r.shots)) out.shots=r.shots.filter(function(x){return x&&typeof x.dataUrl==='string'&&x.dataUrl.indexOf('data:image/')===0;}).map(function(x){return {id:x.id||rid(),ts:x.ts||fb,name:x.name||'shot',dataUrl:x.dataUrl};});
+      if(r.resolution&&typeof r.resolution==='object'&&typeof r.resolution.text==='string') out.resolution={status:r.resolution.status||'fixed',text:r.resolution.text,ts:r.resolution.ts||fb};
+      if(r.retest===true) out.retest=true;
+      state.results[k]=out;
+    });
+    if(typeof s.observations==='string') state.observations=s.observations;
+    if(typeof s.stepsSinceExport==='number' && s.stepsSinceExport>=0) state.stepsSinceExport=s.stepsSinceExport;
+    if(typeof s.backupReminderOff==='boolean') state.backupReminderOff=s.backupReminderOff;
+    if(s.testdata&&typeof s.testdata==='object') Object.keys(s.testdata).forEach(function(k){ var d=s.testdata[k]; if(d&&typeof d==='object') state.testdata[k]={associate:d.associate||undefined,email:d.email||undefined}; });
+    /* migrate legacy per-section notes + product notes into the single Additional observations box (no data loss) */
+    var legacy=[];
+    if(s.sectionNotes&&typeof s.sectionNotes==='object') Object.keys(s.sectionNotes).forEach(function(k){ coerceNotes(s.sectionNotes[k],fb).forEach(function(e){ legacy.push('['+fmtTs(e.ts)+'] '+e.text); }); });
+    if(Array.isArray(s.productNotes)) s.productNotes.forEach(function(p){ if(p&&typeof p.text==='string') legacy.push('['+fmtTs(p.ts||fb)+'] '+(p.caseId?'('+p.caseId+') ':'')+p.text); });
+    if(legacy.length) state.observations=(state.observations?state.observations+'\n':'')+legacy.join('\n');
+  }
+  (function load(){ try{ var raw=localStorage.getItem(LSKEY); if(raw) hydrate(JSON.parse(raw)); }catch(e){} })();
+
+  var saveTimer=null;
+  function persist(){
+    state.updatedAt=nowISO();
+    clearTimeout(saveTimer);
+    saveTimer=setTimeout(function(){
+      try{ localStorage.setItem(LSKEY, JSON.stringify(state)); }
+      catch(e){ toast(e && /quota/i.test(e.name||e.message||'') ? 'Browser storage is full — export your progress to keep it safe.' : 'Could not save: '+e.message); }
+    },250);
+  }
+
+  /* ---------------- helpers ---------------- */
+  var allCases=[]; DATA.sections.forEach(function(sec){ sec.cases.forEach(function(c){ allCases.push({sec:sec,c:c}); }); });
+  function res(id){ if(!state.results[id]) state.results[id]={status:null,note:'',shots:[]}; if(!state.results[id].shots) state.results[id].shots=[]; return state.results[id]; }
+  function td(id){ if(!state.testdata[id]) state.testdata[id]={}; return state.testdata[id]; }
+  function envBase(){ if(state.customBase.trim()) return state.customBase.trim().replace(/\/+$/,''); var e=DATA.envs.find(function(x){return x.id===state.envId;})||DATA.envs[0]; return e.base.replace(/\/+$/,''); }
+  function linkFor(label){ if(!DATA.access||!DATA.access.links) return null; var l=DATA.access.links.find(function(x){return x.label===label;}); if(!l) return null; return (l.urlByEnv&&(l.urlByEnv[state.envId]||l.urlByEnv[DATA.envs[0].id]))||l.url||null; }
+  function el(t,c,x){ var n=document.createElement(t); if(c)n.className=c; if(x!=null)n.textContent=x; return n; }
+  function toast(m){ var t=document.getElementById('toast'); t.textContent=m; t.classList.add('show'); setTimeout(function(){t.classList.remove('show');},2600); }
+  function openWindow(url){ var w=window.open(url,'_blank','noopener,noreferrer,width=1200,height=900'); if(!w){ toast('Pop-up blocked — allow pop-ups, or the link opens in a new tab.'); window.open(url,'_blank','noopener'); } }
+  function fmtTs(iso){ try{ return new Date(iso).toLocaleString(); }catch(e){ return iso; } }
+
+  function copyText(v){
+    if(navigator.clipboard&&navigator.clipboard.writeText){ navigator.clipboard.writeText(v).then(function(){toast('Copied');},function(){fallbackCopy(v);}); }
+    else fallbackCopy(v);
+  }
+  function fallbackCopy(v){ var ta=document.createElement('textarea'); ta.value=v; ta.style.position='fixed'; ta.style.left='-9999px'; document.body.appendChild(ta); ta.select(); try{ document.execCommand('copy'); toast('Copied'); }catch(e){ toast('Copy failed — select and copy manually'); } ta.remove(); }
+  function copyChip(label,value,onRegen){
+    var c=el('span','chip'); if(label){ var l=el('span','clab',label); c.appendChild(l); }
+    c.appendChild(document.createTextNode(value));
+    var cp=el('button',null,'⧉'); cp.title='Copy'; cp.addEventListener('click',function(){copyText(value);}); c.appendChild(cp);
+    if(onRegen){ var rg=el('button',null,'↻'); rg.title='New value'; rg.addEventListener('click',onRegen); c.appendChild(rg); }
+    return c;
+  }
+
+  function rich(target,text){
+    var s=String(text).split('{BASE}').join(envBase());
+    var re=/(https?:\/\/[^\s,;)"']+)|`([^`]+)`/g,last=0,m;
+    while((m=re.exec(s))){
+      if(m.index>last) target.appendChild(document.createTextNode(s.slice(last,m.index)));
+      if(m[1]){ var a=el('a',null,m[1]); a.href=m[1]; a.addEventListener('click',function(ev){ev.preventDefault();openWindow(this.href);}); target.appendChild(a); }
+      else target.appendChild(el('code',null,m[2]));
+      last=re.lastIndex;
+    }
+    if(last<s.length) target.appendChild(document.createTextNode(s.slice(last)));
+  }
+
+  /* ---------------- header ---------------- */
+  var h1=document.getElementById('apptitle');
+  h1.appendChild(document.createTextNode(DATA.title));
+  h1.appendChild(el('small',null,'Suite '+DATA.version+' · '+allCases.length+' cases'));
+  document.title=DATA.title;
+
+  var envsel=document.getElementById('envsel'), envbase=document.getElementById('envbase');
+  DATA.envs.forEach(function(e){ var o=el('option',null,e.label); o.value=e.id; envsel.appendChild(o); });
+  var co=el('option',null,'Custom…'); co.value='__custom__'; envsel.appendChild(co);
+  function syncEnvUI(){
+    envsel.value=state.customBase.trim()?'__custom__':state.envId;
+    envbase.value=state.customBase.trim()||(DATA.envs.find(function(x){return x.id===state.envId;})||DATA.envs[0]).base;
+    envbase.readOnly=!state.customBase.trim()&&envsel.value!=='__custom__';
+  }
+  envsel.addEventListener('change',function(){
+    if(envsel.value==='__custom__'){ state.customBase=envbase.value; envbase.readOnly=false; envbase.focus(); }
+    else { state.envId=envsel.value; state.customBase=''; }
+    persist(); syncEnvUI(); render();
+  });
+  envbase.addEventListener('input',function(){ if(envsel.value==='__custom__'){ state.customBase=envbase.value; persist(); } });
+  envbase.addEventListener('change',render);
+
+  document.getElementById('btn-evidence').addEventListener('click',function(){ state.showEvidence=!state.showEvidence; persist(); render(); });
+  document.getElementById('btn-summary').addEventListener('click',function(){ view.mode='summary'; render(); });
+  document.getElementById('btn-creds').addEventListener('click',showCredsModal);
+  document.getElementById('btn-profile').addEventListener('click',showProfileModal);
+
+  /* ---------------- export / import / merge ---------------- */
+  document.getElementById('btn-export').addEventListener('click',function(){
+    state.updatedAt=nowISO();
+    var name=DATA.appId+'_progress_'+state.updatedAt.slice(0,19).replace(/[:T]/g,'-')+'.json';
+    var blob=new Blob([JSON.stringify(state,null,2)],{type:'application/json'});
+    var a=document.createElement('a'); a.href=URL.createObjectURL(blob); a.download=name; document.body.appendChild(a); a.click(); a.remove();
+    setTimeout(function(){URL.revokeObjectURL(a.href);},2000);
+    state.stepsSinceExport=0; persist(); toast('Exported '+name);
+    if(view.mode==='case') render();
+  });
+  document.getElementById('btn-import').addEventListener('click',function(){ document.getElementById('importfile').click(); });
+  document.getElementById('importfile').addEventListener('change',function(ev){
+    var f=ev.target.files[0]; ev.target.value=''; if(!f) return;
+    var rd=new FileReader();
+    rd.onload=function(){ try{ var s=JSON.parse(rd.result); if(!s||s.appId!==DATA.appId){ toast('That file belongs to a different suite ('+(s&&s.appId||'unknown')+').'); return; } if(!confirm('Import REPLACES the progress stored in this browser. Continue?')) return; localStorage.setItem(LSKEY,JSON.stringify(s)); location.reload(); }catch(e){ toast('Invalid file: '+e.message); } };
+    rd.readAsText(f);
+  });
+  document.getElementById('btn-merge').addEventListener('click',function(){ document.getElementById('mergefile').click(); });
+  document.getElementById('mergefile').addEventListener('change',function(ev){
+    var f=ev.target.files[0]; ev.target.value=''; if(!f) return;
+    var rd=new FileReader();
+    rd.onload=function(){
+      try{
+        var s=JSON.parse(rd.result); if(!s||s.appId!==DATA.appId){ toast('That file belongs to a different suite.'); return; }
+        var n=0;
+        if(s.results&&typeof s.results==='object') Object.keys(s.results).forEach(function(k){
+          var inc=s.results[k]; if(!inc||!inc.resolution||typeof inc.resolution.text!=='string') return;
+          var r=res(k); r.resolution={status:inc.resolution.status||'fixed',text:inc.resolution.text,ts:inc.resolution.ts||nowISO()};
+          if(r.status==='fail'||r.status==='na') r.retest=true;
+          n++;
+        });
+        persist(); toast('Merged '+n+' resolution(s). See the "Needs retest" filter.'); render();
+      }catch(e){ toast('Invalid file: '+e.message); }
+    };
+    rd.readAsText(f);
+  });
+
+  /* ---------------- modals ---------------- */
+  var modalBg=document.getElementById('modal-bg'), modal=document.getElementById('modal');
+  modalBg.addEventListener('click',function(e){ if(e.target===modalBg) closeModal(); });
+  document.addEventListener('keydown',function(e){ if(e.key==='Escape') closeModal(); });
+  function closeModal(){ modalBg.classList.remove('show'); modal.textContent=''; }
+  function openModal(build){ modal.textContent=''; var x=el('button','x','×'); x.addEventListener('click',closeModal); modal.appendChild(x); build(modal); modalBg.classList.add('show'); }
+
+  function credsContent(host){
+    host.appendChild(el('h3',null,'Access & credentials'));
+    if(!DATA.access){ host.appendChild(el('p',null,'This suite needs no special logins.')); return; }
+    if(DATA.access.note){ var p=el('p'); p.style.cssText='color:var(--ink-soft);margin-bottom:10px'; rich(p,DATA.access.note); host.appendChild(p); }
+    if(DATA.access.credentials&&DATA.access.credentials.length){
+      var t=el('table','credtable'); var hr=el('tr'); ['Role','Email','Password',''].forEach(function(h){hr.appendChild(el('th',null,h));}); t.appendChild(hr);
+      DATA.access.credentials.forEach(function(c){
+        var tr=el('tr');
+        tr.appendChild(el('td',null,c.role));
+        var te=el('td'); te.appendChild(el('code',null,c.email)); tr.appendChild(te);
+        var tp=el('td'); tp.appendChild(el('code',null,c.password)); tr.appendChild(tp);
+        var ta=el('td'); var b=el('button','minibtn','Copy login'); b.addEventListener('click',function(){copyText(c.email+' / '+c.password);}); ta.appendChild(b); tr.appendChild(ta);
+        t.appendChild(tr);
+      });
+      host.appendChild(t);
+    }
+    if(DATA.access.links&&DATA.access.links.length){
+      var lr=el('div','linkrow');
+      DATA.access.links.forEach(function(l){ var url=linkFor(l.label); if(!url) return; var b=el('button','minibtn','Open '+l.label+' ↗'); b.addEventListener('click',function(){openWindow(url);}); lr.appendChild(b); });
+      host.appendChild(lr);
+    }
+    var sec=el('p'); sec.style.cssText='font-size:12px;color:var(--ink-soft);margin-top:12px'; sec.textContent='These are shared QA accounts on the test environment. Do not use real customer data.'; host.appendChild(sec);
+  }
+  function showCredsModal(){ openModal(credsContent); }
+
+  function profileContent(host){
+    host.appendChild(el('h3',null,'Tester profile'));
+    var f1=el('div','field'); f1.appendChild(el('label',null,'Your name')); var i1=el('input'); i1.type='text'; i1.value=state.tester; i1.addEventListener('input',function(){state.tester=i1.value;persist();}); f1.appendChild(i1); host.appendChild(f1);
+    var f2=el('div','field'); f2.appendChild(el('label',null,'Email to return results to (your real inbox)')); var i2=el('input'); i2.type='email'; i2.value=state.testerEmail; i2.placeholder='e.g. abarres@raptns.com'; i2.addEventListener('input',function(){state.testerEmail=i2.value;persist();}); f2.appendChild(i2); host.appendChild(f2);
+    var f3=el('div','field'); f3.appendChild(el('label',null,'Are you comfortable using browser developer tools?'));
+    [['Yes',true],['No',false]].forEach(function(pair){
+      var lab=el('label','radio'); var r=el('input'); r.type='radio'; r.name='tech'; r.checked=state.isTechnical===pair[1];
+      r.addEventListener('change',function(){ state.isTechnical=pair[1]; persist(); render(); });
+      lab.appendChild(r); lab.appendChild(document.createTextNode(pair[0])); f3.appendChild(lab);
+    });
+    host.appendChild(f3);
+  }
+  function showProfileModal(){ openModal(profileContent); }
+
+  /* ---------------- image compress ---------------- */
+  function compressImage(file, cb){
+    var img=new Image(), url=URL.createObjectURL(file);
+    img.onload=function(){
+      var mx=1400, w=img.width, h=img.height, sc=Math.min(1, mx/Math.max(w,h));
+      var cv=document.createElement('canvas'); cv.width=Math.round(w*sc); cv.height=Math.round(h*sc);
+      cv.getContext('2d').drawImage(img,0,0,cv.width,cv.height);
+      URL.revokeObjectURL(url);
+      try{ cb(cv.toDataURL('image/jpeg',0.7)); }catch(e){ cb(null); }
+    };
+    img.onerror=function(){ URL.revokeObjectURL(url); cb(null); };
+    img.src=url;
+  }
+  function totalImgBytes(){ var t=0; Object.keys(state.results).forEach(function(k){ (state.results[k].shots||[]).forEach(function(s){ t+=s.dataUrl.length; }); }); return t; }
+  function addShot(id,file){
+    if(!file||file.type.indexOf('image/')!==0){ toast('Only images can be attached.'); return; }
+    compressImage(file,function(dataUrl){
+      if(!dataUrl){ toast('Could not read that image.'); return; }
+      if(dataUrl.length>IMG_MAX_BYTES){ toast('That image is too large even after compression — crop it and retry.'); return; }
+      res(id).shots.push({id:rid(),ts:nowISO(),name:file.name||'screenshot',dataUrl:dataUrl});
+      if(totalImgBytes()>TOTAL_IMG_WARN) toast('Storage is filling up — export your progress to keep screenshots safe.');
+      persist(); render();
+    });
+  }
+
+  /* ---------------- progress ---------------- */
+  function counts(){ var p=0,f=0,n=0,rt=0; allCases.forEach(function(x){ var r=state.results[x.c.id]; if(r&&r.retest&&(r.status==='fail'||r.status==='na')) rt++; if(!r||!r.status) return; if(r.status==='pass')p++; else if(r.status==='fail')f++; else n++; }); return {pass:p,fail:f,na:n,retest:rt,done:p+f+n,total:allCases.length}; }
+  function updateProgress(){ var c=counts(); document.querySelector('#progressbar>div').style.width=(c.total?100*c.done/c.total:0)+'%'; document.getElementById('btn-evidence').classList.toggle('on',state.showEvidence); }
+
+  /* ---------------- navigation ---------------- */
+  var view={mode:'intro',idx:0,retestOnly:false};
+  var nav=document.getElementById('nav');
+  function isTech(c){ return !!c.tech; }
+  function buildNav(){
+    nav.textContent='';
+    var ib=el('button','navcase'+(view.mode==='intro'?' current':'')); ib.style.cssText='padding:10px 12px;font-weight:700'; ib.appendChild(el('span','cid','▸')); ib.appendChild(el('span',null,'Before you start'));
+    ib.addEventListener('click',function(){ view.mode='intro'; render(); });
+    nav.appendChild(ib);
+    DATA.sections.forEach(function(sec){
+      var visCases=sec.cases.filter(function(c){ return !view.retestOnly || (function(){var r=state.results[c.id];return r&&r.retest&&(r.status==='fail'||r.status==='na');})(); });
+      if(!visCases.length) return;
+      var wrap=el('div','navsec');
+      var head=el('button'); head.appendChild(el('span','chev','▶')); head.appendChild(el('span',null,sec.title));
+      var done=sec.cases.filter(function(c){var r=state.results[c.id];return r&&r.status;}).length;
+      head.appendChild(el('span','cnt',done+'/'+sec.cases.length));
+      head.addEventListener('click',function(){ wrap.classList.toggle('open'); });
+      wrap.appendChild(head);
+      var list=el('div','navcases');
+      visCases.forEach(function(c){
+        var gi=allCases.findIndex(function(x){return x.c.id===c.id;});
+        var b=el('button','navcase'+(view.mode==='case'&&view.idx===gi?' current':''));
+        var r=state.results[c.id];
+        b.appendChild(el('span','dot'+(r&&r.status?' '+r.status:'')));
+        b.appendChild(el('span','cid',c.id));
+        b.appendChild(el('span',null,c.title));
+        var mk=''; if(isTech(c)) mk+='⚙'; if(r&&r.retest&&(r.status==='fail'||r.status==='na')) mk+='⟳';
+        if(mk) b.appendChild(el('span','mk',mk));
+        b.addEventListener('click',function(){ view.mode='case'; view.idx=gi; render(); });
+        list.appendChild(b);
+      });
+      wrap.appendChild(list);
+      if(view.retestOnly || (view.mode==='case'&&allCases[view.idx]&&allCases[view.idx].sec.id===sec.id)) wrap.classList.add('open');
+      nav.appendChild(wrap);
+    });
+  }
+
+  /* ---------------- views ---------------- */
+  var content=document.getElementById('content');
+
+  function profileComplete(){ return state.tester.trim() && emailValid(state.testerEmail) && (state.isTechnical===true||state.isTechnical===false); }
+
+  function renderIntro(){
+    var wrap=el('div','intro');
+    wrap.appendChild(el('div','crumb','Before you start'));
+
+    if(!profileComplete()){
+      var pc=el('div','panel accent');
+      pc.appendChild(el('h2',null,'Before you begin'));
+      var pp=el('p',null,'Tell us who you are. Your email is used to make fresh test addresses and to send you back the results later. Nothing is uploaded — it stays in this browser.');
+      pp.style.color='var(--ink-soft)'; pc.appendChild(pp);
+      profileContent2(pc);
+      wrap.appendChild(pc);
+    }
+
+    var card=el('div','card');
+    card.appendChild(el('h2',null,'How this works'));
+    ['You will walk through '+allCases.length+' test cases, one at a time. Do exactly what each step says, then press Pass if the app behaved as the Expected result describes, Fail if it did not, or N/A if you could not run the case (say why in the note).',
+     'Everything you type is saved automatically in THIS browser. Use "Export" often: it downloads a backup you can re-import with "Import" on any machine.',
+     'The Environment selector controls the URLs shown in the steps. Default is the live site.',
+     'There is one "Additional observations" box, shared across the whole run and always visible under each case, for anything you notice — about the product OR about this testing tool itself.'
+    ].forEach(function(t){ card.appendChild(el('p',null,t)); });
+    if(DATA.intro&&DATA.intro.length){
+      card.appendChild(el('div','lbl','Notes for this suite'));
+      var ul=el('ul'); DATA.intro.forEach(function(t){ var li=el('li'); rich(li,t); ul.appendChild(li); }); card.appendChild(ul);
+    }
+    wrap.appendChild(card);
+
+    if(DATA.access){ var ac=el('div','panel'); credsContent(ac); wrap.appendChild(ac); }
+
+    var start=el('div','wiznav');
+    var b=el('button','next','Start testing →');
+    b.addEventListener('click',function(){ if(!profileComplete()){ toast('Please fill your name, a valid email, and the technical question.'); return; } view.mode='case'; view.idx=0; render(); });
+    start.appendChild(b);
+    wrap.appendChild(start);
+    content.appendChild(wrap);
+  }
+  function profileContent2(host){
+    var f1=el('div','field'); f1.appendChild(el('label',null,'Your name')); var i1=el('input'); i1.type='text'; i1.value=state.tester; i1.placeholder='e.g. Adrian'; i1.addEventListener('input',function(){state.tester=i1.value;persist();}); f1.appendChild(i1); host.appendChild(f1);
+    var f2=el('div','field'); f2.appendChild(el('label',null,'Email to return results to (your real inbox)')); var i2=el('input'); i2.type='email'; i2.value=state.testerEmail; i2.placeholder='e.g. abarres@raptns.com'; i2.addEventListener('input',function(){state.testerEmail=i2.value;persist();updateProfileNav();}); f2.appendChild(i2); host.appendChild(f2);
+    var f3=el('div','field'); f3.appendChild(el('label',null,'Are you comfortable using browser developer tools (F12)?'));
+    [['Yes',true],['No',false]].forEach(function(pair){ var lab=el('label','radio'); var r=el('input'); r.type='radio'; r.name='techp'; r.checked=state.isTechnical===pair[1]; r.addEventListener('change',function(){state.isTechnical=pair[1];persist();render();}); lab.appendChild(r); lab.appendChild(document.createTextNode(pair[0])); f3.appendChild(lab); });
+    host.appendChild(f3);
+  }
+  function updateProfileNav(){}
+
+  function renderCase(){
+    var x=allCases[view.idx], sec=x.sec, c=x.c, r=res(c.id);
+
+    /* backup reminder (non-blocking): every BACKUP_EVERY advances, unless dismissed */
+    if(!state.backupReminderOff && state.stepsSinceExport>0 && state.stepsSinceExport % BACKUP_EVERY===0){
+      var rem=el('div','backup-reminder');
+      rem.appendChild(el('span','bm-txt','Backup reminder: '+state.stepsSinceExport+' steps since your last export. Export a copy so nothing you typed can get lost.'));
+      var rrow=el('div','bm-row');
+      var xb=el('button','minibtn','⬇ Export now'); xb.addEventListener('click',function(){ document.getElementById('btn-export').click(); }); rrow.appendChild(xb);
+      var lab=el('label','bm-off'); var cbx=el('input'); cbx.type='checkbox'; cbx.addEventListener('change',function(){ state.backupReminderOff=cbx.checked; persist(); render(); }); lab.appendChild(cbx); lab.appendChild(document.createTextNode(' Don’t remind me again')); rrow.appendChild(lab);
+      rem.appendChild(rrow);
+      content.appendChild(rem);
+    }
+
+    content.appendChild(el('div','crumb','Section: '+sec.title+' · Case '+(view.idx+1)+' of '+allCases.length));
+    var card=el('div','card');
+    var top=el('div','case-top');
+    top.appendChild(el('span','case-id',c.id));
+    top.appendChild(el('span','tag '+c.kind,c.kind));
+    if(c.role) top.appendChild(el('span','tag role','Role: '+c.role));
+    if(isTech(c)) top.appendChild(el('span','tag tech','Technical'));
+    card.appendChild(top);
+    card.appendChild(el('h2',null,c.title));
+
+    /* developer resolution (TA-13) */
+    if(r.resolution){
+      var rk=r.resolution.status||'fixed';
+      var rb=el('div','reso'+(rk==='wontfix'?' wontfix':rk==='needinfo'?' needinfo':''));
+      var line=el('div'); var pill=el('span','rpill '+rk, rk==='wontfix'?'Won\'t fix':rk==='needinfo'?'Need info':'Fixed'); line.appendChild(pill); line.appendChild(el('b',null,'Developer resolution')); rb.appendChild(line);
+      var rt=el('p'); rt.style.margin='6px 0'; rich(rt,r.resolution.text); rb.appendChild(rt);
+      if(r.retest&&(r.status==='fail'||r.status==='na')){
+        var reb=el('button','minibtn','Re-test this case');
+        reb.addEventListener('click',function(){
+          if(r.note){ state.observations=(state.observations?state.observations+'\n':'')+'['+fmtTs(nowISO())+'] ('+c.id+') Previous result: '+(r.status||'').toUpperCase()+' — '+r.note; }
+          r.status=null; r.retest=false; persist(); render();
+        });
+        rb.appendChild(reb);
+      }
+      card.appendChild(rb);
+    }
+
+    /* technical skip banner (TA-2) */
+    if(isTech(c) && state.isTechnical===false){
+      var tb=el('div','tech-banner');
+      tb.appendChild(el('p',null,'This case needs browser developer tools. You marked yourself as non-technical, so you can skip it.'));
+      var row=el('div','row');
+      var skip=el('button','minibtn','Mark N/A (skip)'); skip.addEventListener('click',function(){ r.status='na'; if(!r.note) r.note='Skipped: technical case, tester is non-technical.'; persist(); goNext(); });
+      var showa=el('button','minibtn','Show me anyway'); showa.addEventListener('click',function(){ tb.style.display='none'; });
+      row.appendChild(skip); row.appendChild(showa); tb.appendChild(row);
+      card.appendChild(tb);
+    }
+
+    /* open-in-window button (TA-9) */
+    if(c.openInWindow){ var url=linkFor(c.openInWindow); if(url){ var ow=el('button','openwin','Open '+c.openInWindow+' in a new window ↗'); ow.addEventListener('click',function(){openWindow(url);}); card.appendChild(ow); } }
+
+    card.appendChild(el('div','lbl','Do this'));
+    var ol=el('ol','steps'); c.steps.forEach(function(s){ var li=el('li'); rich(li,s); ol.appendChild(li); }); card.appendChild(ol);
+
+    /* test data chips (TA-5) */
+    if(Array.isArray(c.needs)&&c.needs.length){
+      var db=el('div','datablock'); db.appendChild(el('div','lbl','Test data for this case (tap to copy)'));
+      var row2=el('div','chiprow'); var d=td(c.id);
+      if(c.needs.indexOf('associate')>=0){
+        if(!d.associate) d.associate=genAssociate(state.tester);
+        row2.appendChild(copyChip('Associate #',d.associate,function(){ d.associate=genAssociate(state.tester); persist(); render(); }));
+      }
+      var showEmailHint=false;
+      if(c.needs.indexOf('email')>=0){
+        if(!d.email){ d.email=genEmail(state.testerEmail); }
+        if(d.email){ row2.appendChild(copyChip('Customer email',d.email,function(){ d.email=genEmail(state.testerEmail); persist(); render(); })); showEmailHint=true; }
+        else { var warn=el('span','datahint'); warn.textContent='Set a valid return email in your Profile to generate test emails.'; row2.appendChild(warn); }
+      }
+      db.appendChild(row2);
+      if(showEmailHint){
+        var hint=el('div','datahint');
+        hint.appendChild(document.createTextNode('The part after “+” is just a label. This email still arrives in your normal inbox ('));
+        hint.appendChild(el('b',null,emailBase()));
+        hint.appendChild(document.createTextNode('); it just gives each test a fresh-looking address without creating a new mailbox.'));
+        db.appendChild(hint);
+      }
+      persist(); card.appendChild(db);
+    }
+
+    card.appendChild(el('div','lbl','Expected result'));
+    var ex=el('div','expected'); rich(ex,c.expected); card.appendChild(ex);
+    if(c.why){ var wy=el('div','why'); wy.appendChild(el('b',null,'Why this matters: ')); rich(wy,c.why); wy.querySelector('b').style.fontStyle='normal'; card.appendChild(wy); }
+
+    /* verdict */
+    card.appendChild(el('div','lbl','Your verdict'));
+    var vd=el('div','verdict');
+    [['pass','✔ Pass'],['fail','✘ Fail'],['na','— N/A']].forEach(function(pair){
+      var b=el('button','vbtn '+pair[0]+(r.status===pair[0]?' on':''),pair[1]);
+      b.addEventListener('click',function(){ r.status=(r.status===pair[0])?null:pair[0]; persist(); render(); });
+      vd.appendChild(b);
+    });
+    card.appendChild(vd);
+
+    card.appendChild(el('div','lbl','Note (what you saw, error text, etc.) — you can paste a screenshot here'));
+    var ta=el('textarea'); ta.value=r.note; ta.placeholder='Optional for Pass, please fill for Fail / N/A. Paste an image to attach it.';
+    ta.addEventListener('input',function(){ r.note=ta.value; persist(); });
+    ta.addEventListener('paste',function(ev){ var items=(ev.clipboardData||{}).items||[]; for(var i=0;i<items.length;i++){ if(items[i].type&&items[i].type.indexOf('image/')===0){ var f=items[i].getAsFile(); if(f){ ev.preventDefault(); addShot(c.id,f); } } } });
+    card.appendChild(ta);
+
+    /* screenshots (TA-8) */
+    var arow=el('div','attachrow');
+    var fl=el('input'); fl.type='file'; fl.accept='image/*'; fl.style.display='none'; fl.addEventListener('change',function(){ if(fl.files[0]) addShot(c.id,fl.files[0]); fl.value=''; });
+    var ab=el('button','minibtn','📎 Attach screenshot'); ab.addEventListener('click',function(){ fl.click(); });
+    arow.appendChild(ab); arow.appendChild(fl); arow.appendChild(el('span','hint','…or paste an image into the note above.'));
+    card.appendChild(arow);
+    if(r.shots&&r.shots.length){
+      var sh=el('div','shots');
+      r.shots.forEach(function(s){ var d=el('div','shot'); var im=el('img'); im.src=s.dataUrl; im.addEventListener('click',function(){ openModal(function(host){ host.appendChild(el('h3',null,s.name||'Screenshot')); var big=el('div','imgmodal'); var i2=el('img'); i2.src=s.dataUrl; big.appendChild(i2); host.appendChild(big); }); }); d.appendChild(im); var rm=el('button',null,'×'); rm.addEventListener('click',function(){ if(confirm('Remove this screenshot?')){ r.shots=r.shots.filter(function(z){return z.id!==s.id;}); persist(); render(); } }); d.appendChild(rm); sh.appendChild(d); });
+      card.appendChild(sh);
+    }
+
+    /* evidence (TA-1, hidden by default) */
+    if(c.source && state.showEvidence){ var src=el('div','source'); src.appendChild(el('b',null,'Evidence (developers): ')); src.appendChild(document.createTextNode(c.source)); card.appendChild(src); }
+
+    content.appendChild(card);
+
+    var wn=el('div','wiznav');
+    var prev=el('button',null,'← Back');
+    prev.addEventListener('click',function(){ if(view.idx>0){view.idx--;render();} else {view.mode='intro';render();} });
+    wn.appendChild(prev);
+    var saveMsg='Progress is saved automatically in this browser.';
+    if(state.stepsSinceExport>0) saveMsg+=' '+state.stepsSinceExport+' step'+(state.stepsSinceExport===1?'':'s')+' since your last export.';
+    wn.appendChild(el('span','savehint',saveMsg));
+    var next=el('button','next', view.idx<allCases.length-1?'Next case →':'Finish → Summary');
+    next.addEventListener('click',goNext);
+    wn.appendChild(next);
+    content.appendChild(wn);
+
+    /* additional observations — one shared box, always visible, kept across the whole run */
+    var ob=el('div','obsbox');
+    ob.appendChild(el('div','lbl','Additional observations'));
+    var oh=el('p'); oh.style.cssText='font-size:12px;color:var(--ink-soft);margin-bottom:8px';
+    oh.textContent='See a problem with this task? Your Pass / Fail / N/A above already covers it. This shared notepad is for anything else you notice as you go — about the product OR about this testing tool itself (for example, if it fails to save something). Write freely; it saves automatically and stays here on every step.';
+    ob.appendChild(oh);
+    var ota=el('textarea','obsta'); ota.value=state.observations||''; ota.rows=6; ota.placeholder='Type anything you notice here. It is kept for the whole run.';
+    ota.addEventListener('input',function(){ state.observations=ota.value; persist(); });
+    ob.appendChild(ota);
+    content.appendChild(ob);
+  }
+  function goNext(){
+    state.stepsSinceExport=(state.stepsSinceExport||0)+1;
+    if(view.idx<allCases.length-1){view.idx++;} else {view.mode='summary';}
+    persist(); render();
+  }
+
+  function renderSummary(){
+    var c=counts();
+    content.appendChild(el('div','crumb','Summary'));
+    var tiles=el('div','sum-tiles');
+    [['Total',c.total],['Done',c.done],['Pass',c.pass],['Fail',c.fail],['N/A',c.na],['Pending',c.total-c.done],['Needs retest',c.retest]].forEach(function(t){ var d=el('div','tile'); d.appendChild(el('b',null,String(t[1]))); d.appendChild(el('span',null,t[0])); tiles.appendChild(d); });
+    content.appendChild(tiles);
+
+    if(c.retest){
+      var rf=el('div','wiznav'); rf.style.marginTop='0';
+      var rb=el('button',state.showRetestBtn?'next':'', (view.retestOnly?'Show all cases':'Filter: Needs retest only'));
+      rb.addEventListener('click',function(){ view.retestOnly=!view.retestOnly; if(view.retestOnly){ var first=allCases.find(function(x){var r=state.results[x.c.id];return r&&r.retest&&(r.status==='fail'||r.status==='na');}); if(first){ view.mode='case'; view.idx=allCases.indexOf(first); } } render(); });
+      rf.appendChild(rb); content.appendChild(rf);
+    }
+
+    var tbl=el('table','sum'); var thead=el('thead'); var trh=el('tr'); ['Case','Title','Status','Note'].forEach(function(h){trh.appendChild(el('th',null,h));}); thead.appendChild(trh); tbl.appendChild(thead);
+    var tb=el('tbody');
+    DATA.sections.forEach(function(sec){
+      var trs=el('tr'); var tds=el('td',null,''); tds.colSpan=4; tds.style.cssText='background:#f8f5ee;font-weight:700'; tds.textContent=sec.title; trs.appendChild(tds); tb.appendChild(trs);
+      sec.cases.forEach(function(cse){
+        var r=state.results[cse.id], st=r&&r.status?r.status:'pending';
+        var tr=el('tr'); var tdid=el('td'); tdid.appendChild(el('code',null,cse.id)); if(r&&r.retest)tdid.appendChild(document.createTextNode(' ⟳')); tr.appendChild(tdid);
+        tr.appendChild(el('td',null,cse.title));
+        tr.appendChild(el('td','st-'+st, st==='pending'?'—':st.toUpperCase()));
+        var tdn=el('td',null,(r&&r.note)||''); if(r&&r.shots&&r.shots.length) tdn.appendChild(el('span',null,' 📎'+r.shots.length)); tr.appendChild(tdn);
+        tb.appendChild(tr);
+      });
+    });
+    tbl.appendChild(tb); content.appendChild(tbl);
+
+    if(state.observations && state.observations.trim()){
+      content.appendChild(el('div','lbl','Additional observations from the tester'));
+      var obx=el('div','obsbox'); var obp=el('div'); obp.style.whiteSpace='pre-wrap'; obp.textContent=state.observations; obx.appendChild(obp); content.appendChild(obx);
+    }
+
+    var wn=el('div','wiznav');
+    var back=el('button',null,'← Back to cases'); back.addEventListener('click',function(){ view.mode='case'; render(); }); wn.appendChild(back);
+    var pr=el('button',null,'Print / Save as PDF'); pr.addEventListener('click',function(){ window.print(); }); wn.appendChild(pr);
+    content.appendChild(wn);
+  }
+
+  function render(){
+    content.textContent='';
+    buildNav(); syncEnvUI(); updateProgress();
+    if(view.mode==='intro') renderIntro();
+    else if(view.mode==='summary') renderSummary();
+    else renderCase();
+    content.scrollTop=0;
+  }
+  render();
+})();
+</script>
+</body>
+</html>
