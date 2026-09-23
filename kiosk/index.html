@@ -78,7 +78,7 @@
   --display: "Fraunces", Georgia, serif;
   --body:    "Inter", system-ui, -apple-system, sans-serif;
 
-  --sp-section: clamp(64px, 8vw, 112px);
+  --sp-section: clamp(40px, 5vw, 64px);   /* Sep-2026 (Doug): era clamp(64px,8vw,112px) — espacio excesivo entre secciones */
   --sp-block:   clamp(32px, 4vw, 56px);
   --container:  1200px;
   --container-narrow: 760px;
@@ -500,7 +500,7 @@ em.gold{font-style:italic;color:var(--gold);font-weight:500}
 /* ============================================================
    TRUST — single navy-deep anchor with subtle orange glow
    ============================================================ */
-.trust{background:var(--navy-deep);color:#fff;padding:clamp(40px,5vw,72px) 0;position:relative;overflow:hidden}
+.trust{background:var(--navy-deep);color:#fff;padding:clamp(32px,4vw,56px) 0;position:relative;overflow:hidden}
 .trust::before{content:"";position:absolute;top:-30%;right:-15%;width:60%;height:160%;background:radial-gradient(ellipse 50% 50% at center,rgba(212,84,30,.18),transparent 60%);pointer-events:none}
 .trust .container{position:relative;z-index:1}
 .trust-grid{display:grid;grid-template-columns:1fr;gap:48px;align-items:start}
@@ -626,7 +626,7 @@ em.gold{font-style:italic;color:var(--gold);font-weight:500}
 /* ============================================================
    CARE KITS STRIP
    ============================================================ */
-.kits{padding:clamp(40px,5vw,72px) 0 var(--sp-section);background:var(--paper-cool);border-top:1px solid var(--rule);border-bottom:1px solid var(--rule)}
+.kits{padding:clamp(32px,4vw,56px) 0 var(--sp-section);background:var(--paper-cool);border-top:1px solid var(--rule);border-bottom:1px solid var(--rule)}
 .kits-intro{max-width:1040px;margin-bottom:var(--sp-block)}
 .kits-intro p{margin-top:18px;max-width:640px}
 .kits-grid{display:grid;grid-template-columns:1fr;gap:18px}
@@ -663,7 +663,7 @@ em.gold{font-style:italic;color:var(--gold);font-weight:500}
 /* ============================================================
    FAQ
    ============================================================ */
-.faq{padding:clamp(40px,5vw,72px) 0 var(--sp-section);background:var(--paper)}
+.faq{padding:clamp(32px,4vw,56px) 0 var(--sp-section);background:var(--paper)}
 .faq-wrap{max-width:1040px}
 .faq-header{margin-bottom:var(--sp-block)}
 details.faq-item{border-bottom:1px solid var(--rule-strong);padding:0}
@@ -1110,9 +1110,9 @@ html.phone #phone-handoff{display:flex;width:100%;min-height:100vh;align-items:c
 <section class="compare" id="compare" aria-label="Comparison">
   <div class="container">
     <div class="compare-header reveal">
-      <h2 class="h-section">Multi-year plan more than you wanted to spend? Get the same coverage, <em class="accent">monthly.</em></h2>
-      <p class="lead" style="max-width:none;margin-top:18px">Two monthly plans: <strong>Mattress &amp; Bed Base</strong> and <strong>Home Furnishings</strong>.</p>
-      <p class="compare-fine">Monthly &middot; cancel, pause or upgrade anytime &middot; <a href="/terms/" target="_blank" rel="noopener" class="js-plan-terms">Read Plan Terms &amp; Conditions</a> before purchasing.</p>
+      <h2 class="h-section">Protect Your New Mattress or Furniture <em class="accent">Starting at $19.99/Month</em></h2>
+      <p class="lead" style="max-width:none;margin-top:18px"><strong>Monthly &middot; cancel, pause or upgrade anytime.</strong></p>
+      <p class="compare-fine"><a href="/terms/" target="_blank" rel="noopener" class="js-plan-terms">Read Plan Terms &amp; Conditions</a> before purchasing.</p>
     </div>
 
     <div class="compare-grid reveal">
