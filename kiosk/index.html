@@ -903,6 +903,24 @@ details.faq-item summary:focus-visible{outline:2px solid var(--orange);outline-o
 }
 
 /* Coverage Assistant: trigger prominente (header cerca del tope de la card, look de Doug) + flip del chat. */
+/* "What are you covering?" picker (Doug, Sep-2026) — replaces the Maya box on the plan cards. Chips =
+   categories (≥1 always on; price does NOT change — one Subscription covers every category of its card);
+   <details> checklists = optional items. Informative only (SKU-not-Type): travels to checkout as types/items. */
+.cov-pick{margin:0 0 20px}
+.cov-pick-q{margin:0 0 8px;font-size:.8125rem;font-weight:600;color:var(--ink)}
+.cov-chips{display:flex;flex-wrap:wrap;gap:8px}
+.cov-chip{min-height:38px;padding:8px 14px;border:1px solid var(--rule-strong);border-radius:999px;background:var(--paper);font:inherit;font-size:.875rem;font-weight:500;color:var(--ink-80);cursor:pointer;line-height:1.2;transition:background var(--t-fast) var(--ease),border-color var(--t-fast) var(--ease),color var(--t-fast) var(--ease)}
+.cov-chip:hover{border-color:var(--orange)}
+.cov-chip[aria-pressed="true"]{background:var(--orange-soft);border-color:var(--orange);color:var(--ink);font-weight:600}
+.cov-chip[aria-pressed="true"]::before{content:"\2713\00a0";color:var(--orange)}
+.cov-chip:focus-visible{outline:2px solid var(--orange);outline-offset:2px}
+.cov-items{margin-top:10px}
+.cov-items summary{cursor:pointer;font-size:.8125rem;font-weight:600;color:var(--ink-65);padding:2px 0;width:fit-content}
+.cov-items summary:hover{color:var(--ink)}
+.cov-items-n{color:var(--orange);font-weight:600}
+.cov-items-list{margin-top:8px;max-height:176px;overflow:auto;border:1px solid var(--rule);border-radius:4px;padding:6px 12px;display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:0 12px;background:var(--paper)}
+.cov-items-list label{display:flex;align-items:center;gap:8px;padding:7px 0;font-size:.875rem;color:var(--ink-80);cursor:pointer}
+.cov-items-list input{width:16px;height:16px;accent-color:var(--orange);flex:none;margin:0}
 .cov-assist-trigger{display:block;width:100%;text-align:left;cursor:pointer;margin:0 0 20px;padding:11px 15px;background:var(--paper-cool);border:1px solid var(--orange);border-left:4px solid var(--orange);border-radius:6px;font-family:var(--body);transition:background var(--t-fast) var(--ease),box-shadow var(--t-fast) var(--ease)}
 .cov-assist-trigger:hover{background:#fff;box-shadow:0 2px 10px rgba(212,84,30,.14)}
 .cov-assist-title{display:block;font-size:.72rem;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--orange)}
@@ -1122,10 +1140,13 @@ html.phone #phone-handoff{display:flex;width:100%;min-height:100vh;align-items:c
         <div class="upfront">$19.99<small>/month</small></div>
         <p class="upfront-sub">Covers mattresses &middot; box springs &middot; adjustable bed bases</p>
 
-        <button type="button" class="cov-assist-trigger" data-cov="stain">
-          <span class="cov-assist-title">Maya · your sales assistant</span>
-          <span class="cov-assist-sub">Tell me about your purchase &rarr;</span>
-        </button>
+        <div class="cov-pick" data-cov="stain">
+          <p class="cov-pick-q" id="cov-pick-q-stain">What are you covering?</p>
+          <div class="cov-chips" role="group" aria-labelledby="cov-pick-q-stain">
+            <button type="button" class="cov-chip" data-type="mattress" aria-pressed="true">Mattress / box spring</button>
+            <button type="button" class="cov-chip" data-type="adjbed" aria-pressed="false">Adjustable bed</button>
+          </div>
+        </div>
 
         <ul class="cmp-features">
           <li>Accidental stains</li>
@@ -1177,10 +1198,22 @@ html.phone #phone-handoff{display:flex;width:100%;min-height:100vh;align-items:c
         <div class="upfront">$24.99<small>/month</small></div>
         <p class="upfront-sub">Covers furniture &middot; outdoor &middot; area rugs &middot; lamps &amp; accessories</p>
 
-        <button type="button" class="cov-assist-trigger" data-cov="stain-mech">
-          <span class="cov-assist-title">Maya · your sales assistant</span>
-          <span class="cov-assist-sub">Tell me about your purchase &rarr;</span>
-        </button>
+        <div class="cov-pick" data-cov="stain-mech">
+          <p class="cov-pick-q" id="cov-pick-q-mech">What are you covering?</p>
+          <div class="cov-chips" role="group" aria-labelledby="cov-pick-q-mech">
+            <button type="button" class="cov-chip" data-type="furniture" aria-pressed="true">Furniture</button>
+            <button type="button" class="cov-chip" data-type="outdoor" aria-pressed="false">Outdoor</button>
+            <button type="button" class="cov-chip" data-type="rugs" aria-pressed="false">Area rug</button>
+          </div>
+          <details class="cov-items" data-cat="furniture">
+            <summary>Furniture items <span class="cov-items-n"></span></summary>
+            <div class="cov-items-list"></div>
+          </details>
+          <details class="cov-items" data-cat="outdoor" hidden>
+            <summary>Outdoor items <span class="cov-items-n"></span></summary>
+            <div class="cov-items-list"></div>
+          </details>
+        </div>
 
         <ul class="cmp-features">
           <li>Stains, dye transfer &amp; liquid marks</li>
@@ -2299,6 +2332,47 @@ html.phone #phone-handoff{display:flex;width:100%;min-height:100vh;align-items:c
   var CART_KEY = 'furnfx_cart';
   var KNOWN_COV = { 'stain':1, 'stain-mech':1 };
   var savedItems = loadCart();   /* hydrate the device-local cart (localStorage) so it survives reloads */
+  /* "What are you covering?" picker (Doug, Sep-2026). Per card (cov): chosen categories (≥1; keys = server
+     PIECE_TYPES) + optional items per category. INFORMATIVE only — never changes price (one Subscription
+     covers every category of its card; SKU-not-Type). Same hoisting rule as CART_KEY: assigned up here, before
+     any render reads it. Untrusted storage → filtered against these lists on load. */
+  var COVER_KEY = 'furnfx_cover';
+  var COVER_CATS = { 'stain': ['mattress', 'adjbed'], 'stain-mech': ['furniture', 'outdoor', 'rugs'] };
+  var COVER_NAMES = { mattress:'Mattress / box spring', adjbed:'Adjustable bed', furniture:'Furniture', outdoor:'Outdoor', rugs:'Area rug' };
+  var COVER_ITEMS = {
+    furniture: ['Sofa', 'Loveseat', 'Sectional', 'Chair', 'Recliner', 'Chaise', 'Bench', 'Dining Sets', 'Bedroom Furniture', 'Tables', 'Stools & Ottomans', 'Lamps & Accessories'],
+    outdoor:   ['Sofa', 'Loveseat', 'Sectional', 'Chair', 'Chaise', 'Bench', 'Dining Sets', 'Tables', 'Stools & Ottomans']
+  };
+  var coverPick = loadCoverPick();
+  function loadCoverPick(){
+    var raw = null;
+    try { raw = JSON.parse(localStorage.getItem(COVER_KEY) || 'null'); } catch(_){}
+    var out = {};
+    Object.keys(COVER_CATS).forEach(function(cov){
+      var src = raw && typeof raw === 'object' && raw[cov] && typeof raw[cov] === 'object' ? raw[cov] : {};
+      var types = Array.isArray(src.types) ? src.types.filter(function(t, i, a){ return COVER_CATS[cov].indexOf(t) !== -1 && a.indexOf(t) === i; }) : [];
+      if(!types.length) types = [COVER_CATS[cov][0]];
+      var items = {};
+      Object.keys(COVER_ITEMS).forEach(function(cat){
+        if(COVER_CATS[cov].indexOf(cat) === -1) return;
+        var got = src.items && Array.isArray(src.items[cat]) ? src.items[cat] : [];
+        items[cat] = got.filter(function(n, i, a){ return COVER_ITEMS[cat].indexOf(n) !== -1 && a.indexOf(n) === i; });
+      });
+      out[cov] = { types: types, items: items };
+    });
+    return out;
+  }
+  function persistCoverPick(){ try { localStorage.setItem(COVER_KEY, JSON.stringify(coverPick)); } catch(_){} }
+  function coverType(cov){ return (coverPick[cov] && coverPick[cov].types[0]) || COVER_CATS[cov][0]; }   /* server's single `type` */
+  function coverLabel(cov){ return coverPick[cov] ? coverPick[cov].types.map(function(t){ return COVER_NAMES[t]; }).join(' + ') : ''; }
+  /* Checkout payload extras: full category list (+ 'lighting' when Lamps & Accessories is checked) and items. */
+  function coverPayload(cov){
+    var p = coverPick[cov]; if(!p) return { types: [], items: {} };
+    var types = p.types.slice(), items = {};
+    Object.keys(p.items).forEach(function(cat){ if(types.indexOf(cat) !== -1 && p.items[cat].length) items[cat] = p.items[cat].slice(); });
+    if(items.furniture && items.furniture.indexOf('Lamps & Accessories') !== -1) types.push('lighting');
+    return { types: types, items: items };
+  }
   /* Care kits cart (KIT-3) — a SEPARATE one-time-product line from the plan cart. Same hoisting rule
      as CART_KEY: KIT_KEY/KIT_NAMES must be assigned before loadKits() runs (the function decl hoists). */
   var KIT_KEY = 'furnfx_kits';
@@ -2613,7 +2687,7 @@ html.phone #phone-handoff{display:flex;width:100%;min-height:100vh;align-items:c
 
       var cov = document.createElement('div'); cov.className = 'cov'; cov.textContent = covName;
       var meta = document.createElement('div'); meta.className = 'meta';
-      var metaTxt = pl.label + ' · ' + tObj.name + ' · up to ' + fmtBig(pl.limit) + ' coverage';
+      var metaTxt = pl.label + ' · ' + (coverLabel(line.cov) || tObj.name) + ' · up to ' + fmtBig(pl.limit) + ' coverage';
       if(line.count > 1) metaTxt += ' · ' + line.count + ' plans';
       meta.textContent = metaTxt;
       var price = document.createElement('div'); price.className = 'price';
@@ -3248,7 +3322,7 @@ html.phone #phone-handoff{display:flex;width:100%;min-height:100vh;align-items:c
          precios (planes desde PRICE_CENTS, kits desde care_kits) y arma el checkout mixto. */
       var coPayload = {
         email: email,
-        plans: savedItems.map(function(l){ return { cov:l.cov, term:l.term, type:l.type, count:l.count }; }),
+        plans: savedItems.map(function(l){ var cp = coverPayload(l.cov); return { cov:l.cov, term:l.term, type:l.type, count:l.count, types:cp.types, items:cp.items }; }),
         kits: Object.keys(savedKits).map(function(n){ return { sku: KIT_SKU[n], quantity: savedKits[n] }; }),
         membership: savedMembership,   /* de pago, $19.99 siempre (MEM-7); la incluida es entitlement */
         full_name: name, phone: phone, address: address,
@@ -3706,7 +3780,7 @@ html.phone #phone-handoff{display:flex;width:100%;min-height:100vh;align-items:c
         method: 'POST', headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           email: email,
-          plans: savedItems.map(function(l){ return { cov:l.cov, term:l.term, type:l.type, count:l.count }; }),
+          plans: savedItems.map(function(l){ var cp = coverPayload(l.cov); return { cov:l.cov, term:l.term, type:l.type, count:l.count, types:cp.types, items:cp.items }; }),
           kits: Object.keys(savedKits).map(function(n){ return { sku: KIT_SKU[n], quantity: savedKits[n] }; }),
           membership: savedMembership
         })
@@ -4085,13 +4159,13 @@ html.phone #phone-handoff{display:flex;width:100%;min-height:100vh;align-items:c
       var totalEl  = document.getElementById(c.pre + '-total');
       var article  = document.querySelector('.compare-col[data-cov="' + c.cov + '"]');
       if(!article) return;
-      var selType = 'furniture';   /* label por defecto del type (el dropdown se reemplazó por el Coverage Assistant) */
+      /* type = 1ª categoría del picker "What are you covering?" (Sep-2026); antes 'furniture' fijo. */
 
       function base(){ return PLANS.monthly.base[c.cov]; }
       /* Identidad de línea = cov+term (type es etiqueta, NO identidad — ver CLAUDE.md). Reusa findLine
          para que la card nunca difiera de savedItems/drawer (elimina el footgun del param `type`). */
       function lineFor(){ return findLine(c.cov, TERM); }
-      function add(){ cartAdd(c.cov, TERM, selType, 1); render(); updateCartBadge(); reflectToHero(c.cov); }
+      function add(){ cartAdd(c.cov, TERM, coverType(c.cov), 1); render(); updateCartBadge(); reflectToHero(c.cov); }
       function sub(){
         var line = lineFor();
         if(!line) return;
@@ -4113,10 +4187,10 @@ html.phone #phone-handoff{display:flex;width:100%;min-height:100vh;align-items:c
       var saveHTML = saveBtn ? saveBtn.innerHTML : '';   /* "Save to cart →" original, para restaurar */
       var checkoutBtn = document.getElementById(c.pre + '-checkout');
       function save(){
-        if(cartCount(c.cov, TERM) < 1){ cartAdd(c.cov, TERM, selType, 1); render(); updateCartBadge(); reflectToHero(c.cov); }
+        if(cartCount(c.cov, TERM) < 1){ cartAdd(c.cov, TERM, coverType(c.cov), 1); render(); updateCartBadge(); reflectToHero(c.cov); }
       }
       function checkout(){
-        if(cartCount(c.cov, TERM) < 1){ cartAdd(c.cov, TERM, selType, 1); render(); updateCartBadge(); }
+        if(cartCount(c.cov, TERM) < 1){ cartAdd(c.cov, TERM, coverType(c.cov), 1); render(); updateCartBadge(); }
         reflectToHero(c.cov);   /* the drawer reads hero state → show this plan */
         openCart();
       }
@@ -4125,7 +4199,6 @@ html.phone #phone-handoff{display:flex;width:100%;min-height:100vh;align-items:c
 
       function render(){
         var line = lineFor();   /* a monthly line of this coverage drives the displayed type + count */
-        if(line) selType = line.type;
         var count = line ? line.count : 0;
         countEl.textContent = String(count);
         totalEl.textContent = fmt(base() * count);
@@ -4401,6 +4474,56 @@ html.phone #phone-handoff{display:flex;width:100%;min-height:100vh;align-items:c
     });
   });
 
+
+  // "WHAT ARE YOU COVERING?" picker (Sep-2026): chips toggle categories (≥1 stays on), <details> hold the
+  // optional item checklists (built here from COVER_ITEMS, textContent only). Keeps the cart line's single
+  // `type` = first category so the server's required-type check (CA-4) is always satisfied.
+  Array.prototype.forEach.call(document.querySelectorAll('.cov-pick'), function(box){
+    var cov = box.getAttribute('data-cov');
+    if(!coverPick[cov]) return;
+    var chips = box.querySelectorAll('.cov-chip');
+    var lists = box.querySelectorAll('.cov-items');
+    function syncLine(){
+      var line = findLine(cov, 'monthly');
+      if(line && line.type !== coverType(cov)){ line.type = coverType(cov); persistCart(); }
+      renderPlanLines();
+    }
+    function sync(){
+      var p = coverPick[cov];
+      Array.prototype.forEach.call(chips, function(ch){ ch.setAttribute('aria-pressed', p.types.indexOf(ch.getAttribute('data-type')) !== -1 ? 'true' : 'false'); });
+      Array.prototype.forEach.call(lists, function(d){
+        var cat = d.getAttribute('data-cat'), n = (p.items[cat] || []).length;
+        d.hidden = p.types.indexOf(cat) === -1;
+        d.querySelector('.cov-items-n').textContent = n ? '(' + n + ')' : '';
+      });
+    }
+    Array.prototype.forEach.call(lists, function(d){
+      var cat = d.getAttribute('data-cat'), wrap = d.querySelector('.cov-items-list');
+      (COVER_ITEMS[cat] || []).forEach(function(name){
+        var lab = document.createElement('label'), cb = document.createElement('input');
+        cb.type = 'checkbox'; cb.value = name;
+        cb.checked = coverPick[cov].items[cat].indexOf(name) !== -1;
+        cb.addEventListener('change', function(){
+          var arr = coverPick[cov].items[cat], i = arr.indexOf(name);
+          if(cb.checked && i === -1) arr.push(name);
+          if(!cb.checked && i !== -1) arr.splice(i, 1);
+          persistCoverPick(); sync();
+        });
+        lab.appendChild(cb); lab.appendChild(document.createTextNode(name));
+        wrap.appendChild(lab);
+      });
+    });
+    Array.prototype.forEach.call(chips, function(ch){
+      ch.addEventListener('click', function(){
+        var t = ch.getAttribute('data-type'), types = coverPick[cov].types, i = types.indexOf(t);
+        if(i === -1) types.push(t);
+        else if(types.length > 1) types.splice(i, 1);
+        else return;   /* keep ≥1 category: the plan always covers something */
+        persistCoverPick(); sync(); syncLine();
+      });
+    });
+    sync(); syncLine();   /* also fixes carts saved before the picker (type was always 'furniture') */
+  });
 
   // MEMBERSHIP TERMS popup: opened from "See membership details" + the drawer's membership T&C link.
   var memtermsModal = document.getElementById('memterms-modal');
