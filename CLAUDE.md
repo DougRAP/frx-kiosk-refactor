@@ -25,8 +25,9 @@ one IIFE, no build). They reach the backend through the **`/api/*` seam** — a 
 folder's `netlify.toml` pointing at the central backend, so the API can move hosts without touching
 a front-end. Only the D2C goes through `scripts/build.mjs`.
 
-**Git**: the GitHub repo is <https://github.com/DougRAP/frx-kiosk-refactor>. As of this refresh the
-working folder is **not yet a local git repo** (no `.git`) — `git init` + remote wiring is pending.
+**Git**: <https://github.com/DougRAP/frx-kiosk-refactor>, branch `main`. Current scope (Doug,
+Sep-2026): styling changes to `kiosk/index.html` + the new plan T&C at `kiosk/terms/index.html`,
+previewed on a separate Netlify site, then handed to Adrian (dev) to make it work end-to-end.
 
 ## Layout
 
