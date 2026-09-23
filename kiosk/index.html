@@ -180,6 +180,10 @@ em.gold{font-style:italic;color:var(--gold);font-weight:500}
 .nav-links a{font-size:.9rem;color:var(--ink);text-decoration:none;font-weight:500;transition:color var(--t-fast) var(--ease)}
 .nav-links a:hover{color:var(--orange)}
 .nav-cta{display:flex;align-items:center;gap:14px}
+.nav-login{font-size:.875rem;font-weight:600;color:var(--orange);text-decoration:none;border-bottom:1px solid currentColor;white-space:nowrap;line-height:1.3}
+.nav-login:hover{color:var(--orange-hover)}
+.nav-login-long{display:none}
+@media (min-width:680px){.nav-login-long{display:inline}}
 .nav-cart{position:relative;display:inline-flex;align-items:center;justify-content:center;width:42px;height:42px;border:1px solid var(--rule);border-radius:50%;background:var(--paper);color:var(--ink);cursor:pointer;transition:border-color var(--t-fast) var(--ease),color var(--t-fast) var(--ease)}
 .nav-cart:hover{border-color:var(--ink);color:var(--orange)}
 .nav-cart-count{position:absolute;top:-4px;right:-4px;min-width:18px;height:18px;padding:0 4px;border-radius:9px;background:var(--orange);color:#fff;font-size:.68rem;font-weight:700;line-height:18px;text-align:center;font-family:var(--body)}
@@ -1050,6 +1054,9 @@ html.phone #phone-handoff{display:flex;width:100%;min-height:100vh;align-items:c
       </ul>
     </nav>
     <div class="nav-cta">
+      <!-- DASH-5 (Doug 24-jun) → movido al header (Doug, Sep-2026). Absoluto porque el kiosk es un site aparte
+           y el dashboard vive en el site principal. Pestaña nueva: la tablet no pierde el kiosk. -->
+      <a class="nav-login" href="https://www.furniturerx.net/dashboard" target="_blank" rel="noopener"><span class="nav-login-long">Already covered? </span>Log in<span class="nav-login-long"> to your dashboard</span></a>
       <button type="button" class="nav-cart" id="nav-cart" aria-label="Open cart">
         <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="9" cy="21" r="1"></circle><circle cx="20" cy="21" r="1"></circle><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"></path></svg>
         <span class="nav-cart-count" id="nav-cart-count" hidden>0</span>
@@ -1084,7 +1091,6 @@ html.phone #phone-handoff{display:flex;width:100%;min-height:100vh;align-items:c
   <div class="container">
     <div class="trust-grid">
       <div class="trust-lead">
-        <span class="eyebrow">4.5 stars on Google &middot; Trusted by 2M+ households</span>
         <h2 class="h-section">2M households trust <em class="gold">our service.</em></h2>
         <p>US-based service that handles every step &mdash; file a claim in moments through our app, 24/7. No hold music.</p>
       </div>
@@ -1104,10 +1110,6 @@ html.phone #phone-handoff{display:flex;width:100%;min-height:100vh;align-items:c
 <section class="compare" id="compare" aria-label="Comparison">
   <div class="container">
     <div class="compare-header reveal">
-      <!-- DASH-5 (Doug 24-jun): recaptura; absoluto porque el kiosk es un site aparte (kiosk.furniturerx.net)
-           y el dashboard vive en el site principal. Pestaña nueva: la tablet no pierde el kiosk. -->
-      <p class="dash-login"><a href="https://www.furniturerx.net/dashboard" target="_blank" rel="noopener">Already covered? Log in to your dashboard &rarr;</a></p>
-      <span class="eyebrow eyebrow-orange">Only pay for what you need</span>
       <h2 class="h-section">Multi-year plan more than you wanted to spend? Get the same coverage, <em class="accent">monthly.</em></h2>
       <p class="lead" style="max-width:none;margin-top:18px">Two monthly plans: <strong>Mattress &amp; Bed Base</strong> and <strong>Home Furnishings</strong>.</p>
       <p class="compare-fine">Monthly &middot; cancel, pause or upgrade anytime &middot; <a href="/terms/" target="_blank" rel="noopener" class="js-plan-terms">Read Plan Terms &amp; Conditions</a> before purchasing.</p>
@@ -1236,7 +1238,6 @@ html.phone #phone-handoff{display:flex;width:100%;min-height:100vh;align-items:c
 <section class="membership" id="membership">
   <div class="container">
     <div class="mem-intro reveal">
-      <span class="eyebrow eyebrow-orange">FurnitureRx Repair Concierge</span>
       <h2 class="h-section">Keep your furniture looking new with <em class="accent">Repair Concierge.</em></h2>
       <p class="lead">Repair Concierge helps you care for your furniture with professional damage triage, access to our skilled repair network, repair coordination, and member rates on repair labor and parts costs.</p>
     </div>
@@ -1289,7 +1290,6 @@ html.phone #phone-handoff{display:flex;width:100%;min-height:100vh;align-items:c
 <section class="faq" id="faq" style="background: var(--paper-cool); border-top: 1px solid var(--rule); border-bottom: 1px solid var(--rule);">
   <div class="container faq-wrap reveal">
     <div class="faq-header">
-      <span class="eyebrow eyebrow-orange">Real questions</span>
       <h2 class="h-section">Direct answers.</h2>
     </div>
 
@@ -1362,7 +1362,6 @@ html.phone #phone-handoff{display:flex;width:100%;min-height:100vh;align-items:c
 <section class="kits" id="kits">
   <div class="container">
     <div class="kits-intro reveal">
-      <span class="eyebrow eyebrow-orange">While you&rsquo;re here</span>
       <h2 class="h-section">Care kits, <em class="accent">in a box.</em></h2>
       <p class="lead" style="max-width:620px">Member-grade cleaning and conditioning, but no subscription required. The same products our technicians carry on service calls.</p>
     </div>

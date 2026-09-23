@@ -189,11 +189,12 @@ for (const [name, source] of [['kiosk', kiosk], ['d2c', src('index.html')]]) {
   const d2cAt = d2cSrc.indexOf('id="compare"');
   const d2cHead = d2cSrc.slice(d2cAt, d2cSrc.indexOf('compare-grid', d2cAt));
   t(/<p class="dash-login"><a href="\/dashboard">/.test(d2cHead), 'DASH-5: D2C — link /dashboard al TOPE del compare-header');
-  const kioskAt = kiosk.indexOf('id="compare"');
-  const kioskHead = kiosk.slice(kioskAt, kiosk.indexOf('compare-grid', kioskAt));
-  t(/<a href="https:\/\/www\.furniturerx\.net\/dashboard" target="_blank" rel="noopener">/.test(kioskHead),
-    'DASH-5: kiosk — link ABSOLUTO al site principal, pestaña nueva (la tablet no pierde el kiosk)');
-  t(/Log in to your dashboard/.test(d2cHead) && /Log in to your dashboard/.test(kioskHead),
+  /* Kiosk: el login se movió del compare-header al HEADER (Doug, Sep-2026). */
+  const kioskAt = kiosk.indexOf('<header class="nav"');
+  const kioskHead = kiosk.slice(kioskAt, kiosk.indexOf('</header>', kioskAt));
+  t(/<a class="nav-login" href="https:\/\/www\.furniturerx\.net\/dashboard" target="_blank" rel="noopener">/.test(kioskHead),
+    'DASH-5: kiosk — link ABSOLUTO al site principal en el header, pestaña nueva (la tablet no pierde el kiosk)');
+  t(/Log in to your dashboard/.test(d2cHead) && /Log in to your dashboard/.test(kioskHead.replace(/<[^>]+>/g, '')),
     'DASH-5: copy "Log in to your dashboard" en ambos fronts');
   const toml = src('netlify.toml');
   t(/from = "\/dashboard"\s+to = "\/account\.html"\s+status = 301/.test(toml), 'DASH-5: redirect /dashboard → /account.html en netlify.toml');
