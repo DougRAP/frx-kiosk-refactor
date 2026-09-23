@@ -254,7 +254,7 @@ async function bootAndSubmitHandoff(extraStorage, api) {
 
   const full = await loadKiosk({ storage: { furnfx_cart: ONE_LINE } });
   const payF = full.document.getElementById('cart-pay');
-  t(/\$9\.99/.test(payF.textContent), 'KIOSK-10: con 1 plan el Pay muestra $9.99/mo');
+  t(/\$19\.99/.test(payF.textContent), 'KIOSK-10: con 1 plan el Pay muestra $19.99/mo');
   /* C.6: el botón de email quedó destapado (envío real verificado); abrir el drawer no lo altera */
   full.document.getElementById('nav-cart').click();
   await flush();
@@ -374,7 +374,7 @@ async function bootAndSubmitHandoff(extraStorage, api) {
   const { document, window } = await loadKiosk({ storage: { furnfx_cart: ONE_LINE } });
   const pay = document.getElementById('cart-pay');
   const pick = (v) => { const r = document.querySelector('input[name="deliver"][value="' + v + '"]'); r.checked = true; r.dispatchEvent(new window.Event('change', { bubbles: true })); };
-  t(/Pay/.test(pay.textContent) && /\$9\.99/.test(pay.textContent), 'pay-label: redirect (default) → Pay $9.99/mo');
+  t(/Pay/.test(pay.textContent) && /\$19\.99/.test(pay.textContent), 'pay-label: redirect (default) → Pay $19.99/mo');
   pick('handoff'); await flush();
   t(/Show the QR code/.test(pay.textContent), 'pay-label: handoff → "Show the QR code"');
   pick('email'); await flush();
@@ -382,7 +382,7 @@ async function bootAndSubmitHandoff(extraStorage, api) {
   pick('qr'); await flush();
   t(/Show the QR code/.test(pay.textContent), 'pay-label: qr → "Show the QR code"');
   pick('redirect'); await flush();
-  t(/Pay/.test(pay.textContent) && /\$9\.99/.test(pay.textContent), 'pay-label: volver a redirect restaura el precio');
+  t(/Pay/.test(pay.textContent) && /\$19\.99/.test(pay.textContent), 'pay-label: volver a redirect restaura el precio');
 }
 
 /* KIOSK-18.2 — máscara de teléfono (000) 000-0000 */
@@ -430,7 +430,7 @@ async function bootAndSubmitHandoff(extraStorage, api) {
   await flush();
   t(form.hidden === false && handoff.hidden === true, 'back: vuelve al form de opciones');
   /* el carrito sigue intacto: el TOTAL conserva el monto (el botón en handoff dice la acción, no el precio) */
-  t(/\$9\.99/.test(document.getElementById('cart-total-val').textContent), 'back: el carrito sigue intacto ($9.99/mo en el total)');
+  t(/\$19\.99/.test(document.getElementById('cart-total-val').textContent), 'back: el carrito sigue intacto ($19.99/mo en el total)');
   t(/Show the QR code/.test(document.getElementById('cart-pay').textContent), 'back: el botón conserva la guía del modo handoff');
   t(document.getElementById('cart-name').value === 'Test Customer', 'back: los campos no se borran');
   t(live().length === 0, 'back: el poll quedó parado');
@@ -474,10 +474,10 @@ async function bootAndSubmitHandoff(extraStorage, api) {
   const open = async (ctx) => { ctx.document.getElementById('nav-cart').click(); await flush(); };
   const mech = await loadKiosk({ storage: { furnfx_cart: JSON.stringify([{ cov: 'stain-mech', term: 'monthly', type: 'furniture', count: 1 }]), furnfx_membership: '1' } });
   await open(mech);
-  t(/\$39\.98/.test(mech.document.getElementById('cart-pay').textContent), 'MEM-7: stain-mech + membership → $39.98 (19.99 + 19.99, sin bundled $0)');
+  t(/\$44\.98/.test(mech.document.getElementById('cart-pay').textContent), 'MEM-7: stain-mech + membership → $44.98 (24.99 + 19.99, sin bundled $0)');
   const stain = await loadKiosk({ storage: { furnfx_cart: ONE_LINE, furnfx_membership: '1' } });
   await open(stain);
-  t(/\$29\.98/.test(stain.document.getElementById('cart-pay').textContent), 'MEM-7: stain + membership → $29.98 (9.99 + 19.99, sin 50%)');
+  t(/\$39\.98/.test(stain.document.getElementById('cart-pay').textContent), 'MEM-7: stain + membership → $39.98 (19.99 + 19.99, sin 50%)');
   const label = stain.document.getElementById('cart-membership-list').textContent;
   t(!/50% off/.test(label) && !/included with your plan/.test(label), 'MEM-7: la línea no promete descuentos ni bundled');
   t(/cancel anytime/.test(label), 'MEM-7: la línea dice $19.99/month · cancel anytime');
