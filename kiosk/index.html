@@ -173,6 +173,8 @@ em.gold{font-style:italic;color:var(--gold);font-weight:500}
 .logo .mark{font-family:var(--display);font-weight:600;font-size:1.5rem;color:var(--ink);letter-spacing:-.02em;font-variation-settings:"opsz" 24}
 .logo .mark em{font-style:italic;color:var(--orange);font-weight:500}
 .logo .tag{font-size:.6875rem;color:var(--ink-65);letter-spacing:.14em;text-transform:uppercase;font-weight:500}
+/* Phones <400px: logo + tag + cart + menu no caben en una fila (el ☰ quedaba 19px fuera a 360px). */
+@media (max-width:400px){.logo .tag{display:none}}
 
 .nav-links{display:none;list-style:none;padding:0;margin:0;gap:32px;align-items:center}
 .nav-links a{font-size:.9rem;color:var(--ink);text-decoration:none;font-weight:500;transition:color var(--t-fast) var(--ease)}
@@ -405,7 +407,7 @@ em.gold{font-style:italic;color:var(--gold);font-weight:500}
 .dash-login{margin:0 0 14px;font-size:.9rem}
 .dash-login a{color:var(--orange);font-weight:600;text-decoration:none;border-bottom:1px solid currentColor}
 .dash-login a:hover{opacity:.75}
-.compare-grid{display:grid;grid-template-columns:1fr;gap:18px}
+.compare-grid{display:grid;grid-template-columns:minmax(0,1fr);gap:18px}   /* minmax(0,…): 1fr no baja de su min-content → desbordaba en phones */
 .compare-col{background:var(--paper);border:1px solid var(--rule);border-radius:4px;padding:32px 28px;position:relative}
 .compare-col.declined{background:#eef0f3;border-color:var(--rule-strong)}
 .compare-col.ours{position:relative}
@@ -594,7 +596,7 @@ em.gold{font-style:italic;color:var(--gold);font-weight:500}
 .mem-intro h2{margin:18px 0 20px}
 .mem-intro .lead{max-width:640px}
 
-.mem-card{display:grid;grid-template-columns:1fr;gap:0;border:1px solid var(--rule);border-radius:4px;overflow:hidden;background:var(--paper);position:relative;box-shadow:var(--shadow-card)}
+.mem-card{display:grid;grid-template-columns:minmax(0,1fr);gap:0;border:1px solid var(--rule);border-radius:4px;overflow:hidden;background:var(--paper);position:relative;box-shadow:var(--shadow-card)}
 .mem-card::before{content:"";position:absolute;left:0;top:0;bottom:0;width:var(--rim);background:var(--orange);z-index:2}
 
 .mem-card-head{padding:36px 36px 28px;border-bottom:1px solid var(--rule);display:flex;flex-direction:column;gap:8px}
@@ -605,7 +607,7 @@ em.gold{font-style:italic;color:var(--gold);font-weight:500}
 .mem-card-head .price .per{font-size:.95rem;color:var(--ink-65);font-weight:500}
 .mem-card-head .price-sub{font-size:.875rem;color:var(--ink-65)}
 
-.mem-card-body{padding:36px;display:grid;grid-template-columns:1fr;gap:36px}
+.mem-card-body{padding:36px;display:grid;grid-template-columns:minmax(0,1fr);gap:36px}
 .mem-card-body .copy h4{font-family:var(--display);font-weight:500;font-size:1.25rem;letter-spacing:-.015em;margin:0 0 14px;font-variation-settings:"opsz" 24}
 .mem-card-body .copy p{font-size:.95rem;color:var(--ink-65);line-height:1.6}
 .mem-benefits{list-style:none;padding:0;margin:0;display:flex;flex-direction:column;gap:16px}
@@ -614,6 +616,7 @@ em.gold{font-style:italic;color:var(--gold);font-weight:500}
 .mem-benefits li strong{font-weight:700}
 
 .mem-card-foot{padding:24px 36px;background:var(--paper-cool);border-top:1px solid var(--rule);display:flex;flex-direction:column;gap:14px;align-items:flex-start}
+.mem-card-foot .btn{white-space:normal;max-width:100%}   /* "Add Repair Safety Net · $19.99/mo →" se cortaba en phones */
 .mem-card-foot .note{font-size:.8125rem;color:var(--ink-65)}
 
 /* ============================================================
