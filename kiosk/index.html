@@ -876,6 +876,17 @@ details.faq-item summary:focus-visible{outline:2px solid var(--orange);outline-o
   transition:opacity var(--t-med) var(--ease),transform var(--t-med) var(--ease);
 }
 .chat-panel.open{opacity:1;transform:translateY(0) scale(1);pointer-events:auto}
+/* Maya opened from checkout (Sep-2026): above the checkout panel (z 120), bottom-right. The kiosk checkout is
+   full-screen with a centred form, so at wide screens 340px fits in the right margin; narrower, it overlays.
+   Its own × closes it (the chat bubble sits under the checkout backdrop). */
+.chat-panel.over-cart{z-index:130;bottom:24px;width:min(340px,calc(100vw - 48px))}
+.chat-close{margin-left:auto;background:none;border:0;padding:4px 6px;font-size:1.5rem;line-height:1;color:rgba(255,255,255,.75);cursor:pointer}
+.chat-close:hover{color:#fff}
+.chat-close:focus-visible{outline:2px solid var(--orange);outline-offset:2px;border-radius:2px}
+.cart-maya{margin:18px 0 16px;padding:14px 16px;border:1px solid var(--rule);border-left:var(--rim) solid var(--orange);border-radius:4px;background:var(--paper-cool)}
+.cart-maya-q{margin:0 0 8px;font-size:.875rem;font-weight:600;color:var(--ink)}
+.cart-maya-btn{background:none;border:0;padding:0;font:inherit;font-size:.9375rem;font-weight:600;color:var(--orange);cursor:pointer;text-decoration:underline;text-decoration-color:var(--orange-soft);text-underline-offset:4px}
+.cart-maya-btn:hover{color:var(--orange-hover);text-decoration-color:currentColor}
 .chat-head{padding:16px 20px;background:var(--navy-deep);color:#fff;display:flex;align-items:center;gap:12px;border-bottom:4px solid var(--orange)}
 .chat-avatar{width:36px;height:36px;border-radius:50%;background:var(--orange);color:#fff;display:flex;align-items:center;justify-content:center;font-family:var(--display);font-weight:600;font-size:1rem;letter-spacing:-.01em;flex-shrink:0}
 .chat-head .who{flex:1;line-height:1.2}
@@ -1685,6 +1696,12 @@ html.phone #phone-handoff{display:flex;width:100%;min-height:100vh;align-items:c
           <input id="cart-referral" name="referral_code" type="text" autocomplete="off" maxlength="24" placeholder="e.g. GAL-7K2M">
           <p class="cart-note" id="cart-referral-msg" aria-live="polite" hidden></p>
         </div>
+        <!-- Maya en el checkout (Doug, Sep-2026): sale de las cards; aquí recoge lo que el cliente quiera añadir.
+             Abre el chat ya sembrado con el contenido del carrito (planes + categorías + ítems del picker). -->
+        <div class="cart-maya" id="cart-maya">
+          <p class="cart-maya-q">Anything else we should know about your purchase?</p>
+          <button type="button" class="cart-maya-btn" id="cart-maya-btn">Tell Maya <span aria-hidden="true">&rarr;</span></button>
+        </div>
         <p class="cart-fine" id="cart-membership-fine" hidden>Covers every piece of furniture in your home &mdash; new, old, online, inherited, or custom. Billed monthly in advance &middot; cancel anytime. <a href="#" id="memterms-drawer-link">Terms &amp; conditions</a>.</p>
         <!-- KIOSK-3 (Doug 02-jul 20:44 a 20:58): el gate de calidad del dato — Stripe no valida
              dirección vs tarjeta, así que la confirmación del cliente es el único control -->
@@ -1996,6 +2013,7 @@ html.phone #phone-handoff{display:flex;width:100%;min-height:100vh;align-items:c
       <div class="name">Maya · your sales assistant</div>
 <!-- MAYA-3 (Doug 02-jul 29:12): fuera la línea de status del header — prometía respuesta "en minutos" y Maya responde al instante -->
     </div>
+    <button type="button" class="chat-close" id="chat-close" aria-label="Close chat">&times;</button>
   </div>
   <div class="chat-body" id="chat-body" aria-live="polite">
     <div class="chat-msg them">Hi there 👋 I&rsquo;m Maya on the FurnitureRx team. Anything I can help you sort out about the plans or membership?</div>
@@ -2840,6 +2858,7 @@ html.phone #phone-handoff{display:flex;width:100%;min-height:100vh;align-items:c
   function closeCart(){
     stopPoll(); clearAutoReset();   /* KIOSK-1: no dejar el poll/auto-reset vivos al cerrar (X/backdrop/Esc) */
     cartPanel.classList.remove('open'); cartBackdrop.classList.remove('open');
+    if(chatPanel && chatPanel.classList.contains('over-cart')) chatClose();   /* Maya abierta desde el checkout se cierra con él */
     document.body.style.overflow = '';
     setTimeout(function(){ cartPanel.hidden = true; cartBackdrop.hidden = true; }, 280);
   }
@@ -4289,7 +4308,7 @@ html.phone #phone-handoff{display:flex;width:100%;min-height:100vh;align-items:c
     setTimeout(function(){ chatInput.focus(); }, 280);
   }
   function chatClose(){
-    chatPanel.classList.remove('open');
+    chatPanel.classList.remove('open', 'over-cart');
     chatBtn.classList.remove('open');
     chatBtn.setAttribute('aria-expanded','false');
   }
@@ -4418,7 +4437,7 @@ html.phone #phone-handoff{display:flex;width:100%;min-height:100vh;align-items:c
     /* Confiamos en el count del SERVER (premium-matched); clamp defensivo. El PRECIO lo recalcula el
        server en el checkout. cartSet solo muta savedItems → refrescamos la UI a mano (renderCompareCards...). */
     var n = Math.max(0, Math.min(MAX_COUNT, parseInt(cv.recommended_plans, 10) || 0));
-    if(n > 0) cartSet(tier, 'monthly', 'furniture', n);
+    if(n > 0) cartSet(tier, 'monthly', coverType(tier), n);   /* type = picker (Sep-2026), antes 'furniture' fijo */
     renderCompareCards(); updateCartBadge(); reflectToHero(tier);
     if(cv.sales_order_number){
       var ord = document.getElementById('cart-order');
@@ -4462,17 +4481,40 @@ html.phone #phone-handoff{display:flex;width:100%;min-height:100vh;align-items:c
     }
   }
 
-  document.querySelectorAll('.cov-assist-trigger').forEach(function(btn){
-    btn.addEventListener('click', function(){
-      var cov = btn.getAttribute('data-cov');
-      covTier = cov;
-      covConvId = covGenId();                                /* conversación de cobertura NUEVA → id nuevo (1 lead upserteado por el server) */
-      /* MAYA-3 (Doug 02-jul 26:16 "let's keep in a single place"): Maya abre SIEMPRE en su posición fija — fuera el flip por card */
-      seedCoverage(cov);
-      if(!chatPanel.classList.contains('open')) chatOpen();
-      else chatInput.focus();
-    });
-  });
+  /* Maya en el CHECKOUT (Doug, Sep-2026): el botón por card se fue (lo reemplazó el picker "What are you
+     covering?"). "Tell Maya" en el drawer abre una conversación de cobertura NUEVA (id propio → 1 lead en el
+     server) sembrada con el carrito, para recoger lo que el cliente quiera añadir. Se abre ENCIMA del drawer. */
+  function cartSummaryForMaya(){
+    return savedItems.map(function(l){
+      var p = coverPick[l.cov], items = [];
+      if(p) Object.keys(p.items).forEach(function(cat){
+        if(p.types.indexOf(cat) !== -1 && p.items[cat].length) items.push(COVER_NAMES[cat] + ': ' + p.items[cat].join(', '));
+      });
+      var name = l.cov === 'stain-mech' ? 'Home Furnishings' : 'Mattress & Bed Base';
+      return l.count + ' x ' + name + ' (' + coverLabel(l.cov) + (items.length ? '; ' + items.join('; ') : '') + ')';
+    }).join(' and ');
+  }
+  function openMayaFromCheckout(){
+    var summary = cartSummaryForMaya();
+    covTier = savedItems[0] ? savedItems[0].cov : null;
+    covConvId = covGenId();
+    covKnown = null;
+    chatBody.innerHTML = '';   /* vaciar (sin contenido dinámico); los mensajes entran por chatPush → textContent */
+    var opener = summary
+      ? "Hi, I'm Maya. I see " + summary + " in your cart. Anything else we should know? Other pieces, delivery details, anything about your purchase."
+      : "Hi, I'm Maya. Anything else we should know about your purchase?";
+    chatPush(opener, 'them');
+    chatHistory = [
+      { role: 'user', content: 'I am at checkout' + (summary ? ' with ' + summary + ' in my cart' : '') + ' and want to add some details about my purchase.' },
+      { role: 'assistant', content: opener }
+    ];
+    chatPanel.classList.add('over-cart');
+    if(!chatPanel.classList.contains('open')) chatOpen(); else chatInput.focus();
+  }
+  var cartMayaBtn = document.getElementById('cart-maya-btn');
+  if(cartMayaBtn) cartMayaBtn.addEventListener('click', openMayaFromCheckout);
+  var chatCloseBtn = document.getElementById('chat-close');
+  if(chatCloseBtn) chatCloseBtn.addEventListener('click', chatClose);
 
 
   // "WHAT ARE YOU COVERING?" picker (Sep-2026): chips toggle categories (≥1 stays on), <details> hold the
