@@ -755,6 +755,42 @@ details.faq-item summary:focus-visible{outline:2px solid var(--orange);outline-o
 .terms-body strong{color:var(--ink);font-weight:600}
 .terms-meta{font-size:.875rem !important;color:var(--ink-45) !important}
 
+/* ── COMPARE COVERAGE popup (Sep-2026, Doug): card link → chart of damage × category. Reuses the
+   .terms-modal shell. Desktop: all 6 columns. Phone (≤640px): Mattress | Home Furnishings switch shows
+   only that plan's columns + the rows it covers (data-plan on the table drives both). */
+.cmp-compare{display:block;width:fit-content;background:none;border:0;padding:0;margin:-8px 0 22px;font:inherit;font-weight:600;font-size:.9375rem;color:var(--orange);cursor:pointer;text-decoration:underline;text-decoration-color:var(--orange-soft);text-underline-offset:4px;transition:color var(--t-fast) var(--ease)}
+.cmp-compare:hover{color:var(--orange-hover);text-decoration-color:currentColor}
+.cmp-compare:focus-visible{outline:2px solid var(--orange);outline-offset:3px;border-radius:2px}
+.terms-modal.cov-modal{width:min(94%,860px)}
+.cov-switch{display:none;grid-template-columns:1fr 1fr;gap:6px;background:var(--paper-cool);padding:4px;border-radius:4px;margin:0 0 18px}
+.cov-switch button{border:0;background:none;padding:10px 8px;border-radius:3px;font:inherit;font-weight:600;font-size:.875rem;color:var(--ink-65);cursor:pointer;line-height:1.2}
+.cov-switch button[aria-pressed="true"]{background:var(--paper);color:var(--ink);box-shadow:0 1px 2px rgba(14,20,24,.08)}
+.cov-table{width:100%;border-collapse:collapse;font-size:.875rem;margin:0 0 20px}
+.cov-table th,.cov-table td{border-bottom:1px solid var(--rule);padding:9px 6px;text-align:center;vertical-align:middle}
+.cov-table thead th{font-weight:600;color:var(--ink);font-size:.75rem;line-height:1.25;vertical-align:bottom}
+.cov-table thead tr:first-child th{font-family:var(--display);font-weight:500;font-size:1rem;letter-spacing:-.01em;border-bottom:2px solid var(--rule-strong);padding-bottom:8px}
+.cov-table thead tr:first-child th small{display:block;font-family:var(--body);font-size:.75rem;color:var(--ink-65);font-weight:500;letter-spacing:0;margin-top:2px}
+.cov-table[data-plan="m"] thead th.g-m,.cov-table[data-plan="h"] thead th.g-h{border-bottom-color:var(--orange)}
+.cov-table tbody th{text-align:left;font-weight:500;color:var(--ink-80);padding-left:0}
+.cov-table thead th.cov-dmg{text-align:left;padding-left:0;font-family:var(--display);font-weight:500;font-size:1rem;letter-spacing:-.01em}
+.cov-table thead td.cov-pad{border-bottom:0}
+.cov-table .g-h,.cov-table .c-h.c-first{border-left:1px solid var(--rule)}
+.cov-table .y{color:var(--orange);font-weight:700;font-size:1rem}
+.cov-table .n{color:var(--ink-45)}
+.cov-sr{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap;border:0}
+.terms-body .cov-notes{margin:0;padding:0;list-style:none}
+.terms-body .cov-notes li{font-size:.8125rem;line-height:1.5;color:var(--ink-65);margin:0 0 6px}
+@media (max-width:640px){
+  .terms-modal.cov-modal .terms-head{padding:16px 18px}
+  .terms-modal.cov-modal .terms-body{padding:16px 18px 24px}
+  .cov-switch{display:grid}
+  .cov-table thead tr:first-child{display:none}
+  .cov-table[data-plan="m"] .c-h,.cov-table[data-plan="h"] .c-m{display:none}
+  .cov-table[data-plan="m"] tbody tr:not(.r-m),.cov-table[data-plan="h"] tbody tr:not(.r-h){display:none}
+  .cov-table .c-h.c-first{border-left:0}
+  .cov-table tbody th{font-size:.8125rem}
+}
+
 /* "My dashboard" (variante B, 08-jul): overlay con QR hacia el dashboard del site principal.
    El show/hide va por el atributo [hidden] (regla global display:none!important). */
 .dashqr-backdrop{position:fixed;inset:0;background:rgba(8,23,41,.5);z-index:150;display:flex;align-items:center;justify-content:center;padding:20px}
@@ -1095,8 +1131,9 @@ html.phone #phone-handoff{display:flex;width:100%;min-height:100vh;align-items:c
           <li>Seam separations &amp; loose buttons</li>
           <li>Bed bases: broken mechanism, motor failure, remotes &amp; wires</li>
           <li><strong>$5,000</strong> total coverage</li>
-          <li><strong>Repair Safety Net included</strong> &mdash; member rates on labor, parts, and coordinated repairs; <a href="#membership">learn more</a></li>
+          <li><strong>Repair Safety Net included</strong> &mdash; <a href="#membership">learn more</a></li>
         </ul>
+        <button type="button" class="cmp-compare js-cov-compare" data-plan="m">Compare coverage <span aria-hidden="true">&rarr;</span></button>
 
         <div class="cfg-price">
           <div class="cfg-eq" role="group" aria-label="Mattress &amp; Bed Base plans in your cart">
@@ -1151,8 +1188,9 @@ html.phone #phone-handoff{display:flex;width:100%;min-height:100vh;align-items:c
           <li>Motors, switches &amp; electrical</li>
           <li>Scratches, chips &amp; finish damage</li>
           <li><strong>$5,000</strong> total coverage</li>
-          <li><strong>Repair Safety Net included</strong> &mdash; member rates on labor, parts, and coordinated repairs; <a href="#membership">learn more</a></li>
+          <li><strong>Repair Safety Net included</strong> &mdash; <a href="#membership">learn more</a></li>
         </ul>
+        <button type="button" class="cmp-compare js-cov-compare" data-plan="h">Compare coverage <span aria-hidden="true">&rarr;</span></button>
 
         <div class="cfg-price">
           <div class="cfg-eq" role="group" aria-label="Home Furnishings plans in your cart">
@@ -1682,6 +1720,46 @@ html.phone #phone-handoff{display:flex;width:100%;min-height:100vh;align-items:c
 </div>
 
 <!-- MEMBERSHIP TERMS & CONDITIONS POPUP -->
+<!-- COMPARE COVERAGE POPUP (Sep-2026, Doug) — opened by the "Compare coverage" link on each plan card.
+     Summary of the new plan T&C (FURNRX_SUBSCRIPTION_ALL_GS_2026); /terms/ is the binding text. -->
+<div class="terms-backdrop" id="cov-backdrop" hidden></div>
+<div class="terms-modal cov-modal" id="cov-modal" role="dialog" aria-modal="true" aria-labelledby="cov-title" hidden>
+  <div class="terms-head">
+    <h3 id="cov-title">Compare coverage</h3>
+    <button class="terms-close" id="cov-close" type="button" aria-label="Close">&times;</button>
+  </div>
+  <div class="terms-body">
+    <div class="cov-switch" role="group" aria-label="Show coverage for">
+      <button type="button" data-plan="m" aria-pressed="true">Mattress &amp; Bed Base</button>
+      <button type="button" data-plan="h" aria-pressed="false">Home Furnishings</button>
+    </div>
+    <table class="cov-table" id="cov-table" data-plan="m">
+      <thead>
+        <tr><td class="cov-pad"></td><th class="g-m c-m" colspan="2" scope="colgroup">Mattress &amp; Bed Base<small>$19.99/mo</small></th><th class="g-h c-h" colspan="4" scope="colgroup">Home Furnishings<small>$24.99/mo</small></th></tr>
+        <tr><th class="cov-dmg" scope="col">Damage</th><th class="c-m" scope="col">Mattress</th><th class="c-m" scope="col">Bed base</th><th class="c-h c-first" scope="col">Furniture</th><th class="c-h" scope="col">Outdoor</th><th class="c-h" scope="col">Rugs</th><th class="c-h" scope="col">Lamps &amp; acc.</th></tr>
+      </thead>
+      <tbody>
+        <tr class="r-m r-h"><th scope="row">Stains &amp; dye transfer</th><td class="c-m y"><span aria-hidden="true">&#10003;</span><span class="cov-sr">Covered</span></td><td class="c-m n"><span aria-hidden="true">&ndash;</span><span class="cov-sr">Not covered</span></td><td class="c-h c-first y"><span aria-hidden="true">&#10003;</span><span class="cov-sr">Covered</span></td><td class="c-h y"><span aria-hidden="true">&#10003;</span><span class="cov-sr">Covered</span></td><td class="c-h y"><span aria-hidden="true">&#10003;</span><span class="cov-sr">Covered</span></td><td class="c-h y"><span aria-hidden="true">&#10003;</span><span class="cov-sr">Covered</span></td></tr>
+        <tr class="r-m r-h"><th scope="row">Rips, tears &amp; punctures</th><td class="c-m y"><span aria-hidden="true">&#10003;</span><span class="cov-sr">Covered</span></td><td class="c-m n"><span aria-hidden="true">&ndash;</span><span class="cov-sr">Not covered</span></td><td class="c-h c-first y"><span aria-hidden="true">&#10003;</span><span class="cov-sr">Covered</span></td><td class="c-h y"><span aria-hidden="true">&#10003;</span><span class="cov-sr">Covered</span></td><td class="c-h y"><span aria-hidden="true">&#10003;</span><span class="cov-sr">Covered</span></td><td class="c-h n"><span aria-hidden="true">&ndash;</span><span class="cov-sr">Not covered</span></td></tr>
+        <tr class="r-m r-h"><th scope="row">Burns, heat &amp; singe marks</th><td class="c-m y"><span aria-hidden="true">&#10003;</span><span class="cov-sr">Covered</span></td><td class="c-m n"><span aria-hidden="true">&ndash;</span><span class="cov-sr">Not covered</span></td><td class="c-h c-first y"><span aria-hidden="true">&#10003;</span><span class="cov-sr">Covered</span></td><td class="c-h y"><span aria-hidden="true">&#10003;</span><span class="cov-sr">Covered</span></td><td class="c-h y"><span aria-hidden="true">&#10003;</span><span class="cov-sr">Covered</span></td><td class="c-h n"><span aria-hidden="true">&ndash;</span><span class="cov-sr">Not covered</span></td></tr>
+        <tr class="r-m r-h"><th scope="row">Seams, threads &amp; buttons</th><td class="c-m y"><span aria-hidden="true">&#10003;</span><span class="cov-sr">Covered</span></td><td class="c-m n"><span aria-hidden="true">&ndash;</span><span class="cov-sr">Not covered</span></td><td class="c-h c-first n"><span aria-hidden="true">&ndash;</span><span class="cov-sr">Not covered</span></td><td class="c-h n"><span aria-hidden="true">&ndash;</span><span class="cov-sr">Not covered</span></td><td class="c-h y"><span aria-hidden="true">&#10003;</span><span class="cov-sr">Covered</span></td><td class="c-h n"><span aria-hidden="true">&ndash;</span><span class="cov-sr">Not covered</span></td></tr>
+        <tr class="r-m r-h"><th scope="row">Broken frames &amp; structure</th><td class="c-m n"><span aria-hidden="true">&ndash;</span><span class="cov-sr">Not covered</span></td><td class="c-m y"><span aria-hidden="true">&#10003;</span><span class="cov-sr">Covered</span></td><td class="c-h c-first y"><span aria-hidden="true">&#10003;</span><span class="cov-sr">Covered</span></td><td class="c-h y"><span aria-hidden="true">&#10003;</span><span class="cov-sr">Covered</span></td><td class="c-h n"><span aria-hidden="true">&ndash;</span><span class="cov-sr">Not covered</span></td><td class="c-h y"><span aria-hidden="true">&#10003;</span><span class="cov-sr">Covered</span></td></tr>
+        <tr class="r-m r-h"><th scope="row">Motors, electrical &amp; controls</th><td class="c-m n"><span aria-hidden="true">&ndash;</span><span class="cov-sr">Not covered</span></td><td class="c-m y"><span aria-hidden="true">&#10003;</span><span class="cov-sr">Covered</span></td><td class="c-h c-first y"><span aria-hidden="true">&#10003;</span><span class="cov-sr">Covered</span></td><td class="c-h n"><span aria-hidden="true">&ndash;</span><span class="cov-sr">Not covered</span></td><td class="c-h n"><span aria-hidden="true">&ndash;</span><span class="cov-sr">Not covered</span></td><td class="c-h y"><span aria-hidden="true">&#10003;</span><span class="cov-sr">Covered</span></td></tr>
+        <tr class="r-h"><th scope="row">Scratches, chips &amp; finish</th><td class="c-m n"><span aria-hidden="true">&ndash;</span><span class="cov-sr">Not covered</span></td><td class="c-m n"><span aria-hidden="true">&ndash;</span><span class="cov-sr">Not covered</span></td><td class="c-h c-first y"><span aria-hidden="true">&#10003;</span><span class="cov-sr">Covered</span></td><td class="c-h n"><span aria-hidden="true">&ndash;</span><span class="cov-sr">Not covered</span></td><td class="c-h n"><span aria-hidden="true">&ndash;</span><span class="cov-sr">Not covered</span></td><td class="c-h n"><span aria-hidden="true">&ndash;</span><span class="cov-sr">Not covered</span></td></tr>
+        <tr class="r-h"><th scope="row">Top-grain leather cracking</th><td class="c-m n"><span aria-hidden="true">&ndash;</span><span class="cov-sr">Not covered</span></td><td class="c-m n"><span aria-hidden="true">&ndash;</span><span class="cov-sr">Not covered</span></td><td class="c-h c-first y"><span aria-hidden="true">&#10003;</span><span class="cov-sr">Covered</span></td><td class="c-h n"><span aria-hidden="true">&ndash;</span><span class="cov-sr">Not covered</span></td><td class="c-h n"><span aria-hidden="true">&ndash;</span><span class="cov-sr">Not covered</span></td><td class="c-h n"><span aria-hidden="true">&ndash;</span><span class="cov-sr">Not covered</span></td></tr>
+        <tr class="r-h"><th scope="row">Glass &amp; mirror</th><td class="c-m n"><span aria-hidden="true">&ndash;</span><span class="cov-sr">Not covered</span></td><td class="c-m n"><span aria-hidden="true">&ndash;</span><span class="cov-sr">Not covered</span></td><td class="c-h c-first y"><span aria-hidden="true">&#10003;</span><span class="cov-sr">Covered</span></td><td class="c-h y"><span aria-hidden="true">&#10003;</span><span class="cov-sr">Covered</span></td><td class="c-h n"><span aria-hidden="true">&ndash;</span><span class="cov-sr">Not covered</span></td><td class="c-h n"><span aria-hidden="true">&ndash;</span><span class="cov-sr">Not covered</span></td></tr>
+        <tr class="r-h"><th scope="row">Rust (metal frames)</th><td class="c-m n"><span aria-hidden="true">&ndash;</span><span class="cov-sr">Not covered</span></td><td class="c-m n"><span aria-hidden="true">&ndash;</span><span class="cov-sr">Not covered</span></td><td class="c-h c-first n"><span aria-hidden="true">&ndash;</span><span class="cov-sr">Not covered</span></td><td class="c-h y"><span aria-hidden="true">&#10003;</span><span class="cov-sr">Covered</span></td><td class="c-h n"><span aria-hidden="true">&ndash;</span><span class="cov-sr">Not covered</span></td><td class="c-h n"><span aria-hidden="true">&ndash;</span><span class="cov-sr">Not covered</span></td></tr>
+        <tr class="r-h"><th scope="row">Rug delamination</th><td class="c-m n"><span aria-hidden="true">&ndash;</span><span class="cov-sr">Not covered</span></td><td class="c-m n"><span aria-hidden="true">&ndash;</span><span class="cov-sr">Not covered</span></td><td class="c-h c-first n"><span aria-hidden="true">&ndash;</span><span class="cov-sr">Not covered</span></td><td class="c-h n"><span aria-hidden="true">&ndash;</span><span class="cov-sr">Not covered</span></td><td class="c-h y"><span aria-hidden="true">&#10003;</span><span class="cov-sr">Covered</span></td><td class="c-h n"><span aria-hidden="true">&ndash;</span><span class="cov-sr">Not covered</span></td></tr>
+      </tbody>
+    </table>
+    <ul class="cov-notes">
+      <li>Mattress &amp; Bed Base also covers linen sets, pillow sets and mattress protectors bought with the mattress.</li>
+      <li>Each adjustable bed base needs its own plan &mdash; a split king with two bases needs two plans.</li>
+      <li>A summary only. Coverage is subject to the full <a href="/terms/" target="_blank" rel="noopener" class="js-plan-terms">Terms &amp; Conditions</a>.</li>
+    </ul>
+  </div>
+</div>
+
 <div class="terms-backdrop" id="memterms-backdrop" hidden></div>
 <div class="terms-modal" id="memterms-modal" role="dialog" aria-modal="true" aria-labelledby="memterms-title" hidden>
   <div class="terms-head">
@@ -4358,6 +4436,42 @@ html.phone #phone-handoff{display:flex;width:100%;min-height:100vh;align-items:c
   if(memtermsCloseBtn) memtermsCloseBtn.addEventListener('click', memtermsClose);
   if(memtermsBackdrop) memtermsBackdrop.addEventListener('click', memtermsClose);
   document.addEventListener('keydown', function(e){ if(e.key === 'Escape' && memtermsModal && !memtermsModal.hidden) memtermsClose(); });
+
+  // COMPARE COVERAGE popup (Sep-2026): "Compare coverage" on each plan card. Same open/close shell as the
+  // membership terms popup. data-plan (m = Mattress & Bed Base, h = Home Furnishings) picks the plan the
+  // popup opens on; on phones the switch toggles it (CSS hides the other plan's columns + rows).
+  var covModal = document.getElementById('cov-modal');
+  var covBackdrop = document.getElementById('cov-backdrop');
+  var covCloseBtn = document.getElementById('cov-close');
+  var covTable = document.getElementById('cov-table');
+  var covSwitchBtns = covModal ? covModal.querySelectorAll('.cov-switch button') : [];
+  var covOpener = null;
+  function covSetPlan(p){
+    if(p !== 'h') p = 'm';
+    if(covTable) covTable.setAttribute('data-plan', p);
+    Array.prototype.forEach.call(covSwitchBtns, function(b){ b.setAttribute('aria-pressed', b.getAttribute('data-plan') === p ? 'true' : 'false'); });
+  }
+  function covOpen(e){
+    if(e) e.preventDefault();
+    if(!covModal) return;
+    covOpener = this;
+    covSetPlan(this.getAttribute('data-plan'));
+    covModal.hidden = false; covBackdrop.hidden = false;
+    requestAnimationFrame(function(){ covModal.classList.add('open'); covBackdrop.classList.add('open'); });
+    document.body.style.overflow = 'hidden';
+    setTimeout(function(){ if(covCloseBtn) covCloseBtn.focus(); }, 300);
+  }
+  function covClose(){
+    if(!covModal || covModal.hidden) return;
+    covModal.classList.remove('open'); covBackdrop.classList.remove('open');
+    document.body.style.overflow = (cartPanel && !cartPanel.hidden) ? 'hidden' : '';
+    setTimeout(function(){ covModal.hidden = true; covBackdrop.hidden = true; if(covOpener) covOpener.focus(); }, 280);
+  }
+  Array.prototype.forEach.call(document.querySelectorAll('.js-cov-compare'), function(b){ b.addEventListener('click', covOpen); });
+  Array.prototype.forEach.call(covSwitchBtns, function(b){ b.addEventListener('click', function(){ covSetPlan(b.getAttribute('data-plan')); }); });
+  if(covCloseBtn) covCloseBtn.addEventListener('click', covClose);
+  if(covBackdrop) covBackdrop.addEventListener('click', covClose);
+  document.addEventListener('keydown', function(e){ if(e.key === 'Escape' && covModal && !covModal.hidden) covClose(); });
 
   /* ── PHONE HANDOFF (single-QR, phone side). Runs INSTEAD of the whole kiosk/D2C boot (see the guard near
      the top, which returns early). Self-contained: it only touches #phone-* nodes + the hoisted helpers
