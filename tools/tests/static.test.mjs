@@ -73,7 +73,8 @@ t(/<label for="cart-name">First name and last name<\/label>/.test(kiosk), 'KIOSK
 {
   t(!kiosk.includes('Repair&middot;Net') && !kiosk.includes('Repair·Net'), 'NAMING: 0 Repair·Net en el kiosk');
   t(!src('index.html').includes('Repair&middot;Net'), 'NAMING: 0 Repair·Net en el D2C');
-  t(kiosk.includes('<span class="kicker">FurnitureRx Repair Safety Net</span>'), 'NAMING: kicker de Doug en el kiosk');
+  /* Sep-2026 (Doug): el kicker se quitó con el resto de eyebrows; el nombre sigue visible en el botón. */
+  t(!kiosk.includes('<span class="kicker">') && kiosk.includes('Add Repair Safety Net &middot;'), 'NAMING: sin kicker (Sep-2026); el nombre vive en el botón "Add Repair Safety Net"');
   t(kiosk.includes('Repair Membership Terms &amp; Conditions'), 'NAMING: el bloque LEGAL memterms quedó intacto');
   t(kiosk.includes('>Uncovered Repairs</a>'), 'DOUG-2: item de menú "Uncovered Repairs"');
   t(src('index.html').includes('Repair Safety Net.</em>'), 'NAMING: heading del D2C en Safety Net');
