@@ -979,6 +979,10 @@ details.faq-item summary:focus-visible{outline:2px solid var(--orange);outline-o
   .refer-inner{flex-direction:row;align-items:center;justify-content:space-between;gap:36px}
 }
 @media (min-width:880px){
+  /* Sep-2026 (Doug): en desktop el enlace de dashboard va centrado en la barra blanca,
+     no pegado al carrito. Absoluto sobre .nav-inner: no mueve logo, carrito ni ☰. */
+  .nav-inner{position:relative}
+  .nav-login{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%)}
   .nav-cta{display:flex}   /* DOUG-2: hamburguesa también en desktop — labels más descriptivos (call 06-jul, intencional) */
   .hero-grid{grid-template-columns:1.05fr 1fr;gap:64px;align-items:start}
   .control-grid{grid-template-columns:repeat(4,1fr)}
