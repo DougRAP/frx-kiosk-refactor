@@ -2314,7 +2314,10 @@ html.phone #phone-handoff{display:flex;width:100%;min-height:100vh;align-items:c
       entries.forEach(function(e){
         if(e.isIntersecting){ e.target.classList.add('in-view'); io.unobserve(e.target); }
       });
-    }, { threshold: 0.12, rootMargin: '0px 0px -40px 0px' });
+    /* threshold 0, NO 0.12 (Doug 24-sep): el .compare-grid apilado mide ~2000px en el phone, así que
+       el 12% de su área nunca cabe en una pantalla corta — a 360x640 las cards se quedaban invisibles
+       hasta hacer scroll. Con 0 basta con que asome: el rootMargin sigue dando el pequeño retraso. */
+    }, { threshold: 0, rootMargin: '0px 0px -40px 0px' });
     document.querySelectorAll('.reveal').forEach(function(el){ io.observe(el); });
   } else {
     document.querySelectorAll('.reveal').forEach(function(el){ el.classList.add('in-view'); });
