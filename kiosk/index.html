@@ -940,8 +940,13 @@ details.faq-item summary:focus-visible{outline:2px solid var(--orange);outline-o
    <details> checklists = optional items. Informative only (SKU-not-Type): travels to checkout as types/items. */
 .cov-pick{margin:0 0 14px}
 .cov-pick-q{margin:0 0 8px;font-size:.8125rem;font-weight:600;color:var(--ink)}
-.cov-chips{display:flex;flex-wrap:wrap;gap:8px}
-.cov-chip{min-height:38px;padding:8px 14px;border:1px solid var(--rule-strong);border-radius:999px;background:var(--paper);font:inherit;font-size:.875rem;font-weight:500;color:var(--ink-80);cursor:pointer;line-height:1.2;transition:background var(--t-fast) var(--ease),border-color var(--t-fast) var(--ease),color var(--t-fast) var(--ease)}
+/* Sep-2026 (Doug): todos los botones del mismo tamaño y repartidos por la card — grid, no flex. */
+/* Columnas por ancho REAL de la card: ningún label puede partir en dos líneas, o una card
+   acabaría con botones más altos que la otra. 1 col en phone, 2 en tablet, 3 en desktop. */
+.cov-chips{display:grid;grid-template-columns:minmax(0,1fr);gap:8px}
+@media (min-width:880px){.cov-chips{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media (min-width:1200px){.cov-chips{grid-template-columns:repeat(3,minmax(0,1fr))}}
+.cov-chip{min-height:38px;padding:8px 10px;display:flex;align-items:center;justify-content:center;text-align:center;border:1px solid var(--rule-strong);border-radius:999px;background:var(--paper);font:inherit;font-size:.875rem;font-weight:500;color:var(--ink-80);cursor:pointer;line-height:1.2;transition:background var(--t-fast) var(--ease),border-color var(--t-fast) var(--ease),color var(--t-fast) var(--ease)}
 .cov-chip:hover{border-color:var(--orange)}
 .cov-chip[aria-pressed="true"]{background:var(--orange-soft);border-color:var(--orange);color:var(--ink);font-weight:600}
 .cov-chip[aria-pressed="true"]::before{content:"\2713\00a0";color:var(--orange)}
@@ -1183,8 +1188,9 @@ html.phone #phone-handoff{display:flex;width:100%;min-height:100vh;align-items:c
         <div class="cov-pick" data-cov="stain">
           <p class="cov-pick-q" id="cov-pick-q-stain"><span class="cov-pick-n" aria-hidden="true">1.</span>Start here — pick all that apply</p>
           <div class="cov-chips" role="group" aria-labelledby="cov-pick-q-stain">
-            <button type="button" class="cov-chip" data-type="mattress" aria-pressed="true">Mattress / box spring</button>
+            <button type="button" class="cov-chip" data-type="mattress" aria-pressed="true">Mattress</button>
             <button type="button" class="cov-chip" data-type="adjbed" aria-pressed="false">Adjustable bed</button>
+            <button type="button" class="cov-chip" data-extra="comfort" aria-pressed="false">Comfort Guarantee</button>
           </div>
         </div>
 
@@ -2410,7 +2416,7 @@ html.phone #phone-handoff{display:flex;width:100%;min-height:100vh;align-items:c
         var got = src.items && Array.isArray(src.items[cat]) ? src.items[cat] : [];
         items[cat] = got.filter(function(n, i, a){ return COVER_ITEMS[cat].indexOf(n) !== -1 && a.indexOf(n) === i; });
       });
-      out[cov] = { types: types, items: items };
+      out[cov] = { types: types, items: items, comfort: src.comfort === true };
     });
     return out;
   }
@@ -4566,7 +4572,10 @@ html.phone #phone-handoff{display:flex;width:100%;min-height:100vh;align-items:c
     }
     function sync(){
       var p = coverPick[cov];
-      Array.prototype.forEach.call(chips, function(ch){ ch.setAttribute('aria-pressed', p.types.indexOf(ch.getAttribute('data-type')) !== -1 ? 'true' : 'false'); });
+      Array.prototype.forEach.call(chips, function(ch){
+        var ex = ch.getAttribute('data-extra');
+        ch.setAttribute('aria-pressed', (ex ? p[ex] === true : p.types.indexOf(ch.getAttribute('data-type')) !== -1) ? 'true' : 'false');
+      });
       Array.prototype.forEach.call(lists, function(d){
         var cat = d.getAttribute('data-cat'), n = (p.items[cat] || []).length;
         d.hidden = p.types.indexOf(cat) === -1;
@@ -4591,6 +4600,8 @@ html.phone #phone-handoff{display:flex;width:100%;min-height:100vh;align-items:c
     });
     Array.prototype.forEach.call(chips, function(ch){
       ch.addEventListener('click', function(){
+        var ex = ch.getAttribute('data-extra');
+        if(ex){ coverPick[cov][ex] = !coverPick[cov][ex]; persistCoverPick(); sync(); return; }   /* extra (Comfort Guarantee): no es categoría */
         var t = ch.getAttribute('data-type'), types = coverPick[cov].types, i = types.indexOf(t);
         if(i === -1) types.push(t);
         else if(types.length > 1) types.splice(i, 1);
