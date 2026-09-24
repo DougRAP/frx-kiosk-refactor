@@ -946,10 +946,12 @@ details.faq-item summary:focus-visible{outline:2px solid var(--orange);outline-o
 .cov-chips{display:grid;grid-template-columns:minmax(0,1fr);gap:8px}
 @media (min-width:880px){.cov-chips{grid-template-columns:repeat(2,minmax(0,1fr))}}
 @media (min-width:1200px){.cov-chips{grid-template-columns:repeat(3,minmax(0,1fr))}}
-.cov-chip{min-height:38px;padding:8px 10px;display:flex;align-items:center;justify-content:center;text-align:center;border:1px solid var(--rule-strong);border-radius:999px;background:var(--paper);font:inherit;font-size:.875rem;font-weight:500;color:var(--ink-80);cursor:pointer;line-height:1.2;transition:background var(--t-fast) var(--ease),border-color var(--t-fast) var(--ease),color var(--t-fast) var(--ease)}
+.cov-chip{min-height:38px;padding:8px 8px;white-space:nowrap;display:flex;align-items:center;justify-content:center;text-align:center;border:1px solid var(--rule-strong);border-radius:999px;background:var(--paper);font:inherit;font-size:.8125rem;font-weight:500;color:var(--ink-80);cursor:pointer;line-height:1.2;transition:background var(--t-fast) var(--ease),border-color var(--t-fast) var(--ease),color var(--t-fast) var(--ease)}
 .cov-chip:hover{border-color:var(--orange)}
 .cov-chip[aria-pressed="true"]{background:var(--orange-soft);border-color:var(--orange);color:var(--ink);font-weight:600}
-.cov-chip[aria-pressed="true"]::before{content:"\2713\00a0";color:var(--orange)}
+/* el hueco del tick se reserva en los DOS estados: si aparece al pulsar, el label se parte en dos líneas */
+.cov-chip::before{content:"✓";margin-right:4px;color:transparent}
+.cov-chip[aria-pressed="true"]::before{color:var(--orange)}
 .cov-chip:focus-visible{outline:2px solid var(--orange);outline-offset:2px}
 .cov-items{margin-top:10px}
 .cov-items summary{cursor:pointer;font-size:.8125rem;font-weight:600;color:var(--ink-65);padding:2px 0;width:fit-content}
@@ -1188,7 +1190,7 @@ html.phone #phone-handoff{display:flex;width:100%;min-height:100vh;align-items:c
         <div class="cov-pick" data-cov="stain">
           <p class="cov-pick-q" id="cov-pick-q-stain"><span class="cov-pick-n" aria-hidden="true">1.</span>Start here — pick all that apply</p>
           <div class="cov-chips" role="group" aria-labelledby="cov-pick-q-stain">
-            <button type="button" class="cov-chip" data-type="mattress" aria-pressed="true">Mattress</button>
+            <button type="button" class="cov-chip" data-type="mattress" aria-pressed="false">Mattress</button>
             <button type="button" class="cov-chip" data-type="adjbed" aria-pressed="false">Adjustable bed</button>
             <button type="button" class="cov-chip" data-extra="comfort" aria-pressed="false">Comfort Guarantee</button>
           </div>
@@ -1248,7 +1250,7 @@ html.phone #phone-handoff{display:flex;width:100%;min-height:100vh;align-items:c
         <div class="cov-pick" data-cov="stain-mech">
           <p class="cov-pick-q" id="cov-pick-q-mech"><span class="cov-pick-n" aria-hidden="true">1.</span>Start here — pick all that apply</p>
           <div class="cov-chips" role="group" aria-labelledby="cov-pick-q-mech">
-            <button type="button" class="cov-chip" data-type="furniture" aria-pressed="true">Furniture</button>
+            <button type="button" class="cov-chip" data-type="furniture" aria-pressed="false">Furniture</button>
             <button type="button" class="cov-chip" data-type="outdoor" aria-pressed="false">Outdoor</button>
             <button type="button" class="cov-chip" data-type="rugs" aria-pressed="false">Area rug</button>
           </div>
@@ -2409,7 +2411,6 @@ html.phone #phone-handoff{display:flex;width:100%;min-height:100vh;align-items:c
     Object.keys(COVER_CATS).forEach(function(cov){
       var src = raw && typeof raw === 'object' && raw[cov] && typeof raw[cov] === 'object' ? raw[cov] : {};
       var types = Array.isArray(src.types) ? src.types.filter(function(t, i, a){ return COVER_CATS[cov].indexOf(t) !== -1 && a.indexOf(t) === i; }) : [];
-      if(!types.length) types = [COVER_CATS[cov][0]];
       var items = {};
       Object.keys(COVER_ITEMS).forEach(function(cat){
         if(COVER_CATS[cov].indexOf(cat) === -1) return;
@@ -2421,7 +2422,9 @@ html.phone #phone-handoff{display:flex;width:100%;min-height:100vh;align-items:c
     return out;
   }
   function persistCoverPick(){ try { localStorage.setItem(COVER_KEY, JSON.stringify(coverPick)); } catch(_){} }
-  function coverType(cov){ return (coverPick[cov] && coverPick[cov].types[0]) || COVER_CATS[cov][0]; }   /* server's single `type` */
+  /* server's single `type`. Sin chips encendidos cae a la categoría natural de la card (mattress /
+     furniture): el checkout exige un type (CA-4) y el cliente no debe chocar con eso por no elegir. */
+  function coverType(cov){ return (coverPick[cov] && coverPick[cov].types[0]) || COVER_CATS[cov][0]; }
   function coverLabel(cov){ return coverPick[cov] ? coverPick[cov].types.map(function(t){ return COVER_NAMES[t]; }).join(' + ') : ''; }
   /* Checkout payload extras: full category list (+ 'lighting' when Lamps & Accessories is checked) and items. */
   function coverPayload(cov){
@@ -4531,7 +4534,7 @@ html.phone #phone-handoff{display:flex;width:100%;min-height:100vh;align-items:c
         if(p.types.indexOf(cat) !== -1 && p.items[cat].length) items.push(COVER_NAMES[cat] + ': ' + p.items[cat].join(', '));
       });
       var name = l.cov === 'stain-mech' ? 'Home Furnishings' : 'Mattress & Bed Base';
-      return l.count + ' x ' + name + ' (' + coverLabel(l.cov) + (items.length ? '; ' + items.join('; ') : '') + ')';
+      return l.count + ' x ' + name + ' (' + (coverLabel(l.cov) || 'category not specified') + (items.length ? '; ' + items.join('; ') : '') + ')';
     }).join(' and ');
   }
   function openMayaFromCheckout(){
@@ -4603,9 +4606,7 @@ html.phone #phone-handoff{display:flex;width:100%;min-height:100vh;align-items:c
         var ex = ch.getAttribute('data-extra');
         if(ex){ coverPick[cov][ex] = !coverPick[cov][ex]; persistCoverPick(); sync(); return; }   /* extra (Comfort Guarantee): no es categoría */
         var t = ch.getAttribute('data-type'), types = coverPick[cov].types, i = types.indexOf(t);
-        if(i === -1) types.push(t);
-        else if(types.length > 1) types.splice(i, 1);
-        else return;   /* keep ≥1 category: the plan always covers something */
+        if(i === -1) types.push(t); else types.splice(i, 1);   /* Doug 24-sep: cualquier chip se apaga, incluido el último */
         persistCoverPick(); sync(); syncLine();
       });
     });
