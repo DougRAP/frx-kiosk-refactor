@@ -414,7 +414,19 @@ em.gold{font-style:normal;color:var(--gold);font-weight:700}
 .compare-header{max-width:1040px;margin-bottom:clamp(20px,2.4vw,32px)}
 .compare-header .lead{max-width:640px}
 /* Subheading del H2 (Doug, Sep-2026): claramente secundario al título (~½ de su tamaño) pero sin esconderse. */
-.compare-sub{margin:12px 0 0;font-size:clamp(1.25rem,2.1vw,1.75rem);line-height:1.3;font-weight:500;letter-spacing:-.01em;color:var(--ink-65)}
+/* Sep-2026 (Doug): subhead normal — antes era grande y pálido y "se desvanecía". Lleva el rating. */
+.compare-sub{margin:14px 0 0;font-size:1.0625rem;line-height:1.5;font-weight:500;color:var(--ink-80)}
+.compare-sub .sub-rate{white-space:nowrap}
+.compare-sub .sub-star{color:var(--gold)}
+/* H1 rotatorio (Doug 24-sep): 4 escenas + "It’s covered." fijo en naranja. La caja se reserva a
+   2 líneas para que las cards NO se muevan al cambiar de escena (cero CLS). */
+.hero-title{font-size:clamp(2rem,6vw,4rem);line-height:1.1;min-height:2.2em}
+.hero-rotator{display:inline}
+.hero-rotator__scene{display:inline-block;transition:opacity .3s var(--ease),transform .3s var(--ease)}
+.hero-rotator__scene.is-leaving{opacity:0;transform:translateY(-.25em)}
+.hero-rotator__scene.is-entering{opacity:0;transform:translateY(.25em)}
+.hero-covered{color:var(--orange);white-space:nowrap}
+@media (prefers-reduced-motion:reduce){.hero-rotator__scene{transition:none}}
 /* DASH-5: puerta de recaptura al dashboard del cliente (Doug 24-jun: "login to your dashboard") */
 .dash-login{margin:0 0 14px;font-size:.9rem}
 .dash-login a{color:var(--orange);font-weight:600;text-decoration:none;border-bottom:1px solid currentColor}
@@ -1150,8 +1162,12 @@ html.phone #phone-handoff{display:flex;width:100%;min-height:100vh;align-items:c
 <section class="compare" id="compare" aria-label="Comparison">
   <div class="container">
     <div class="compare-header reveal">
-      <h2 class="h-section">Furniture, Mattresses &amp; Adj. Beds<br><em class="accent">From $19.99/Month</em></h2>
-      <p class="compare-sub">Pause or Cancel at Anytime</p>
+      <h1 class="h-section hero-title">
+        <span class="cov-sr">Red wine, taco night, pets, parties? It’s covered.</span>
+        <span class="hero-rotator" aria-hidden="true"><span class="hero-rotator__scene" id="hero-scene">Red wine on the new couch?</span></span>
+        <span class="hero-covered" aria-hidden="true">It’s covered.</span>
+      </h1>
+      <p class="compare-sub">File mid-spill, 24/7. Fast claims. <span class="sub-rate"><span class="sub-star" aria-hidden="true">★</span> 4.5 on Google &middot; Trusted by millions</span></p>
     </div>
 
     <div class="compare-grid reveal">
@@ -4830,6 +4846,54 @@ html.phone #phone-handoff{display:flex;width:100%;min-height:100vh;align-items:c
     if(elRetry) elRetry.addEventListener('click', load);
     load();
   }
+
+
+  /* ============================================================
+     HERO ROTATOR (Doug 24-sep) — 4 escenas + "It’s covered." fijo en naranja.
+     Doug quería: la tablet de tienda gira, el phone/desktop da una vuelta y para.
+     NO se puede leer de html.kiosk: este front lleva class="kiosk" horneada en el
+     <html> SIEMPRE, así que no distingue tablet de teléfono. Señal usada en su lugar:
+     la INTERACCIÓN. Nadie toca (tablet en el mostrador esperando cliente) → sigue
+     girando; en cuanto hay scroll/tap/tecla (el cliente ya está leyendo) vuelve a la
+     escena 1 y se detiene. Mismo efecto en los tres dispositivos, sin adivinar cuál es.
+     · prefers-reduced-motion → estático, sin timers.
+     · pestaña oculta → pausa; al volver, sigue.
+     Sin librerías. La escena 1 viene en el HTML: nunca hay titular vacío.
+     ============================================================ */
+  (function(){
+    var el = document.getElementById('hero-scene');
+    if(!el) return;
+    var SCENES = ['Red wine on the new couch?','Taco night gone wrong?','The dog found the sofa?','Housewarming got wild?'];
+    var DWELL = 1600, FADE = 300;
+    if(window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+    var i = 0, t = null, stopping = false, dead = false;
+
+    function clear(){ if(t){ clearTimeout(t); t = null; } }
+    function schedule(){ clear(); if(!dead) t = setTimeout(step, DWELL); }
+
+    function step(){
+      if(dead) return;
+      i = i + 1;
+      if(i >= SCENES.length || stopping){ i = 0; if(stopping) dead = true; }   /* vuelve a la 1 */
+      el.classList.add('is-leaving');
+      setTimeout(function(){
+        el.textContent = SCENES[i];
+        el.classList.remove('is-leaving');
+        el.classList.add('is-entering');
+        requestAnimationFrame(function(){ requestAnimationFrame(function(){ el.classList.remove('is-entering'); }); });
+        schedule();
+      }, FADE);
+    }
+
+    function engaged(){ stopping = true; }
+    ['scroll','pointerdown','keydown'].forEach(function(ev){
+      window.addEventListener(ev, engaged, { once:true, passive:true });
+    });
+    document.addEventListener('visibilitychange', function(){
+      if(document.visibilityState === 'hidden') clear(); else schedule();
+    });
+    schedule();
+  })();
 
 })();
 </script>
