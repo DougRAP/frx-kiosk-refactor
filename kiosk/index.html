@@ -422,7 +422,7 @@ em.gold{font-style:normal;color:var(--gold);font-weight:700}
    2 líneas para que las cards NO se muevan al cambiar de escena (cero CLS). */
 .hero-title{font-size:clamp(2rem,6vw,4rem);line-height:1.1;min-height:2.2em}
 .hero-rotator{display:inline}
-.hero-rotator__scene{display:inline-block;transition:opacity .3s var(--ease),transform .3s var(--ease)}
+.hero-rotator__scene{display:inline-block;transition:opacity .35s var(--ease),transform .35s var(--ease)}
 .hero-rotator__scene.is-leaving{opacity:0;transform:translateY(-.25em)}
 .hero-rotator__scene.is-entering{opacity:0;transform:translateY(.25em)}
 .hero-covered{color:var(--orange);white-space:nowrap}
@@ -4864,7 +4864,7 @@ html.phone #phone-handoff{display:flex;width:100%;min-height:100vh;align-items:c
     var el = document.getElementById('hero-scene');
     if(!el) return;
     var SCENES = ['Red wine on the new couch?','Taco night gone wrong?','The dog found the sofa?','Housewarming got wild?'];
-    var DWELL = 1600, FADE = 300;
+    var DWELL = 2400, FADE = 350;   /* Doug 24-sep: iba demasiado rápido — vuelta completa ~11s */
     if(window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
     var i = 0, t = null, stopping = false, dead = false;
 
