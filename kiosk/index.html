@@ -168,6 +168,8 @@ em.gold{font-style:normal;color:var(--gold);font-weight:700}
 /* Sep-2026 (Doug): frase larga en desktop/tablet, corta en el phone (<=480px) */
 .utility .u-short{display:none}
 .utility .u-br{display:none}
+/* Sep-2026 (Doug): en desktop/tablet las dos frases pesan igual — el <strong> sólo marca el phone */
+@media (min-width:481px){.utility{color:#fff;font-weight:500}.utility strong{font-weight:inherit;color:inherit}}
 @media (max-width:480px){.utility .u-long{display:none}.utility .u-short{display:inline}.utility .dot{display:none}.utility .u-br{display:block}}
 
 .nav{position:sticky;top:0;z-index:50;background:rgba(255,255,255,.94);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);border-bottom:1px solid transparent;padding:18px 0;transition:padding var(--t-med) var(--ease),border-color var(--t-med) var(--ease),box-shadow var(--t-med) var(--ease)}
