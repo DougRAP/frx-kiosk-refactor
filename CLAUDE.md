@@ -29,6 +29,59 @@ a front-end. Only the D2C goes through `scripts/build.mjs`.
 Sep-2026): styling changes to `kiosk/index.html` + the new plan T&C at `kiosk/terms/index.html`,
 previewed on a separate Netlify site, then handed to Adrian (dev) to make it work end-to-end.
 
+## Kiosk refactor, Sep-2026 (Doug) — decisions already made, do NOT change without asking Doug
+
+Work lives in `kiosk/index.html` + `kiosk/terms/index.html` only (plus the same terms copied to
+`terms/Furniture-Rx-Protection-Plan-Terms.html`). Previewed on its own Netlify site (base dir `kiosk`,
+no build, publish `kiosk/`). It is a **front-end preview**: nothing server-side was changed.
+
+**Decided and shipped** (see `git log` from `8509573` on for the detail of each):
+- **Terms**: one T&C for all plans, form `FURNRX_SUBSCRIPTION_ALL_GS_2026`, plain HTML on the kiosk tokens,
+  no JS. Served at `/terms/`. Legal text is verbatim — never edit wording without Doug.
+- **Plan cards**: left = **Mattress & Bed Base $19.99/mo** (key `stain`), right = **Home Furnishings
+  $24.99/mo** (key `stain-mech`). Internal keys unchanged on purpose. One Subscription covers every
+  category of its card; the $5,000 retail limit controls risk (Doug rejected per-category pricing).
+- **Card content**: "Covers …" line under the price, summary bullets, "Repair Safety Net included —
+  learn more", "Compare coverage →" link. Removed: "Monthly plan" tag, "We repair first", "24/7 claim filing".
+- **Size rule**: plan cards must not get taller than the original 877px (desktop). Currently 874px with
+  the item lists closed. Drop optional lines before growing the cards.
+- **"Compare coverage" popup**: 11 damage rows × 6 categories, reuses the `.terms-modal` shell. Phones:
+  Mattress | Home Furnishings switch. Built from a summary of the T&C (2 footnotes + link to /terms/).
+- **"What are you covering?" picker** replaced the Maya box on the cards: chips (≥1 always on, first one
+  preselected) + optional `<details>` item checklists for Furniture (12 items) and Outdoor (9). **Never
+  changes price.** State in `localStorage['furnfx_cover']`. Chip keys = server `PIECE_TYPES`.
+- **Maya**: off the cards. Floating bubble kept (general Q&A). Checkout has "Anything else we should know?
+  Tell Maya →" which opens a new coverage conversation seeded with the cart; chat sits above the checkout
+  (z 130) and has its own ×.
+- **Plans heading**: "Protect Your New Furniture or Mattress<br>*Starting at $19.99/Month*"; subheading
+  `.compare-sub` "Cancel, pause or upgrade anytime." (Doug: restart in the T&C = pause; keep the wording).
+  Below the cards: "Please read terms & conditions" → `/terms/`. The old eligibility fine print was removed.
+- **Page**: all eyebrows / eyebrow-style labels removed; dashboard login moved to the header
+  (`.nav-login`, "Log in" on phones); section spacing tightened (`--sp-section` 40–64px); mobile overflow
+  fixed at 360–414px (grid `minmax(0,1fr)`).
+- **Kept**: every Repair Safety Net / membership **$19.99** price (different product from the plans).
+
+**For Adrian (not done — front-end only so far):**
+- Server still charges $9.99 / $19.99 (`_lib/validate.mjs` `PRICE_CENTS`, Stripe price IDs). Kiosk shows
+  $19.99 / $24.99. `GIFT_CENTS` in the kiosk is a display mirror only.
+- Checkout `plans[]` now also sends `types` (all picked categories, + `lighting` when Lamps is checked) and
+  `items` (per category). The server ignores them today; it still reads the single `type` (= first chip).
+- Add the kiosk preview origin to `ALLOWED_ORIGINS` if checkout should work there. The kiosk proxies
+  `/api/*` to the LIVE backend (`kiosk/netlify.toml`).
+
+**Open, for the fine-tuning pass (ask Doug before doing):**
+- Item lists: keep the checkbox checklist or switch to small chips (Doug unsure).
+- Checkout fine print still says "within the last 60 days"; the new T&C say within 30 days of delivery.
+- `#kits` Checkout button is cut off ~50px at 768px (tablet), pre-existing.
+- 320px (2016 iPhone SE) still overflows (Save/Checkout pair, header) — Doug declined that fix.
+- Plan cards order (Mattress left) vs heading order ("Furniture or Mattress") — offered, not decided.
+- `tools/tests/static.test.mjs` crashes at the end reading `dist/kiosk/index.html` (pre-existing: the
+  build stopped emitting it). All its assertions before that line pass.
+
+**Workflow used**: edit → headless Chrome check (`playwright-core`, `channel:'chrome'`) at 1440/768/390/360
+→ `npm run gate` (must be GREEN) + `node tools/tests/kiosk-dom.test.mjs` → commit → push (Netlify redeploys).
+Plan with Doug first, no code until he agrees.
+
 ## Layout
 
 ```
