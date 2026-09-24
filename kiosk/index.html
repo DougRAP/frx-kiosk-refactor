@@ -60,10 +60,10 @@
   --paper:        #ffffff;
   --paper-cool:   #f3f5f8;
   --paper-cool2:  #eaeef3;
-  --ink:          #0e1418;
-  --ink-80:       rgba(14,20,24,.82);
-  --ink-65:       rgba(14,20,24,.65);
-  --ink-45:       rgba(14,20,24,.45);
+  --ink:          #243240;
+  --ink-80:       rgba(36,50,64,.82);
+  --ink-65:       rgba(36,50,64,.65);
+  --ink-45:       rgba(36,50,64,.45);
   --navy-deep:    #081729;
   --navy-wash:    #eef2f7;
   --orange:       #d4541e;
@@ -114,7 +114,7 @@ button{font:inherit;cursor:pointer}
 .eyebrow-orange{color:var(--orange)}
 
 .h-display{font-size:clamp(2.6rem,6.5vw,5.5rem);line-height:.98;letter-spacing:-.03em;font-weight:500}
-.h-section{font-size:clamp(2rem,4.5vw,3.5rem);line-height:1.02;letter-spacing:-.025em}
+.h-section{font-size:clamp(2rem,4.5vw,3.5rem);font-weight:500;line-height:1.1;letter-spacing:-.012em}
 .h-block{font-size:clamp(1.4rem,2.5vw,1.875rem);line-height:1.1}
 .lead{font-size:clamp(1.05rem,1.5vw,1.2rem);line-height:1.55;color:var(--ink-65)}
 
@@ -408,7 +408,7 @@ em.gold{font-style:normal;color:var(--gold);font-weight:700}
 .compare-header{max-width:1040px;margin-bottom:clamp(20px,2.4vw,32px)}
 .compare-header .lead{max-width:640px}
 /* Subheading del H2 (Doug, Sep-2026): claramente secundario al título (~½ de su tamaño) pero sin esconderse. */
-.compare-sub{margin:12px 0 0;font-size:clamp(1.25rem,2.1vw,1.75rem);line-height:1.3;font-weight:600;letter-spacing:-.01em;color:var(--ink-80)}
+.compare-sub{margin:12px 0 0;font-size:clamp(1.25rem,2.1vw,1.75rem);line-height:1.3;font-weight:500;letter-spacing:-.01em;color:var(--ink-65)}
 /* DASH-5: puerta de recaptura al dashboard del cliente (Doug 24-jun: "login to your dashboard") */
 .dash-login{margin:0 0 14px;font-size:.9rem}
 .dash-login a{color:var(--orange);font-weight:600;text-decoration:none;border-bottom:1px solid currentColor}
@@ -421,7 +421,7 @@ em.gold{font-style:normal;color:var(--gold);font-weight:700}
 .compare-col.ours::after{content:"YOUR BUILD";position:absolute;top:-12px;left:24px;background:var(--orange);color:#fff;font-size:.6875rem;letter-spacing:.16em;font-weight:700;padding:5px 12px;border-radius:2px;font-family:var(--body)}
 .compare-tag{font-size:.75rem;font-weight:600;letter-spacing:.14em;text-transform:uppercase;color:var(--ink-45);margin-bottom:12px;font-family:var(--body)}
 .compare-col.ours .compare-tag{color:var(--orange)}
-.compare-col h3{font-family:var(--display);font-weight:600;font-size:1.625rem;margin-bottom:10px;letter-spacing:-.02em}
+.compare-col h3{font-family:var(--display);font-weight:500;font-size:1.625rem;margin-bottom:10px;letter-spacing:-.008em}
 .compare-col .upfront{font-family:var(--display);font-weight:600;font-size:2.5rem;line-height:1;color:var(--ink);letter-spacing:-.025em;margin-bottom:18px}
 .compare-col .upfront small{font-size:.875rem;color:var(--ink-65);font-weight:400;font-family:var(--body)}
 
