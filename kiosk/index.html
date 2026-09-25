@@ -142,6 +142,10 @@ em.gold{font-style:normal;color:var(--gold);font-weight:700}
 .btn-ink:hover{background:var(--orange);border-color:var(--orange)}
 
 .btn-ghost{background:transparent;color:var(--ink);border-color:var(--ink)}
+/* Sep-2026 (Doug): el 95% compra un solo plan; Checkout no puede parecer el botón secundario.
+   Mismo sitio y mismo orden de siempre; sólido en navy para que pese como "Save to cart". */
+.btn-navy{background:var(--navy-deep);color:#fff;border-color:var(--navy-deep)}
+.btn-navy:hover{background:#0d2440;border-color:#0d2440}
 .btn-ghost:hover{background:var(--ink);color:#fff}
 
 .btn-quiet{background:transparent;color:var(--ink-65);border-color:var(--rule-strong)}
@@ -376,7 +380,7 @@ em.gold{font-style:normal;color:var(--gold);font-weight:700}
 .cfg-toggle button.active{background:var(--paper);color:var(--ink);box-shadow:0 1px 2px rgba(0,0,0,.05),0 0 0 1px var(--ink) inset}
 .cfg-toggle button.active .price{color:var(--ink-65)}
 
-.cfg-price{margin-top:24px;padding:14px 0 0;border-top:1px solid var(--rule);display:flex;flex-direction:column;align-items:stretch;gap:10px}
+.cfg-price{margin-top:24px;padding:10px 0 0;border-top:1px solid var(--rule);display:flex;flex-direction:column;align-items:stretch;gap:10px}
 
 .cfg-actions{margin-top:18px;display:flex;flex-direction:column;gap:8px}
 .cfg-note{font-size:.75rem;color:var(--ink-45);text-align:center;margin-top:4px;line-height:1.6}
@@ -443,10 +447,11 @@ em.gold{font-style:normal;color:var(--gold);font-weight:700}
 .compare-col .upfront{font-family:var(--display);font-weight:600;font-size:2.5rem;line-height:1;color:var(--ink);letter-spacing:-.025em;margin-bottom:4px}
 /* Sep-2026 (Doug): sin plan anual, "/month" ES el producto — deja de ser letra chica. */
 .compare-col .upfront small{font-size:1.1875rem;color:var(--ink-80);font-weight:600;font-family:var(--body);margin-left:2px}
-.compare-col .upfront-note{margin:2px 0 16px;font-size:.9375rem;font-weight:600;color:var(--orange)}
+.compare-col .upfront-note{margin:2px 0 10px;font-size:.9375rem;font-weight:600;color:var(--orange)}
 .cov-pick-n,.cfg-step-n{color:var(--orange);font-weight:700;margin-right:5px}
-.cfg-step{margin:0 0 2px;font-size:.8125rem;font-weight:600;color:var(--ink)}
-.cfg-step-note{margin:0 0 10px;font-size:.8125rem;color:var(--ink-80)}
+.cfg-step{margin:0 0 2px;line-height:1.3;font-size:.8125rem;font-weight:600;color:var(--ink)}
+.cfg-step-cta{margin-top:4px}
+.cfg-step-note{margin:0 0 8px;font-size:.8125rem;color:var(--ink-80)}
 
 .compare-list{list-style:none;padding:0;margin:0 0 24px;display:flex;flex-direction:column;gap:10px}
 .compare-list li{font-size:.9rem;color:var(--ink-80);padding-left:22px;position:relative;line-height:1.5}
@@ -469,7 +474,7 @@ em.gold{font-style:normal;color:var(--gold);font-weight:700}
 .compare-col .cfg-price{margin-top:auto}
 /* Feature list + tagline folded down from the removed #plans cards (orange check bullets). */
 .cmp-for{font-size:.875rem;color:var(--ink-65);margin:0 0 18px}
-.cmp-features{list-style:none;padding:0;margin:0 0 14px;display:flex;flex-direction:column;gap:10px}
+.cmp-features{list-style:none;padding:0;margin:0 0 10px;display:flex;flex-direction:column;gap:10px}
 .cmp-features li{font-size:.9rem;color:var(--ink-80);padding-left:24px;position:relative;line-height:1.5}
 .cmp-features li strong{font-weight:600;color:var(--ink)}
 .cmp-features li::before{content:"";position:absolute;left:0;top:6px;width:13px;height:7px;border-left:2px solid var(--orange);border-bottom:2px solid var(--orange);transform:rotate(-45deg)}
@@ -939,7 +944,7 @@ details.faq-item summary:focus-visible{outline:2px solid var(--orange);outline-o
 /* "What are you covering?" picker (Doug, Sep-2026) — replaces the Maya box on the plan cards. Chips =
    categories (≥1 always on; price does NOT change — one Subscription covers every category of its card);
    <details> checklists = optional items. Informative only (SKU-not-Type): travels to checkout as types/items. */
-.cov-pick{margin:0 0 14px}
+.cov-pick{margin:0 0 10px}
 .cov-pick-q{margin:0 0 8px;font-size:.8125rem;font-weight:600;color:var(--ink)}
 /* Sep-2026 (Doug): todos los botones del mismo tamaño y repartidos por la card — grid, no flex. */
 /* Columnas por ancho REAL de la card: ningún label puede partir en dos líneas, o una card
@@ -1231,9 +1236,10 @@ html.phone #phone-handoff{display:flex;width:100%;min-height:100vh;align-items:c
             </span>
           </div>
         </div>
+        <p class="cfg-step cfg-step-cta"><span class="cfg-step-n" aria-hidden="true">3.</span>Save to cart, then check out — about a minute</p>
         <div class="cfg-cta-row cmp-cta-row">
           <button type="button" id="cmp-stain-save" class="btn btn-accent">Save to cart <span class="arrow">&rarr;</span></button>
-          <button type="button" id="cmp-stain-checkout" class="btn btn-ghost">Checkout</button>
+          <button type="button" id="cmp-stain-checkout" class="btn btn-navy">Checkout</button>
         </div>
         <div class="cmp-addons">
           <span class="cmp-addons-label">Add to your cart</span>
@@ -1300,9 +1306,10 @@ html.phone #phone-handoff{display:flex;width:100%;min-height:100vh;align-items:c
             </span>
           </div>
         </div>
+        <p class="cfg-step cfg-step-cta"><span class="cfg-step-n" aria-hidden="true">3.</span>Save to cart, then check out — about a minute</p>
         <div class="cfg-cta-row cmp-cta-row">
           <button type="button" id="cmp-mech-save" class="btn btn-accent">Save to cart <span class="arrow">&rarr;</span></button>
-          <button type="button" id="cmp-mech-checkout" class="btn btn-ghost">Checkout</button>
+          <button type="button" id="cmp-mech-checkout" class="btn btn-navy">Checkout</button>
         </div>
         <div class="cmp-addons">
           <span class="cmp-addons-label">Add to your cart</span>
