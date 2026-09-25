@@ -4871,35 +4871,26 @@ html.phone #phone-handoff{display:flex;width:100%;min-height:100vh;align-items:c
 
 
   /* ============================================================
-     HERO ROTATOR (Doug 24-sep) — 4 escenas + "It’s covered." fijo en naranja.
-     Doug quería: la tablet de tienda gira, el phone/desktop da una vuelta y para.
-     NO se puede leer de html.kiosk: este front lleva class="kiosk" horneada en el
-     <html> SIEMPRE, así que no distingue tablet de teléfono. Señal usada en su lugar:
-     la INTERACCIÓN. Nadie toca (tablet en el mostrador esperando cliente) → sigue
-     girando; en cuanto hay scroll/tap/tecla (el cliente ya está leyendo) vuelve a la
-     escena 1 y se detiene. Mismo efecto en los tres dispositivos, sin adivinar cuál es.
+     HERO ROTATOR — 4 escenas + "It’s covered." fijo en naranja.
+     Doug 25-sep: gira SIEMPRE. Antes paraba con la primera interacción real y al volver
+     arriba seguía muerto; la regla resultó confusa en uso. Ahora no hay señal que adivinar:
+     · la única pausa es la pestaña oculta (batería); al volver, sigue.
      · prefers-reduced-motion → estático, sin timers.
-     · pestaña oculta → pausa; al volver, sigue.
      Sin librerías. La escena 1 viene en el HTML: nunca hay titular vacío.
      ============================================================ */
   (function(){
     var el = document.getElementById('hero-scene');
     if(!el) return;
     var SCENES = ['Red wine on the new couch?','Taco night gone wrong?','The dog found the sofa?','Housewarming got wild?'];
-    var DWELL = 2400, FADE = 350;   /* Doug 24-sep: iba demasiado rápido — vuelta completa ~11s */
+    var DWELL = 2400, FADE = 350;   /* Doug 24-sep: vuelta completa ~11s */
     if(window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
-    var i = 0, t = null, stopping = false, dead = false;
+    var i = 0, t = null;
 
     function clear(){ if(t){ clearTimeout(t); t = null; } }
-    function schedule(){ clear(); if(!dead) t = setTimeout(step, DWELL); }
+    function schedule(){ clear(); t = setTimeout(step, DWELL); }
 
     function step(){
-      if(dead) return;
-      i = i + 1;
-      /* BUG (Doug 25-sep, phone): 'stopping' cortaba la vuelta EN EL ACTO, y el navegador móvil
-         dispara un scroll nada más cargar (la barra de URL se pliega) -> sólo se veía el vino.
-         Ahora la parada sólo surte efecto al cerrar la vuelta: siempre se ven las 4 escenas. */
-      if(i >= SCENES.length){ i = 0; if(stopping) dead = true; }
+      i = (i + 1) % SCENES.length;
       el.classList.add('is-leaving');
       setTimeout(function(){
         el.textContent = SCENES[i];
@@ -4910,15 +4901,6 @@ html.phone #phone-handoff{display:flex;width:100%;min-height:100vh;align-items:c
       }, FADE);
     }
 
-    function engaged(){ stopping = true; }
-    ['pointerdown','keydown'].forEach(function(ev){
-      window.addEventListener(ev, engaged, { once:true, passive:true });
-    });
-    /* el scroll cuenta sólo si de verdad se movió la página (el evento de la barra de URL llega con scrollY 0) */
-    window.addEventListener('scroll', function onScr(){
-      if((window.pageYOffset || 0) < 24) return;
-      window.removeEventListener('scroll', onScr); engaged();
-    }, { passive:true });
     document.addEventListener('visibilitychange', function(){
       if(document.visibilityState === 'hidden') clear(); else schedule();
     });
