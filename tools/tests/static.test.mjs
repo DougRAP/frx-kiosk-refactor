@@ -83,10 +83,13 @@ t(/<label for="cart-name">First name and last name<\/label>/.test(kiosk), 'KIOSK
   t(!kiosk.includes('Second Chance — You'), 'DOUG-2: título AI-search (fuera Second Chance del title)');
 }
 
-/* 10 · COPY-1a — fix gramatical del Trust (audit: la frase no tenía sujeto). 06-jul: también en el D2C. */
+/* 10 · COPY-1a — fix gramatical del Trust (audit: la frase no tenía sujeto). 06-jul: también en el D2C.
+   25-sep (Doug): el kiosk ya no lleva ese párrafo — el trust banner se comprimió a titular + 3 stats
+   porque ocupaba el 59% de la pantalla del phone. La frase rota sigue prohibida en los dos fronts;
+   la presencia de la frase corregida sólo se exige donde el párrafo sigue existiendo (D2C). */
 for (const [name, source] of [['kiosk', kiosk], ['d2c', src('index.html')]]) {
   t(!source.includes('US-based service and handles every step'), `COPY-1a: fuera la frase sin sujeto (${name})`);
-  t(source.includes('US-based service that handles every step'), `COPY-1a: "service that handles" presente (${name})`);
+  if (name === 'd2c') t(source.includes('US-based service that handles every step'), `COPY-1a: "service that handles" presente (${name})`);
 }
 
 /* 11 · KIOSK-10 — ramas muertas cartMode='membership' podadas (audit C8) */
