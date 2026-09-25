@@ -2459,9 +2459,12 @@ html.phone #phone-handoff{display:flex;width:100%;min-height:100vh;align-items:c
     outdoor:   ['Sofa', 'Loveseat', 'Sectional', 'Chair', 'Chaise', 'Bench', 'Dining Sets', 'Tables', 'Stools & Ottomans']
   };
   var coverPick = loadCoverPick();
+  /* Doug 25-sep: el picker arranca LIMPIO en cada carga. Persistía en localStorage, así que al recargar
+     (o al llegar el siguiente cliente a la misma tablet de tienda) volvían los chips del anterior — se
+     leía como "preseleccionado". El carrito sí sigue persistiendo; esto son sólo las categorías. */
   function loadCoverPick(){
     var raw = null;
-    try { raw = JSON.parse(localStorage.getItem(COVER_KEY) || 'null'); } catch(_){}
+    try { localStorage.removeItem(COVER_KEY); } catch(_){}
     var out = {};
     Object.keys(COVER_CATS).forEach(function(cov){
       var src = raw && typeof raw === 'object' && raw[cov] && typeof raw[cov] === 'object' ? raw[cov] : {};
