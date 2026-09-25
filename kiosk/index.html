@@ -4897,7 +4897,10 @@ html.phone #phone-handoff{display:flex;width:100%;min-height:100vh;align-items:c
     function step(){
       if(dead) return;
       i = i + 1;
-      if(i >= SCENES.length || stopping){ i = 0; if(stopping) dead = true; }   /* vuelve a la 1 */
+      /* BUG (Doug 25-sep, phone): 'stopping' cortaba la vuelta EN EL ACTO, y el navegador móvil
+         dispara un scroll nada más cargar (la barra de URL se pliega) -> sólo se veía el vino.
+         Ahora la parada sólo surte efecto al cerrar la vuelta: siempre se ven las 4 escenas. */
+      if(i >= SCENES.length){ i = 0; if(stopping) dead = true; }
       el.classList.add('is-leaving');
       setTimeout(function(){
         el.textContent = SCENES[i];
@@ -4909,9 +4912,14 @@ html.phone #phone-handoff{display:flex;width:100%;min-height:100vh;align-items:c
     }
 
     function engaged(){ stopping = true; }
-    ['scroll','pointerdown','keydown'].forEach(function(ev){
+    ['pointerdown','keydown'].forEach(function(ev){
       window.addEventListener(ev, engaged, { once:true, passive:true });
     });
+    /* el scroll cuenta sólo si de verdad se movió la página (el evento de la barra de URL llega con scrollY 0) */
+    window.addEventListener('scroll', function onScr(){
+      if((window.pageYOffset || 0) < 24) return;
+      window.removeEventListener('scroll', onScr); engaged();
+    }, { passive:true });
     document.addEventListener('visibilitychange', function(){
       if(document.visibilityState === 'hidden') clear(); else schedule();
     });
