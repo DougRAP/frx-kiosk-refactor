@@ -1022,7 +1022,8 @@ details.faq-item summary:focus-visible{outline:2px solid var(--orange);outline-o
   .footer-base{flex-direction:row;justify-content:space-between;align-items:center}
   .dash-grid{grid-template-columns:1fr 1.1fr;gap:64px}
   .trust-grid{grid-template-columns:auto 1fr;gap:40px}
-  .trust-stats{grid-template-columns:repeat(5,minmax(0,1fr))}
+  /* la última columna se dimensiona al contenido: "Pro technicians" no cabe en 1fr y el num va nowrap */
+  .trust-stats{grid-template-columns:repeat(4,minmax(0,1fr)) max-content}
   .trust-stat-wide{display:block}
   .sticky-mobile{display:none}
 }
@@ -1172,7 +1173,7 @@ html.phone #phone-handoff{display:flex;width:100%;min-height:100vh;align-items:c
         <div class="trust-stat"><div class="num">24/7</div><div class="lbl">Claims in the app</div></div>
         <div class="trust-stat"><div class="num">Same day</div><div class="lbl">Most claims</div></div>
         <div class="trust-stat trust-stat-wide"><div class="num">US based</div><div class="lbl">Service team</div></div>
-        <div class="trust-stat trust-stat-wide"><div class="num">Pro</div><div class="lbl">Technicians</div></div>
+        <div class="trust-stat trust-stat-wide"><div class="num">Pro technicians</div><div class="lbl">Nationwide</div></div>
       </div>
     </div>
   </div>
