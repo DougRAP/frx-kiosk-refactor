@@ -417,7 +417,7 @@ em.gold{font-style:normal;color:var(--gold);font-weight:700}
 /* Sep-2026 (Doug): subhead normal — antes era grande y pálido y "se desvanecía". Lleva el rating. */
 .compare-sub{margin:14px 0 0;font-size:1.0625rem;line-height:1.5;font-weight:500;color:var(--ink-80)}
 .compare-sub .sub-rate{white-space:nowrap}
-.compare-sub .sub-star{color:var(--gold)}
+.compare-sub .sub-star{color:var(--gold);font-size:.7em;vertical-align:super;line-height:0;margin-left:1px}
 /* H1 rotatorio (Doug 24-sep): 4 escenas + "It’s covered." fijo en naranja. La caja se reserva a
    2 líneas para que las cards NO se muevan al cambiar de escena (cero CLS). */
 .hero-title{font-size:clamp(2rem,6vw,4rem);line-height:1.1;min-height:2.2em}
@@ -1178,7 +1178,7 @@ html.phone #phone-handoff{display:flex;width:100%;min-height:100vh;align-items:c
         <span class="hero-rotator" aria-hidden="true"><span class="hero-rotator__scene" id="hero-scene">Red wine on the new couch?</span></span>
         <span class="hero-covered" aria-hidden="true">It’s covered.</span>
       </h1>
-      <p class="compare-sub">File mid-spill, 24/7. Fast claims. <span class="sub-rate"><span class="sub-star" aria-hidden="true">★</span> 4.5 on Google &middot; Trusted by millions</span></p>
+      <p class="compare-sub">File mid-spill, 24/7. Fast claims. <span class="sub-rate">4.5<span class="sub-star" aria-hidden="true">★</span> on Google &middot; Trusted by millions</span></p>
     </div>
 
     <div class="compare-grid reveal">
