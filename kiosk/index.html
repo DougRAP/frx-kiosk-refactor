@@ -477,7 +477,12 @@ em.gold{font-style:normal;color:var(--gold);font-weight:700}
 .cmp-features{list-style:none;padding:0;margin:0 0 6px;display:flex;flex-direction:column;gap:10px}
 .cmp-features li{font-size:.9rem;color:var(--ink-80);padding-left:24px;position:relative;line-height:1.5}
 .cmp-features li strong{font-weight:600;color:var(--ink)}
-.cmp-features li::before{content:"";position:absolute;left:0;top:6px;width:13px;height:7px;border-left:2px solid var(--orange);border-bottom:2px solid var(--orange);transform:rotate(-45deg)}
+.cmp-features li::before{content:"";position:absolute;left:0;top:6px;width:13px;height:7px;border-left:2px solid var(--orange);border-bottom:2px solid var(--orange);transform:rotate(-45deg);transition:border-color var(--t-fast) var(--ease)}
+/* Sep-2026 (Doug): al elegir categorías, las filas que NO son de lo elegido se atenúan (no se quitan:
+   la card no puede saltar y el plan SIGUE cubriendo todo lo de su tarjeta — display only, nunca una
+   regla de cobertura; el servidor trata los chips como informativos). Sin chips = todo encendido. */
+.cmp-features li.is-dim{opacity:.42}
+.cmp-features li.is-dim::before{border-left-color:var(--ink-45);border-bottom-color:var(--ink-45)}
 .cmp-count{font-family:var(--display);font-size:1.2rem;font-weight:500;min-width:1ch;text-align:center}
 /* Botón "Save to cart" cuando el plan ya está en el carrito → estado confirmado en el MISMO botón
    (no inserta el viejo <p> "already in your cart" que estiraba la card — feedback de Doug ~17:00). */
@@ -1210,11 +1215,12 @@ html.phone #phone-handoff{display:flex;width:100%;min-height:100vh;align-items:c
 
         <button type="button" class="cmp-compare js-cov-compare" data-plan="m">Compare coverage <span aria-hidden="true">&rarr;</span></button>
         <ul class="cmp-features">
-          <li>Accidental stains</li>
-          <li>Rips, tears, burns &amp; singe marks</li>
-          <li>Seam separations &amp; loose buttons</li>
-          <li>Bed bases: broken mechanism</li>
-          <li>Motor failure, remotes &amp; wires</li>
+          <li data-cats="mattress">Accidental stains</li>
+          <li data-cats="mattress">Rips, tears, burns &amp; singe marks</li>
+          <li data-cats="mattress">Seam separations &amp; loose buttons</li>
+          <li data-cats="adjbed">Bed bases: broken mechanism</li>
+          <li data-cats="adjbed">Motor failure, remotes &amp; wires</li>
+          <li data-extra="comfort" hidden>90-night comfort exchange</li>
           <li><strong>Repair Safety Net included</strong> &mdash; <a href="#membership">learn more</a></li>
         </ul>
 
@@ -1280,11 +1286,14 @@ html.phone #phone-handoff{display:flex;width:100%;min-height:100vh;align-items:c
 
         <button type="button" class="cmp-compare js-cov-compare" data-plan="h">Compare coverage <span aria-hidden="true">&rarr;</span></button>
         <ul class="cmp-features">
-          <li>Stains, dye transfer &amp; liquid marks</li>
-          <li>Rips, tears, punctures &amp; burns</li>
-          <li>Broken frames, springs &amp; structure</li>
-          <li>Motors, switches &amp; electrical</li>
-          <li>Scratches, chips &amp; finish damage</li>
+          <li data-cats="furniture outdoor rugs">Stains, dye transfer &amp; liquid marks</li>
+          <li data-cats="furniture outdoor rugs">Rips, tears, punctures &amp; burns</li>
+          <li data-cats="furniture outdoor">Broken frames, springs &amp; structure</li>
+          <li data-cats="furniture">Motors, switches &amp; electrical</li>
+          <li data-cats="furniture">Scratches, chips &amp; finish damage</li>
+          <li data-cats="furniture" data-add hidden>Glass, mirrors &amp; leather cracking</li>
+          <li data-cats="outdoor" data-add hidden>Rust on metal frames</li>
+          <li data-cats="rugs" data-add hidden>Rug delamination</li>
           <li><strong>Repair Safety Net included</strong> &mdash; <a href="#membership">learn more</a></li>
         </ul>
 
@@ -4588,6 +4597,25 @@ html.phone #phone-handoff{display:flex;width:100%;min-height:100vh;align-items:c
       if(line && line.type !== coverType(cov)){ line.type = coverType(cov); persistCart(); }
       renderPlanLines();
     }
+    /* La lista de cobertura sigue a los chips (Doug 25-sep): filas de lo elegido en firme, el resto
+       atenuadas, y las filas propias de una categoría (data-add) aparecen al elegirla. Sin chips →
+       todo encendido y los extras ocultos. DISPLAY ONLY: el plan cubre todas las categorías de su
+       card pase lo que pase (SKU-not-Type, PORT-15) — esto no es una regla de cobertura. */
+    var card = box.closest ? box.closest('.compare-col') : box.parentNode;
+    var featureRows = card ? card.querySelectorAll('.cmp-features li') : [];
+    function syncFeatures(){
+      var p = coverPick[cov], picked = p.types, none = picked.length === 0;
+      Array.prototype.forEach.call(featureRows, function(li){
+        var extra = li.getAttribute('data-extra');
+        if(extra){ li.hidden = p[extra] !== true; return; }          /* Comfort Guarantee */
+        var cats = (li.getAttribute('data-cats') || '').split(' ').filter(Boolean);
+        if(!cats.length){ li.classList.remove('is-dim'); return; }   /* Repair Safety Net: siempre */
+        var hit = cats.some(function(c){ return picked.indexOf(c) !== -1; });
+        if(li.hasAttribute('data-add')){ li.hidden = !hit; li.classList.remove('is-dim'); return; }
+        li.classList.toggle('is-dim', !none && !hit);
+      });
+    }
+
     function sync(){
       var p = coverPick[cov];
       Array.prototype.forEach.call(chips, function(ch){
@@ -4599,6 +4627,7 @@ html.phone #phone-handoff{display:flex;width:100%;min-height:100vh;align-items:c
         d.hidden = p.types.indexOf(cat) === -1;
         d.querySelector('.cov-items-n').textContent = n ? '(' + n + ')' : '';
       });
+      syncFeatures();
     }
     Array.prototype.forEach.call(lists, function(d){
       var cat = d.getAttribute('data-cat'), wrap = d.querySelector('.cov-items-list');
