@@ -477,6 +477,12 @@ em.gold{font-style:normal;color:var(--gold);font-weight:700}
 .cmp-features{list-style:none;padding:0;margin:0 0 6px;display:flex;flex-direction:column;gap:10px}
 .cmp-features li{font-size:.9rem;color:var(--ink-80);padding-left:24px;position:relative;line-height:1.5}
 .cmp-features li strong{font-weight:600;color:var(--ink)}
+/* enlace en línea dentro de una fila de cobertura (Comfort Guarantee) */
+.cmp-inline-link{background:none;border:0;padding:0;font:inherit;color:var(--orange);font-weight:600;cursor:pointer;text-decoration:underline;text-decoration-color:var(--orange-soft);text-underline-offset:3px}
+.cmp-inline-link:hover{color:var(--orange-hover);text-decoration-color:currentColor}
+.cmp-inline-link:focus-visible{outline:2px solid var(--orange);outline-offset:2px;border-radius:2px}
+/* volver a las cards desde el popup: botón grande al pie, no sólo la × de la cabecera */
+.terms-back{display:block;width:100%;margin-top:18px}
 .cmp-features li::before{content:"";position:absolute;left:0;top:6px;width:13px;height:7px;border-left:2px solid var(--orange);border-bottom:2px solid var(--orange);transform:rotate(-45deg);transition:border-color var(--t-fast) var(--ease)}
 /* Sep-2026 (Doug): al elegir categorías, las filas que NO son de lo elegido se atenúan (no se quitan:
    la card no puede saltar y el plan SIGUE cubriendo todo lo de su tarjeta — display only, nunca una
@@ -1220,7 +1226,7 @@ html.phone #phone-handoff{display:flex;width:100%;min-height:100vh;align-items:c
           <li data-cats="mattress">Seam separations &amp; loose buttons</li>
           <li data-cats="adjbed">Bed bases: broken mechanism</li>
           <li data-cats="adjbed">Motor failure, remotes &amp; wires</li>
-          <li data-extra="comfort" hidden>90-night comfort exchange</li>
+          <li data-extra="comfort" hidden>90-night Comfort Guarantee &mdash; <button type="button" class="cmp-inline-link js-cg-details">click here for details</button></li>
           <li><strong>Repair Safety Net included</strong> &mdash; <a href="#membership">learn more</a></li>
         </ul>
 
@@ -1862,6 +1868,31 @@ html.phone #phone-handoff{display:flex;width:100%;min-height:100vh;align-items:c
       <li>Each adjustable bed base needs its own plan &mdash; a split king with two bases needs two plans.</li>
       <li>A summary only. Coverage is subject to the full <a href="/terms/" target="_blank" rel="noopener" class="js-plan-terms">Terms &amp; Conditions</a>.</li>
     </ul>
+  </div>
+</div>
+
+<!-- 90-NIGHT COMFORT GUARANTEE POPUP (Sep-2026, Doug) — abierto desde la fila de la card de colchones.
+     RESUMEN, pendiente del texto genérico de Doug (el ejemplo que pasó es de marca). Misma cáscara que
+     los otros popups: ×, backdrop y Esc cierran, y el foco vuelve a la fila que lo abrió. -->
+<div class="terms-backdrop" id="cg-backdrop" hidden></div>
+<div class="terms-modal" id="cg-modal" role="dialog" aria-modal="true" aria-labelledby="cg-title" hidden>
+  <div class="terms-head">
+    <h3 id="cg-title">90-Night Comfort Guarantee</h3>
+    <button class="terms-close" id="cg-close" type="button" aria-label="Close">&times;</button>
+  </div>
+  <div class="terms-body">
+    <p>Included at no extra cost with a qualifying new mattress set bought from this dealer. If the mattress
+      is not right for you, it can be exchanged once.</p>
+    <ul>
+      <li>Sleep on it at least 30 nights first &mdash; a new mattress needs time.</li>
+      <li>Exchange any time from night 31 through night 90 after delivery.</li>
+      <li>One exchange, for a mattress of equal or greater value, at the dealer that sold it.</li>
+      <li>The mattress must be clean and undamaged, with its law and model tags still attached.</li>
+      <li>An exchange fee applies, plus any price difference on the new mattress.</li>
+      <li>Adjustable bed bases are not part of the guarantee.</li>
+    </ul>
+    <p class="terms-meta">Summary only. The full Comfort Guarantee terms are provided with your purchase.</p>
+    <button type="button" class="btn btn-ghost terms-back" id="cg-back">Back to plans</button>
   </div>
 </div>
 
@@ -4658,6 +4689,32 @@ html.phone #phone-handoff{display:flex;width:100%;min-height:100vh;align-items:c
   });
 
   // MEMBERSHIP TERMS popup: opened from "See membership details" + the drawer's membership T&C link.
+  /* Comfort Guarantee popup (Doug 25-sep): la fila de la card es un enlace; el popup evita sacar al
+     cliente de la página y el foco vuelve al sitio exacto del que salió. */
+  (function(){
+    var cgModal = document.getElementById('cg-modal'), cgBack = document.getElementById('cg-backdrop');
+    if(!cgModal) return;
+    var opener = null;
+    function open(e){
+      opener = e && e.currentTarget ? e.currentTarget : null;
+      cgModal.hidden = false; cgBack.hidden = false;
+      requestAnimationFrame(function(){ cgModal.classList.add('open'); cgBack.classList.add('open'); });
+      document.body.style.overflow = 'hidden';
+      setTimeout(function(){ var b = document.getElementById('cg-close'); if(b) b.focus(); }, 300);
+    }
+    function close(){
+      cgModal.classList.remove('open'); cgBack.classList.remove('open');
+      document.body.style.overflow = (cartPanel && !cartPanel.hidden) ? 'hidden' : '';
+      setTimeout(function(){ cgModal.hidden = true; cgBack.hidden = true; if(opener) opener.focus(); }, 280);
+    }
+    Array.prototype.forEach.call(document.querySelectorAll('.js-cg-details'), function(b){ b.addEventListener('click', open); });
+    var x = document.getElementById('cg-close'), back = document.getElementById('cg-back');
+    if(x) x.addEventListener('click', close);
+    if(back) back.addEventListener('click', close);
+    cgBack.addEventListener('click', close);
+    document.addEventListener('keydown', function(e){ if(e.key === 'Escape' && !cgModal.hidden) close(); });
+  })();
+
   var memtermsModal = document.getElementById('memterms-modal');
   var memtermsBackdrop = document.getElementById('memterms-backdrop');
   var memtermsCloseBtn = document.getElementById('memterms-close');
