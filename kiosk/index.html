@@ -785,7 +785,7 @@ details.faq-item summary:focus-visible{outline:2px solid var(--orange);outline-o
 /* ── COMPARE COVERAGE popup (Sep-2026, Doug): card link → chart of damage × category. Reuses the
    .terms-modal shell. Desktop: all 6 columns. Phone (≤640px): Mattress | Home Furnishings switch shows
    only that plan's columns + the rows it covers (data-plan on the table drives both). */
-.cmp-compare{display:block;width:fit-content;background:none;border:0;padding:0;margin:-8px 0 22px;font:inherit;font-weight:600;font-size:.9375rem;color:var(--orange);cursor:pointer;text-decoration:underline;text-decoration-color:var(--orange-soft);text-underline-offset:4px;transition:color var(--t-fast) var(--ease)}
+.cmp-compare{display:block;width:fit-content;background:none;border:0;padding:0;margin:0 0 14px;font:inherit;font-weight:600;font-size:.9375rem;color:var(--orange);cursor:pointer;text-decoration:underline;text-decoration-color:var(--orange-soft);text-underline-offset:4px;transition:color var(--t-fast) var(--ease)}
 .cmp-compare:hover{color:var(--orange-hover);text-decoration-color:currentColor}
 .cmp-compare:focus-visible{outline:2px solid var(--orange);outline-offset:3px;border-radius:2px}
 .terms-modal.cov-modal{width:min(94%,860px)}
@@ -1196,6 +1196,7 @@ html.phone #phone-handoff{display:flex;width:100%;min-height:100vh;align-items:c
           </div>
         </div>
 
+        <button type="button" class="cmp-compare js-cov-compare" data-plan="m">Compare coverage <span aria-hidden="true">&rarr;</span></button>
         <ul class="cmp-features">
           <li>Accidental stains</li>
           <li>Rips, tears, burns &amp; singe marks</li>
@@ -1204,7 +1205,6 @@ html.phone #phone-handoff{display:flex;width:100%;min-height:100vh;align-items:c
           <li>Motor failure, remotes &amp; wires</li>
           <li><strong>Repair Safety Net included</strong> &mdash; <a href="#membership">learn more</a></li>
         </ul>
-        <button type="button" class="cmp-compare js-cov-compare" data-plan="m">Compare coverage <span aria-hidden="true">&rarr;</span></button>
 
         <div class="cfg-price">
           <p class="cfg-step"><span class="cfg-step-n" aria-hidden="true">2.</span>How many plans?</p>
@@ -1264,6 +1264,7 @@ html.phone #phone-handoff{display:flex;width:100%;min-height:100vh;align-items:c
           </details>
         </div>
 
+        <button type="button" class="cmp-compare js-cov-compare" data-plan="h">Compare coverage <span aria-hidden="true">&rarr;</span></button>
         <ul class="cmp-features">
           <li>Stains, dye transfer &amp; liquid marks</li>
           <li>Rips, tears, punctures &amp; burns</li>
@@ -1272,7 +1273,6 @@ html.phone #phone-handoff{display:flex;width:100%;min-height:100vh;align-items:c
           <li>Scratches, chips &amp; finish damage</li>
           <li><strong>Repair Safety Net included</strong> &mdash; <a href="#membership">learn more</a></li>
         </ul>
-        <button type="button" class="cmp-compare js-cov-compare" data-plan="h">Compare coverage <span aria-hidden="true">&rarr;</span></button>
 
         <div class="cfg-price">
           <p class="cfg-step"><span class="cfg-step-n" aria-hidden="true">2.</span>How many plans?</p>
